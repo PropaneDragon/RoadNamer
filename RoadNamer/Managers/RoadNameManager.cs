@@ -4,7 +4,7 @@ namespace RoadNamer.Managers
 {
     public static class RoadNameManager
     {
-        private static Dictionary<ushort, string> m_roadNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> m_roadNames = new Dictionary<ushort, string>();
 
         public static void SetRoadName(ushort segmentId, string name)
         {

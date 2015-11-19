@@ -1,5 +1,7 @@
-﻿using ColossalFramework.UI;
+﻿using ColossalFramework;
+using ColossalFramework.UI;
 using ICities;
+using RoadNamer.Managers;
 using RoadNamer.Tools;
 using System;
 using UnityEngine;
@@ -10,7 +12,6 @@ namespace RoadNamer
     {
         public override void OnCreated(ILoading loading)
         {
-            
         }
 
         public override void OnLevelLoaded(LoadMode mode)
@@ -46,6 +47,11 @@ namespace RoadNamer
                 tabButton.disabledFgSprite = "InfoIconEducation";
                 tabButton.tooltip = "Road Namer";
                 tabButton.eventClicked += TabButton_eventClicked;
+
+
+                RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
+                roadRenderingManager.enabled = true;
+                RenderManager.RegisterRenderableManager(roadRenderingManager);
             }
         }
 
@@ -56,11 +62,7 @@ namespace RoadNamer
             UIView view = UIView.GetAView();
             RoadSelectTool roadSelectTool = ToolsModifierControl.SetTool<RoadSelectTool>();
 
-            if (roadSelectTool != null)
-            {
-                roadSelectTool.m_uiFont = view.defaultFont;
-            }
-            else
+            if (roadSelectTool == null)
             {
                 Debug.Log("Tool failed to initialise!");
             }
