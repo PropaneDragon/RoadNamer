@@ -22,8 +22,6 @@ namespace RoadNamer.Tools
             base.Awake();
 
             Debug.Log("Tool awake");
-
-            //m_uiFont = UIDynamicFont.FindByName("Calibri");
         }
 
         protected override void OnToolGUI()
@@ -41,6 +39,7 @@ namespace RoadNamer.Tools
 
                 this.m_nameMaterial = new Material(districtManager.m_properties.m_areaNameShader);
                 this.m_nameMaterial.CopyPropertiesFromMaterial(districtManager.m_properties.m_areaNameFont.material);
+                //this.m_nameMaterial.CopyPropertiesFromMaterial(m_uiFont.material);
 
                 this.m_iconMaterial = new Material(districtManager.m_properties.m_areaIconShader);
                 this.m_iconMaterial.CopyPropertiesFromMaterial(districtManager.m_properties.m_areaIconAtlas.material);
@@ -77,7 +76,7 @@ namespace RoadNamer.Tools
                     }
                     else
                     {
-                        RoadNameManager.SetRoadName(netSegmentId, "Test Road " + netSegmentId.ToString());
+                        RoadNameManager.SetRoadName(netSegmentId, "Test Road <color#ff6666>" + netSegmentId.ToString() + "</color>");
                     }
                 }
             }
@@ -86,8 +85,9 @@ namespace RoadNamer.Tools
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             base.RenderOverlay(cameraInfo);
+            DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (m_uiFont != null)
+            if (districtManager.m_properties.m_areaNameFont != null) //m_uiFont != null)
             {
                 UIFontManager.Invalidate(m_uiFont);
                 NetManager netManager = Singleton<NetManager>.instance;
@@ -130,22 +130,26 @@ namespace RoadNamer.Tools
                             {
                                 Debug.Log("Rendering 2 " + roadName);
 
-                                UIFontRenderer fontRenderer = m_uiFont.ObtainRenderer();
+                                UIFontRenderer fontRenderer = districtManager.m_properties.m_areaNameFont.ObtainRenderer();
                                 UIDynamicFont.DynamicFontRenderer dynamicFontRenderer = fontRenderer as UIDynamicFont.DynamicFontRenderer;
 
                                 if (dynamicFontRenderer != null)
                                 {
-                                    //dynamicFontRenderer.spriteAtlas = this.m_properties.m_areaIconAtlas;
+                                    dynamicFontRenderer.spriteAtlas = districtManager.m_properties.m_areaIconAtlas;
                                     dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
                                 }
 
                                 fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
-                                fontRenderer.textScale = 2f;
+                                fontRenderer.textScale = 0.5f;
                                 fontRenderer.pixelRatio = 1f;
+                                fontRenderer.processMarkup = true;
                                 fontRenderer.wordWrap = true;
                                 fontRenderer.multiLine = true;
                                 fontRenderer.textAlign = UIHorizontalAlignment.Center;
                                 fontRenderer.maxSize = new Vector2(450f, 900f);
+                                fontRenderer.shadow = false;
+                                fontRenderer.shadowColor = (Color32)Color.black;
+                                fontRenderer.shadowOffset = Vector2.one;
 
                                 Vector2 stringSize = fontRenderer.MeasureString(roadName);
 
@@ -237,19 +241,15 @@ namespace RoadNamer.Tools
 
                     if (this.m_nameMesh != null && this.m_nameMaterial != null)
                     {
-                        this.m_nameMaterial.color = new Color(255, 255, 255, 255);
+                        this.m_nameMaterial.color = districtManager.m_properties.m_areaNameColor;
                         if (this.m_nameMaterial.SetPass(0))
                         {
-                            DistrictManager expr_5E_cp_0 = Singleton<DistrictManager>.instance;
-                            expr_5E_cp_0.m_drawCallData.m_overlayCalls = expr_5E_cp_0.m_drawCallData.m_overlayCalls + 1;
                             Graphics.DrawMeshNow(this.m_nameMesh, Matrix4x4.identity);
                         }
                     }
 
                     if (this.m_iconMesh != null && this.m_iconMaterial != null && this.m_iconMaterial.SetPass(0))
                     {
-                        DistrictManager expr_B8_cp_0 = Singleton<DistrictManager>.instance;
-                        expr_B8_cp_0.m_drawCallData.m_overlayCalls = expr_B8_cp_0.m_drawCallData.m_overlayCalls + 1;
                         Graphics.DrawMeshNow(this.m_iconMesh, Matrix4x4.identity);
                     }
                 }
