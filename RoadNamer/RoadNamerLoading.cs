@@ -31,9 +31,9 @@ namespace RoadNamer
 
                 ToolController toolController = ToolsModifierControl.toolController;
 
-                if (!toolController.GetComponent<RoadSelectTool>())
+                if (toolController.GetComponent<RoadSelectTool>() == null)
                 {
-                    ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();
+                    ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();                    
                 }
 
                 GameObject buttonGameObject = UITemplateManager.GetAsGameObject("MainToolbarButtonTemplate");
@@ -52,10 +52,15 @@ namespace RoadNamer
         private void TabButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
             Debug.Log("Clicked");
-            
+
+            UIView view = UIView.GetAView();
             RoadSelectTool roadSelectTool = ToolsModifierControl.SetTool<RoadSelectTool>();
 
-            if(!roadSelectTool)
+            if (roadSelectTool != null)
+            {
+                roadSelectTool.m_uiFont = view.defaultFont;
+            }
+            else
             {
                 Debug.Log("Tool failed to initialise!");
             }
