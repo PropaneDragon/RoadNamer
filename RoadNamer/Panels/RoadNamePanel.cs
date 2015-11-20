@@ -25,8 +25,7 @@ namespace RoadNamer.Panels
                 
                 if(m_textField != null)
                 {
-                    string sanitisedLabel = RemoveTags(value);
-                    m_textField.text = value == null ? "" : sanitisedLabel;
+                    m_textField.text = value == null ? "" : value;
                 }
             }
             get
@@ -126,11 +125,6 @@ namespace RoadNamer.Panels
                     roadRenderingManager.ForceUpdate();
                 }
             }
-        }
-
-        private string RemoveTags(string label)
-        {
-            
         }
     }
 }
