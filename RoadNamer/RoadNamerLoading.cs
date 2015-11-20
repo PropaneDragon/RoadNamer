@@ -17,6 +17,7 @@ namespace RoadNamer
     {
         private GameObject m_roadNamePanelObject;
         private RoadNamePanel m_roadNamePanel;
+        private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
 
         public override void OnCreated(ILoading loading)
         {
@@ -26,7 +27,7 @@ namespace RoadNamer
         {
             if (mode == LoadMode.LoadGame || mode == LoadMode.NewGame || mode == LoadMode.NewMap || mode == LoadMode.LoadMap)
             {
-                RoadNameManager.Load();
+                //RoadNameManager.Load();
                 LoadSprites();
 
                 UIView view = UIView.GetAView();

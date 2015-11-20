@@ -36,37 +36,34 @@ namespace RoadNamer.Tools
         protected override void OnToolUpdate()
         {
             base.OnToolUpdate();
+            
+            RaycastOutput raycastOutput;
 
-            if (true || !m_toolController.IsInsideUI)
+            if (RaycastRoad(out raycastOutput))
             {
-                RaycastOutput raycastOutput;
+                ushort netSegmentId = raycastOutput.m_netSegment;
 
-                if (RaycastRoad(out raycastOutput))
+                if (netSegmentId != 0)
                 {
-                    ushort netSegmentId = raycastOutput.m_netSegment;
+                    NetManager netManager = Singleton<NetManager>.instance;
+                    NetSegment netSegment = netManager.m_segments.m_buffer[(int)netSegmentId];
 
-                    if (netSegmentId != 0)
+                    if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
                     {
-                        NetManager netManager = Singleton<NetManager>.instance;
-                        NetSegment netSegment = netManager.m_segments.m_buffer[(int)netSegmentId];
-
-                        if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
+                        if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
                         {
-                            if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
-                            {
-                                ShowToolInfo(true, null, new Vector3());
+                            ShowToolInfo(true, null, new Vector3());
 
-                                if(m_roadNamePanel != null)
-                                {
-                                    m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
-                                    m_roadNamePanel.m_netSegmentId = netSegmentId;
-                                    m_roadNamePanel.Show();
-                                }
-                            }
-                            else
+                            if(m_roadNamePanel != null)
                             {
-                                ShowToolInfo(true, "Click to name this road segment", netSegment.m_bounds.center);
+                                m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
+                                m_roadNamePanel.m_netSegmentId = netSegmentId;
+                                m_roadNamePanel.Show();
                             }
+                        }
+                        else
+                        {
+                            ShowToolInfo(true, "Click to name this road segment", netSegment.m_bounds.center);
                         }
                     }
                 }

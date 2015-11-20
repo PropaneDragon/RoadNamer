@@ -85,7 +85,10 @@ namespace RoadNamer.Panels
 
         private void M_textField_eventKeyDown(UIComponent component, UIKeyEventParameter eventParam)
         {
-            SetRoadData();
+            if (eventParam.keycode == KeyCode.KeypadEnter || eventParam.keycode == KeyCode.Return)
+            {
+                SetRoadData();
+            }
         }
 
         private void NameRoadButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)

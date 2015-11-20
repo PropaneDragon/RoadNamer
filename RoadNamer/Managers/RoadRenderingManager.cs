@@ -47,8 +47,10 @@ namespace RoadNamer.Managers
                     Debug.LogError(ex.Message + "\n\n" + ex.StackTrace.ToString() + "\n" + ex.Source);
                 }
             }
-
+            
             DrawMesh();
+
+            Debug.Log(cameraInfo.m_height.ToString());
         }
 
         private void DrawMesh()
@@ -74,10 +76,9 @@ namespace RoadNamer.Managers
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (districtManager.m_properties.m_areaNameFont != null) //m_uiFont != null)
+            if (districtManager.m_properties.m_areaNameFont != null)
             {
                 int lastFontSize = districtManager.m_properties.m_areaNameFont.size;
-                //districtManager.m_properties.m_areaNameFont.size = 6;
 
                 UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
                 UIRenderData uiRenderData = UIRenderData.Obtain();
@@ -218,8 +219,6 @@ namespace RoadNamer.Managers
                 this.m_iconMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
 
                 uiRenderData.Release();
-
-                //districtManager.m_properties.m_areaNameFont.size = lastFontSize;
             }
         }
     }

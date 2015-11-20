@@ -1,4 +1,5 @@
 ﻿using ColossalFramework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
@@ -6,15 +7,11 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
-    [XmlTypeAttribute(AnonymousType = true)]
-    [XmlRootAttribute(ElementName = "RoadNames", Namespace = "", IsNullable = false)]
     public class RoadNameManager
     {
         private static RoadNameManager instance = null;
-        public List<RoadContainer> m_roadList = new List<RoadContainer>();
 
-        [XmlArray("Roads")]
-        [XmlArrayItem("Road", typeof(RoadContainer))]
+        public List<RoadContainer> m_roadList = new List<RoadContainer>();        
         private RoadContainer[] m_roads = null;        
 
         public static RoadNameManager Instance()
@@ -49,7 +46,7 @@ namespace RoadNamer.Managers
                 m_roadList.Add(newRoad);
             }
 
-            Save();
+            //Save();
         }
 
         public string GetRoadName(ushort segmentId)
@@ -80,33 +77,19 @@ namespace RoadNamer.Managers
             return false;
         }
 
-        public void Save()
+        public RoadContainer[] Save()
         {
             m_roads = m_roadList.ToArray();
 
-            XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RoadNameManager));
-            StreamWriter writer = new StreamWriter("RoadNameTest.xml");
-
-            xmlSerialiser.Serialize(writer, this);
-            writer.Close();
+            return m_roads;
         }
 
-        public static void Load()
+        public void Load(RoadContainer[] roadNames)
         {
-            XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RoadNameManager));
-            StreamReader reader = new StreamReader("RoadNameTest.xml");
-            
-            RoadNameManager newManager = xmlSerialiser.Deserialize(reader) as RoadNameManager;
-            reader.Close();
-
-            if (newManager != null)
+            if (roadNames != null)
             {
-                newManager.Initialise();
-                instance = newManager;
-            }
-            else
-            {
-                Debug.LogError("Failed to load the roads from XML");
+                m_roads = roadNames;
+                Initialise();
             }
         }
 
@@ -126,7 +109,7 @@ namespace RoadNamer.Managers
         }
     }
 
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [Serializable]
     public class RoadContainer
     {
         public string m_roadName = null;
