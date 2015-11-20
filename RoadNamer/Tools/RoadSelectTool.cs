@@ -13,9 +13,9 @@ namespace RoadNamer.Tools
 
         protected override void Awake()
         {
-            base.Awake();
-
             Debug.Log("Road Namer: Tool awake");
+
+            base.Awake();
         }
 
         protected override void OnToolGUI()
@@ -35,7 +35,7 @@ namespace RoadNamer.Tools
 
         protected override void OnToolUpdate()
         {
-            if (!m_toolController.IsInsideUI && Cursor.visible)
+            if (m_toolController != null && !m_toolController.IsInsideUI && Cursor.visible)
             {
                 RaycastOutput raycastOutput;
 

@@ -8,6 +8,7 @@ using RoadNamer.Tools;
 using RoadNamer.Utilities;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Xml.Serialization;
 using UnityEngine;
 
@@ -123,21 +124,31 @@ namespace RoadNamer
         {
             ToolController toolController = ToolsModifierControl.toolController;
 
-            if (toolController.GetComponent<RoadSelectTool>() == null)
+            if (toolController != null)
             {
-                ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();
-            }
+                if (toolController.GetComponent<RoadSelectTool>() == null)
+                {
+                    ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();
 
-            UIView view = UIView.GetAView();
-            RoadSelectTool roadSelectTool = ToolsModifierControl.SetTool<RoadSelectTool>();
+                    //I stole this from Traffic++ for now, until I can figure some things out. Quick fix!
+                    FieldInfo toolControllerField = typeof(ToolController).GetField("m_tools", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (toolControllerField != null)
+                        toolControllerField.SetValue(toolController, toolController.GetComponents<ToolBase>());
+                    FieldInfo toolModifierDictionary = typeof(ToolsModifierControl).GetField("m_Tools", BindingFlags.Static | BindingFlags.NonPublic);
+                    if (toolModifierDictionary != null)
+                        toolModifierDictionary.SetValue(null, null); // to force a refresh
+                }
+                
+                RoadSelectTool roadSelectTool = ToolsModifierControl.SetTool<RoadSelectTool>();
 
-            if (roadSelectTool == null)
-            {
-                Debug.Log("Tool failed to initialise!");
-            }
-            else
-            {
-                roadSelectTool.m_roadNamePanel = m_roadNamePanel;
+                if (roadSelectTool == null)
+                {
+                    Debug.Log("Tool failed to initialise!");
+                }
+                else
+                {
+                    roadSelectTool.m_roadNamePanel = m_roadNamePanel;
+                }
             }
         }
 

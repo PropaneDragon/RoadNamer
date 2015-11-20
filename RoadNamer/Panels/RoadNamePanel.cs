@@ -1,4 +1,5 @@
-﻿using ColossalFramework;
+﻿using System;
+using ColossalFramework;
 using ColossalFramework.UI;
 using RoadNamer.CustomUI;
 using RoadNamer.Managers;
@@ -24,7 +25,8 @@ namespace RoadNamer.Panels
                 
                 if(m_textField != null)
                 {
-                    m_textField.text = value == null ? "" : value;
+                    string sanitisedLabel = RemoveTags(value);
+                    m_textField.text = value == null ? "" : sanitisedLabel;
                 }
             }
             get
@@ -48,7 +50,7 @@ namespace RoadNamer.Panels
             base.Start();
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
-            m_panelTitle.title = "Name a road";
+            m_panelTitle.title = "Set a name";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
 
@@ -74,14 +76,26 @@ namespace RoadNamer.Panels
             m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
             m_textField.width = this.width - m_UIPadding.left - m_UIPadding.right;
             m_textField.eventKeyDown += M_textField_eventKeyDown;
+            m_textField.processMarkup = true;
+
+            UIColorField colourSelector = CustomUI.UIUtils.CreateColorField(this);
+            colourSelector.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+            colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
+            colourSelector.tooltip = "Set the label colour";
 
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
             nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
+            nameRoadButton.tooltip = "Create the label";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
+        }
+
+        private void ColourSelector_eventColorChanged(UIComponent component, Color32 value)
+        {
+            m_textField.textColor = value;
         }
 
         private void M_textField_eventKeyDown(UIComponent component, UIKeyEventParameter eventParam)
@@ -112,6 +126,11 @@ namespace RoadNamer.Panels
                     roadRenderingManager.ForceUpdate();
                 }
             }
+        }
+
+        private string RemoveTags(string label)
+        {
+            
         }
     }
 }
