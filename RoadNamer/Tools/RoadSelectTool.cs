@@ -3,11 +3,14 @@ using UnityEngine;
 using RoadNamer.Managers;
 using ColossalFramework.UI;
 using System;
+using RoadNamer.Panels;
 
 namespace RoadNamer.Tools
 {
     class RoadSelectTool : DefaultTool
     {
+        public RoadNamePanel m_roadNamePanel = null;
+
         protected override void Awake()
         {
             base.Awake();
@@ -33,35 +36,41 @@ namespace RoadNamer.Tools
         protected override void OnToolUpdate()
         {
             base.OnToolUpdate();
-            RaycastOutput raycastOutput;
 
-            if (RaycastRoad(out raycastOutput))
+            if (true || !m_toolController.IsInsideUI)
             {
-                ushort netSegmentId = raycastOutput.m_netSegment;
+                RaycastOutput raycastOutput;
 
-                if(netSegmentId != 0)
+                if (RaycastRoad(out raycastOutput))
                 {
-                    InstanceManager instanceManager = Singleton<InstanceManager>.instance;
+                    ushort netSegmentId = raycastOutput.m_netSegment;
 
-                    NetManager netManager = Singleton<NetManager>.instance;
-                    NetSegment netSegment = netManager.m_segments.m_buffer[(int)netSegmentId];
-                    string roadName = RoadNameManager.GetRoadName(netSegmentId);
+                    if (netSegmentId != 0)
+                    {
+                        NetManager netManager = Singleton<NetManager>.instance;
+                        NetSegment netSegment = netManager.m_segments.m_buffer[(int)netSegmentId];
 
-                    if(roadName != null)
-                    {
-                        Debug.Log(roadName);
-                    }
-                    else
-                    {
-                        RoadNameManager.SetRoadName(netSegmentId, "Test Road <color#ff6666>" + netSegmentId.ToString() + "</color>");
+                        if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
+                        {
+                            if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
+                            {
+                                ShowToolInfo(true, null, new Vector3());
+
+                                if(m_roadNamePanel != null)
+                                {
+                                    m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
+                                    m_roadNamePanel.m_netSegmentId = netSegmentId;
+                                    m_roadNamePanel.Show();
+                                }
+                            }
+                            else
+                            {
+                                ShowToolInfo(true, "Click to name this road segment", netSegment.m_bounds.center);
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
-        {
-            
         }
 
         bool RaycastRoad(out RaycastOutput raycastOutput)

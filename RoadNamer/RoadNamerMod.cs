@@ -16,7 +16,7 @@ namespace RoadNamer
         {
             get
             {
-                return "Allows you to name roads";
+                return "Allows you to name any of the roads in your city.";
             }
         }
     }

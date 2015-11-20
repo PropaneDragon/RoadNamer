@@ -34,164 +34,21 @@ namespace RoadNamer.Managers
 
         protected override void BeginOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
-            DistrictManager districtManager = Singleton<DistrictManager>.instance;
-
-            if (districtManager.m_properties.m_areaNameFont != null) //m_uiFont != null)
+            if (lastCount != RoadNameManager.Instance().m_roadList.Count)
             {
-                Debug.Log(districtManager.m_properties.m_areaNameFont.size.ToString());
+                lastCount = RoadNameManager.Instance().m_roadList.Count;
 
-                UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
-                NetManager netManager = Singleton<NetManager>.instance;
-                NetSegment[] netSegments = netManager.m_segments.m_buffer;
-                UIRenderData uiRenderData = UIRenderData.Obtain();
-                UIRenderData dynamicFontRenderData = UIRenderData.Obtain();
-
-                if (lastCount != RoadNameManager.m_roadNames.Count)
+                try
                 {
-                    lastCount = RoadNameManager.m_roadNames.Count;
-
-                    try
-                    {
-                        uiRenderData.Clear();
-                        dynamicFontRenderData.Clear();
-
-                        PoolList<Vector3> vertices = uiRenderData.vertices;
-                        PoolList<Vector3> normals = uiRenderData.normals;
-                        PoolList<Color32> colors = uiRenderData.colors;
-                        PoolList<Vector2> uvs = uiRenderData.uvs;
-                        PoolList<int> triangles = uiRenderData.triangles;
-
-                        PoolList<Vector3> dynamicFontVertices = dynamicFontRenderData.vertices;
-                        PoolList<Vector3> dynamicFontNormals = dynamicFontRenderData.normals;
-                        PoolList<Color32> dynamicFontColors = dynamicFontRenderData.colors;
-                        PoolList<Vector2> dynamicFontUvs = dynamicFontRenderData.uvs;
-                        PoolList<int> dynamicFontTriangles = dynamicFontRenderData.triangles;
-
-                        foreach (KeyValuePair<ushort, string> road in RoadNameManager.m_roadNames)
-                        {
-                            if (road.Key != 0)
-                            {
-                                string roadName = road.Value;
-
-                                if (roadName != null)
-                                {
-                                    int originalNormalCount = normals.Count;
-                                    int originalDynamicFontNormalCount = dynamicFontNormals.Count;
-
-                                    NetSegment netSegment = netManager.m_segments.m_buffer[road.Key];
-                                    NetSegment.Flags segmentFlags = netSegment.m_flags;
-
-                                    if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
-                                    {
-                                        UIFontRenderer fontRenderer = districtManager.m_properties.m_areaNameFont.ObtainRenderer();
-                                        UIDynamicFont.DynamicFontRenderer dynamicFontRenderer = fontRenderer as UIDynamicFont.DynamicFontRenderer;
-
-                                        if (dynamicFontRenderer != null)
-                                        {
-                                            dynamicFontRenderer.spriteAtlas = districtManager.m_properties.m_areaIconAtlas;
-                                            dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
-                                        }
-
-                                        fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
-                                        fontRenderer.textScale = 0.5f;
-                                        fontRenderer.pixelRatio = 1f;
-                                        fontRenderer.processMarkup = true;
-                                        fontRenderer.wordWrap = true;
-                                        fontRenderer.multiLine = true;
-                                        fontRenderer.textAlign = UIHorizontalAlignment.Center;
-                                        fontRenderer.maxSize = new Vector2(450f, 900f);
-                                        fontRenderer.shadow = false;
-                                        fontRenderer.shadowColor = (Color32)Color.black;
-                                        fontRenderer.shadowOffset = Vector2.one;
-
-                                        Vector2 stringSize = fontRenderer.MeasureString(roadName);
-
-                                        vertices.Add(new Vector3(-stringSize.x, -stringSize.y, 1f));
-                                        vertices.Add(new Vector3(-stringSize.x, stringSize.y, 1f));
-                                        vertices.Add(new Vector3(stringSize.x, stringSize.y, 1f));
-                                        vertices.Add(new Vector3(stringSize.x, -stringSize.y, 1f));
-
-                                        colors.Add(new Color32(0, 0, 0, 255));
-                                        colors.Add(new Color32(0, 0, 0, 255));
-                                        colors.Add(new Color32(0, 0, 0, 255));
-                                        colors.Add(new Color32(0, 0, 0, 255));
-
-                                        uvs.Add(new Vector2(-1f, -1f));
-                                        uvs.Add(new Vector2(-1f, 1f));
-                                        uvs.Add(new Vector2(1f, 1f));
-                                        uvs.Add(new Vector2(1f, -1f));
-
-                                        triangles.Add(vertices.Count - 4);
-                                        triangles.Add(vertices.Count - 3);
-                                        triangles.Add(vertices.Count - 1);
-                                        triangles.Add(vertices.Count - 1);
-                                        triangles.Add(vertices.Count - 3);
-                                        triangles.Add(vertices.Count - 2);
-
-                                        fontRenderer.vectorOffset = new Vector3(-225f, stringSize.y * 0.5f, 0f);
-                                        fontRenderer.Render(roadName, uiRenderData);
-
-                                        Vector3 segmentLocation = netSegment.m_bounds.center;
-
-                                        for (int normalCount = originalNormalCount; normalCount < normals.Count; ++normalCount)
-                                        {
-                                            normals[normalCount] = segmentLocation;
-                                        }
-
-                                        for (int normalCount = normals.Count; normalCount < vertices.Count; ++normalCount)
-                                        {
-                                            normals.Add(segmentLocation);
-                                        }
-
-                                        for (int normalCount = originalDynamicFontNormalCount; normalCount < dynamicFontNormals.Count; ++normalCount)
-                                        {
-                                            dynamicFontNormals[normalCount] = segmentLocation;
-                                        }
-
-                                        for (int normalCount = normals.Count; normalCount < dynamicFontVertices.Count; ++normalCount)
-                                        {
-                                            dynamicFontNormals.Add(segmentLocation);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (this.m_nameMesh == null)
-                        {
-                            this.m_nameMesh = new Mesh();
-                        }
-
-                        this.m_nameMesh.Clear();
-                        this.m_nameMesh.vertices = vertices.ToArray();
-                        this.m_nameMesh.normals = normals.ToArray();
-                        this.m_nameMesh.colors32 = colors.ToArray();
-                        this.m_nameMesh.uv = uvs.ToArray();
-                        this.m_nameMesh.triangles = triangles.ToArray();
-                        this.m_nameMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
-
-                        if (this.m_iconMesh == null)
-                        {
-                            this.m_iconMesh = new Mesh();
-                        }
-
-                        this.m_iconMesh.Clear();
-                        this.m_iconMesh.vertices = dynamicFontVertices.ToArray();
-                        this.m_iconMesh.normals = dynamicFontNormals.ToArray();
-                        this.m_iconMesh.colors32 = dynamicFontColors.ToArray();
-                        this.m_iconMesh.uv = dynamicFontUvs.ToArray();
-                        this.m_iconMesh.triangles = dynamicFontTriangles.ToArray();
-                        this.m_iconMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError(ex.Message + "\n\n" + ex.StackTrace.ToString() + "\n" + ex.Source);
-                    }
+                    RenderText();
                 }
-
-                DrawMesh();
-                uiRenderData.Release();
+                catch (Exception ex)
+                {
+                    Debug.LogError(ex.Message + "\n\n" + ex.StackTrace.ToString() + "\n" + ex.Source);
+                }
             }
+
+            DrawMesh();
         }
 
         private void DrawMesh()
@@ -210,6 +67,159 @@ namespace RoadNamer.Managers
             if (this.m_iconMesh != null && this.m_iconMaterial != null && this.m_iconMaterial.SetPass(0))
             {
                 Graphics.DrawMeshNow(this.m_iconMesh, Matrix4x4.identity);
+            }
+        }
+
+        private void RenderText()
+        {
+            DistrictManager districtManager = Singleton<DistrictManager>.instance;
+
+            if (districtManager.m_properties.m_areaNameFont != null) //m_uiFont != null)
+            {
+                int lastFontSize = districtManager.m_properties.m_areaNameFont.size;
+                //districtManager.m_properties.m_areaNameFont.size = 6;
+
+                UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
+                UIRenderData uiRenderData = UIRenderData.Obtain();
+                UIRenderData dynamicFontRenderData = UIRenderData.Obtain();
+
+                NetManager netManager = Singleton<NetManager>.instance;
+                NetSegment[] netSegments = netManager.m_segments.m_buffer;
+
+                uiRenderData.Clear();
+                dynamicFontRenderData.Clear();
+
+                PoolList<Vector3> vertices = uiRenderData.vertices;
+                PoolList<Vector3> normals = uiRenderData.normals;
+                PoolList<Color32> colors = uiRenderData.colors;
+                PoolList<Vector2> uvs = uiRenderData.uvs;
+                PoolList<int> triangles = uiRenderData.triangles;
+
+                PoolList<Vector3> dynamicFontVertices = dynamicFontRenderData.vertices;
+                PoolList<Vector3> dynamicFontNormals = dynamicFontRenderData.normals;
+                PoolList<Color32> dynamicFontColors = dynamicFontRenderData.colors;
+                PoolList<Vector2> dynamicFontUvs = dynamicFontRenderData.uvs;
+                PoolList<int> dynamicFontTriangles = dynamicFontRenderData.triangles;
+
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                {
+                    if (road.m_segmentId != 0)
+                    {
+                        string roadName = road.m_roadName;
+
+                        if (roadName != null)
+                        {
+                            int originalNormalCount = normals.Count;
+                            int originalDynamicFontNormalCount = dynamicFontNormals.Count;
+
+                            NetSegment netSegment = netManager.m_segments.m_buffer[road.m_segmentId];
+                            NetSegment.Flags segmentFlags = netSegment.m_flags;
+
+                            if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
+                            {
+                                UIFontRenderer fontRenderer = districtManager.m_properties.m_areaNameFont.ObtainRenderer();
+                                UIDynamicFont.DynamicFontRenderer dynamicFontRenderer = fontRenderer as UIDynamicFont.DynamicFontRenderer;
+
+                                if (dynamicFontRenderer != null)
+                                {
+                                    dynamicFontRenderer.spriteAtlas = districtManager.m_properties.m_areaIconAtlas;
+                                    dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
+                                }
+
+                                fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
+                                fontRenderer.textScale = 0.5f;
+                                fontRenderer.pixelRatio = 1f;
+                                fontRenderer.processMarkup = true;
+                                fontRenderer.wordWrap = true;
+                                fontRenderer.multiLine = true;
+                                fontRenderer.textAlign = UIHorizontalAlignment.Center;
+                                fontRenderer.maxSize = new Vector2(450f, 900f);
+                                fontRenderer.shadow = false;
+                                fontRenderer.shadowColor = (Color32)Color.black;
+                                fontRenderer.shadowOffset = Vector2.one;
+
+                                Vector2 stringSize = fontRenderer.MeasureString(roadName);
+
+                                vertices.Add(new Vector3(-stringSize.x, -stringSize.y, 1f));
+                                vertices.Add(new Vector3(-stringSize.x, stringSize.y, 1f));
+                                vertices.Add(new Vector3(stringSize.x, stringSize.y, 1f));
+                                vertices.Add(new Vector3(stringSize.x, -stringSize.y, 1f));
+
+                                colors.Add(new Color32(0, 0, 0, 255));
+                                colors.Add(new Color32(0, 0, 0, 255));
+                                colors.Add(new Color32(0, 0, 0, 255));
+                                colors.Add(new Color32(0, 0, 0, 255));
+
+                                uvs.Add(new Vector2(-1f, -1f));
+                                uvs.Add(new Vector2(-1f, 1f));
+                                uvs.Add(new Vector2(1f, 1f));
+                                uvs.Add(new Vector2(1f, -1f));
+
+                                triangles.Add(vertices.Count - 4);
+                                triangles.Add(vertices.Count - 3);
+                                triangles.Add(vertices.Count - 1);
+                                triangles.Add(vertices.Count - 1);
+                                triangles.Add(vertices.Count - 3);
+                                triangles.Add(vertices.Count - 2);
+
+                                fontRenderer.vectorOffset = new Vector3(-225f, stringSize.y * 0.5f, 0f);
+                                fontRenderer.Render(roadName, uiRenderData);
+
+                                Vector3 segmentLocation = netSegment.m_bounds.center;
+
+                                for (int normalCount = originalNormalCount; normalCount < normals.Count; ++normalCount)
+                                {
+                                    normals[normalCount] = segmentLocation;
+                                }
+
+                                for (int normalCount = normals.Count; normalCount < vertices.Count; ++normalCount)
+                                {
+                                    normals.Add(segmentLocation);
+                                }
+
+                                for (int normalCount = originalDynamicFontNormalCount; normalCount < dynamicFontNormals.Count; ++normalCount)
+                                {
+                                    dynamicFontNormals[normalCount] = segmentLocation;
+                                }
+
+                                for (int normalCount = normals.Count; normalCount < dynamicFontVertices.Count; ++normalCount)
+                                {
+                                    dynamicFontNormals.Add(segmentLocation);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (this.m_nameMesh == null)
+                {
+                    this.m_nameMesh = new Mesh();
+                }
+
+                this.m_nameMesh.Clear();
+                this.m_nameMesh.vertices = vertices.ToArray();
+                this.m_nameMesh.normals = normals.ToArray();
+                this.m_nameMesh.colors32 = colors.ToArray();
+                this.m_nameMesh.uv = uvs.ToArray();
+                this.m_nameMesh.triangles = triangles.ToArray();
+                this.m_nameMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
+
+                if (this.m_iconMesh == null)
+                {
+                    this.m_iconMesh = new Mesh();
+                }
+
+                this.m_iconMesh.Clear();
+                this.m_iconMesh.vertices = dynamicFontVertices.ToArray();
+                this.m_iconMesh.normals = dynamicFontNormals.ToArray();
+                this.m_iconMesh.colors32 = dynamicFontColors.ToArray();
+                this.m_iconMesh.uv = dynamicFontUvs.ToArray();
+                this.m_iconMesh.triangles = dynamicFontTriangles.ToArray();
+                this.m_iconMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
+
+                uiRenderData.Release();
+
+                //districtManager.m_properties.m_areaNameFont.size = lastFontSize;
             }
         }
     }
