@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
-    class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
+    public class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
     {
         private Mesh m_nameMesh = null;
         private Mesh m_iconMesh = null;
@@ -14,19 +14,21 @@ namespace RoadNamer.Managers
         private Material m_nameMaterial = null;
         private Material m_iconMaterial = null;
 
-        int lastCount = 0;
+        private int m_lastCount = 0;
+        private double m_renderHeight = 1000.0;
+
+        public bool m_registered = false;
 
         protected override void Awake()
         {
             base.Awake();
 
-            Debug.Log("Init RoadRenderingManager");
+            Debug.Log("Road Namer: Initialising RoadRenderingManager");
 
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
             this.m_nameMaterial = new Material(districtManager.m_properties.m_areaNameShader);
             this.m_nameMaterial.CopyPropertiesFromMaterial(districtManager.m_properties.m_areaNameFont.material);
-            //this.m_nameMaterial.CopyPropertiesFromMaterial(m_uiFont.material);
 
             this.m_iconMaterial = new Material(districtManager.m_properties.m_areaIconShader);
             this.m_iconMaterial.CopyPropertiesFromMaterial(districtManager.m_properties.m_areaIconAtlas.material);
@@ -34,9 +36,9 @@ namespace RoadNamer.Managers
 
         protected override void BeginOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
-            if (lastCount != RoadNameManager.Instance().m_roadList.Count)
+            if (m_lastCount != RoadNameManager.Instance().m_roadList.Count)
             {
-                lastCount = RoadNameManager.Instance().m_roadList.Count;
+                m_lastCount = RoadNameManager.Instance().m_roadList.Count;
 
                 try
                 {
@@ -44,31 +46,35 @@ namespace RoadNamer.Managers
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError(ex.Message + "\n\n" + ex.StackTrace.ToString() + "\n" + ex.Source);
+                    Debug.LogException(ex);
                 }
             }
-            
-            DrawMesh();
 
-            Debug.Log(cameraInfo.m_height.ToString());
+            if (cameraInfo.m_height < m_renderHeight)
+            {
+                DrawMesh();
+            }
         }
 
         private void DrawMesh()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (this.m_nameMesh != null && this.m_nameMaterial != null)
+            if (districtManager.NamesVisible) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
             {
-                this.m_nameMaterial.color = districtManager.m_properties.m_areaNameColor;
-                if (this.m_nameMaterial.SetPass(0))
+                if (this.m_nameMesh != null && this.m_nameMaterial != null)
                 {
-                    Graphics.DrawMeshNow(this.m_nameMesh, Matrix4x4.identity);
+                    this.m_nameMaterial.color = districtManager.m_properties.m_areaNameColor;
+                    if (this.m_nameMaterial.SetPass(0))
+                    {
+                        Graphics.DrawMeshNow(this.m_nameMesh, Matrix4x4.identity);
+                    }
                 }
-            }
 
-            if (this.m_iconMesh != null && this.m_iconMaterial != null && this.m_iconMaterial.SetPass(0))
-            {
-                Graphics.DrawMeshNow(this.m_iconMesh, Matrix4x4.identity);
+                if (this.m_iconMesh != null && this.m_iconMaterial != null && this.m_iconMaterial.SetPass(0))
+                {
+                    Graphics.DrawMeshNow(this.m_iconMesh, Matrix4x4.identity);
+                }
             }
         }
 
@@ -220,6 +226,11 @@ namespace RoadNamer.Managers
 
                 uiRenderData.Release();
             }
+        }
+
+        public void ForceUpdate()
+        {
+            m_lastCount = -1;
         }
     }
 }

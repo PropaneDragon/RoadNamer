@@ -13,7 +13,7 @@ namespace RoadNamer
 
         public override void OnSaveData()
         {
-            Debug.Log("Saving road names");
+            Debug.Log("Road Namer: Saving road names");
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream();
@@ -26,11 +26,11 @@ namespace RoadNamer
                 {
                     binaryFormatter.Serialize(memoryStream, roadNames);
                     serializableDataManager.SaveData(dataKey, memoryStream.ToArray());
-                    Debug.Log("Road names have been saved!");
+                    Debug.Log("Road Namer: Road names have been saved!");
                 }
                 else
                 {
-                    Debug.LogError("Couldn't save road names, as the array is null!");
+                    Debug.LogWarning("Road Namer: Couldn't save road names, as the array is null!");
                 }
             }
             catch (Exception ex)
@@ -45,7 +45,7 @@ namespace RoadNamer
 
         public override void OnLoadData()
         {
-            Debug.Log("Loading road names");
+            Debug.Log("Road Namer: Loading road names");
 
             byte[] loadedData = serializableDataManager.LoadData(dataKey);
 
@@ -67,7 +67,7 @@ namespace RoadNamer
                     }
                     else
                     {
-                        Debug.LogError("Couldn't load road names, as the array is null!");
+                        Debug.LogWarning("Road Namer: Couldn't load road names, as the array is null!");
                     }
                 }
                 catch (Exception ex)
@@ -81,7 +81,7 @@ namespace RoadNamer
             }
             else
             {
-                Debug.Log("Road Namer found no data to load");
+                Debug.LogWarning("Road Namer: Found no data to load");
             }
         }
     }

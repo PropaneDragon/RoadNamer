@@ -19,6 +19,7 @@ namespace RoadNamer.Utilities
           It's much better than storing individual sprites.
         */
 
+        public const ulong m_workshopId = 558960454ul;
         public static Dictionary<string, UITextureAtlas> m_atlasStore = new Dictionary<string, UITextureAtlas>();
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace RoadNamer.Utilities
 
             foreach (PluginManager.PluginInfo pluginInfo in pluginManager.GetPluginsInfo())
             {
-                if (pluginInfo.name == "RoadNamer")
+                if (pluginInfo.name == "RoadNamer" || pluginInfo.publishedFileID.AsUInt64 == m_workshopId)
                 {
                     modPath = pluginInfo.modPath;
                 }
@@ -90,17 +91,17 @@ namespace RoadNamer.Utilities
                     }
                     else
                     {
-                        Debug.LogError("Could not find atlas at " + fullPath);
+                        Debug.LogError("Road Namer: Could not find atlas at " + fullPath);
                     }
                 }
                 else
                 {
-                    Debug.LogError("Couldn't find the default UI Shader!");
+                    Debug.LogError("Road Namer: Couldn't find the default UI Shader!");
                 }
             }
             else
             {
-                Debug.LogError("Could not find the mod path, which is odd.");
+                Debug.LogError("Road Namer: Could not find the mod path, which is odd.");
             }
 
             return returnValue;
@@ -123,12 +124,8 @@ namespace RoadNamer.Utilities
                 Texture2D atlasTexture = foundAtlas.texture;
                 Vector2 atlasSize = new Vector2(atlasTexture.width, atlasTexture.height);
                 Rect relativeLocation = new Rect(new Vector2(dimensions.position.x / atlasSize.x, dimensions.position.y / atlasSize.y), new Vector2(dimensions.width / atlasSize.x, dimensions.height / atlasSize.y));
-
-                Debug.Log(atlasSize.x + ", " + atlasSize.y);
-                Debug.Log(relativeLocation.position.x.ToString() + ", " + relativeLocation.position.y.ToString() + ", " + relativeLocation.width.ToString() + ", " + relativeLocation.height.ToString());
-                Debug.Log(dimensions.position.x.ToString() + ", " + dimensions.position.y.ToString() + ", " + dimensions.width.ToString() + ", " + dimensions.height.ToString());
-
                 Texture2D spriteTexture = new Texture2D((int)Math.Round(dimensions.width), (int)Math.Round(dimensions.height));
+
                 spriteTexture.SetPixels(atlasTexture.GetPixels((int)dimensions.position.x, (int)dimensions.position.y, (int)dimensions.width, (int)dimensions.height));
 
                 UITextureAtlas.SpriteInfo createdSprite = new UITextureAtlas.SpriteInfo()

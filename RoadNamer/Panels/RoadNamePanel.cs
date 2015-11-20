@@ -1,4 +1,5 @@
-﻿using ColossalFramework.UI;
+﻿using ColossalFramework;
+using ColossalFramework.UI;
 using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace RoadNamer.Panels
 {
-    class RoadNamePanel : UIPanel
+    public class RoadNamePanel : UIPanel
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
@@ -104,8 +105,11 @@ namespace RoadNamer.Panels
 
                 if (roadName != null)
                 {
+                    RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
                     RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName);
                     Hide();
+
+                    roadRenderingManager.ForceUpdate();
                 }
             }
         }

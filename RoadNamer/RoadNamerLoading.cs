@@ -18,18 +18,25 @@ namespace RoadNamer
         private GameObject m_roadNamePanelObject;
         private RoadNamePanel m_roadNamePanel;
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
+        private UIButton m_tabButton = null;
+        private RoadRenderingManager m_roadRenderingManager = null;
 
         public override void OnCreated(ILoading loading)
         {
+            try //So we don't fuck up loading the city
+            {
+                LoadSprites();
+            }
+            catch(Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         public override void OnLevelLoaded(LoadMode mode)
         {
             if (mode == LoadMode.LoadGame || mode == LoadMode.NewGame || mode == LoadMode.NewMap || mode == LoadMode.LoadMap)
             {
-                //RoadNameManager.Load();
-                LoadSprites();
-
                 UIView view = UIView.GetAView();
                 UITabstrip tabStrip = null;
 
@@ -47,43 +54,44 @@ namespace RoadNamer
                     tabStrip = UIView.Find<UITabstrip>("MainToolstrip");
                 }
 
-                ToolController toolController = ToolsModifierControl.toolController;
-
-                if (toolController.GetComponent<RoadSelectTool>() == null)
+                if (m_tabButton == null)
                 {
-                    ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();                    
+                    GameObject buttonGameObject = UITemplateManager.GetAsGameObject("MainToolbarButtonTemplate");
+                    GameObject pageGameObject = UITemplateManager.GetAsGameObject("ScrollablePanelTemplate");
+                    m_tabButton = tabStrip.AddTab("Road Namer", buttonGameObject, pageGameObject, new Type[] { }) as UIButton;
+
+                    UITextureAtlas atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+
+                    m_tabButton.eventClicked += TabButton_eventClicked;
+                    m_tabButton.tooltip = "Road Namer";
+                    m_tabButton.foregroundSpriteMode = UIForegroundSpriteMode.Fill;
+
+                    if (atlas != null)
+                    {
+                        m_tabButton.atlas = atlas;
+                        m_tabButton.normalFgSprite = "ToolbarFGIcon";
+                        m_tabButton.focusedFgSprite = "ToolbarFGIcon";
+                        m_tabButton.hoveredFgSprite = "ToolbarFGIcon";
+                        m_tabButton.disabledFgSprite = "ToolbarFGIcon";
+                        m_tabButton.pressedFgSprite = "ToolbarFGIcon";
+                        m_tabButton.focusedBgSprite = "ToolbarBGFocused";
+                        m_tabButton.hoveredBgSprite = "ToolbarBGHovered";
+                        m_tabButton.pressedBgSprite = "ToolbarBGPressed";
+                    }
+                    else
+                    {
+                        Debug.LogError("Road Namer: Could not find atlas.");
+                    }
                 }
 
-                GameObject buttonGameObject = UITemplateManager.GetAsGameObject("MainToolbarButtonTemplate");
-                GameObject pageGameObject = UITemplateManager.GetAsGameObject("ScrollablePanelTemplate");
-                UIButton tabButton = tabStrip.AddTab("Road Namer", buttonGameObject, pageGameObject, new Type[] { }) as UIButton;
+                m_roadRenderingManager = Singleton<RoadRenderingManager>.instance;
+                m_roadRenderingManager.enabled = true;
 
-                UITextureAtlas atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
-
-                tabButton.eventClicked += TabButton_eventClicked;
-                tabButton.tooltip = "Road Namer";
-                tabButton.foregroundSpriteMode = UIForegroundSpriteMode.Fill;
-
-                if (atlas != null)
+                if (m_roadRenderingManager != null && !m_roadRenderingManager.m_registered)
                 {
-                    tabButton.atlas = atlas;
-                    tabButton.normalFgSprite = "ToolbarFGIcon";
-                    tabButton.focusedFgSprite = "ToolbarFGIcon";
-                    tabButton.hoveredFgSprite = "ToolbarFGIcon";
-                    tabButton.disabledFgSprite = "ToolbarFGIcon";
-                    tabButton.pressedFgSprite = "ToolbarFGIcon";
-                    tabButton.focusedBgSprite = "ToolbarBGFocused";
-                    tabButton.hoveredBgSprite = "ToolbarBGHovered";
-                    tabButton.pressedBgSprite = "ToolbarBGPressed";
+                    RenderManager.RegisterRenderableManager(m_roadRenderingManager);
+                    m_roadRenderingManager.m_registered = true;
                 }
-                else
-                {
-                    Debug.LogError("Could not find atlas.");
-                }
-
-                RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
-                roadRenderingManager.enabled = true;
-                RenderManager.RegisterRenderableManager(roadRenderingManager);
             }
         }
 
@@ -102,17 +110,24 @@ namespace RoadNamer
 
                 if (!spriteSuccess)
                 {
-                    Debug.LogError("Failed to load some sprites!");
+                    Debug.LogError("Road Namer: Failed to load some sprites!");
                 }
             }
             else
             {
-                Debug.LogError("Failed to load the atlas!");
+                Debug.LogError("Road Namer: Failed to load the atlas!");
             }
         }
 
         private void TabButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
+            ToolController toolController = ToolsModifierControl.toolController;
+
+            if (toolController.GetComponent<RoadSelectTool>() == null)
+            {
+                ToolsModifierControl.toolController.gameObject.AddComponent<RoadSelectTool>();
+            }
+
             UIView view = UIView.GetAView();
             RoadSelectTool roadSelectTool = ToolsModifierControl.SetTool<RoadSelectTool>();
 
