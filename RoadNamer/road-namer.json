@@ -65,11 +65,13 @@
     "BasicRoad":[  
       "Route"
     ],
-    "MediumRoad":[  
-      "Route,Highway"
+    "MediumRoad":[
+      "Route",
+      "Highway"
     ],
-    "LargeRoad":[  
-      "Route,Highway"
+    "LargeRoad":[
+      "Route",
+      "Highway"
     ]
   },
   "roadTypes":{  
