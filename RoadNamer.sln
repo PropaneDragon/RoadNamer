@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadNamer", "RoadNamer\RoadNamer.csproj", "{6A388B44-88A7-4E9E-8C2D-F51E173DB061}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadNamerTests", "RoadNamerTests\RoadNamerTests.csproj", "{58CD9723-08FC-4753-9A35-6DF199373F14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
