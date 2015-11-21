@@ -73,19 +73,22 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
-            m_colourSelector = CustomUI.UIUtils.CreateColorField(this);
-            m_colourSelector.relativePosition = new Vector3(m_UIPadding.left, 0);
-            m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
-            m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
-            m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
-            m_colourSelector.tooltip = "Set the label colour";
-            m_colourSelector.PerformLayout();
 
             m_textField = CustomUI.UIUtils.CreateTextField(this);
-            m_textField.relativePosition = new Vector3((m_UIPadding.left * 2) + m_colourSelector.width, m_panelTitle.height + m_UIPadding.bottom);
+            m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
             m_textField.width = this.width - m_textField.relativePosition.x - m_UIPadding.right;
             m_textField.eventKeyDown += M_textField_eventKeyDown;
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
+            
+            UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
+            colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+
+            m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
+            m_colourSelector.relativePosition = new Vector3(0, 0);
+            m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
+            m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
+            m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
+            m_colourSelector.tooltip = "Set the text colour";
 
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";
