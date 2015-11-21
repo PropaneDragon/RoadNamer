@@ -42,7 +42,7 @@ namespace RoadNamer.Panels
         {
             this.isInteractive = true;
             this.enabled = true;
-            this.width = 300;
+            this.width = 350;
             this.height = 100;
 
             base.Awake();
@@ -96,12 +96,19 @@ namespace RoadNamer.Panels
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
 
-            UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
-            randomNameButton.text = "Random";
-            randomNameButton.size = new Vector2(80, 30);
-            randomNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 2 * m_UIPadding.right - randomNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            randomNameButton.eventClicked += RandomNameButton_eventClicked;
-            randomNameButton.tooltip = "Generate a random name for the road";
+            UIButton randomRoadNameButton = CustomUI.UIUtils.CreateButton(this);
+            randomRoadNameButton.text = "Random Road";
+            randomRoadNameButton.size = new Vector2(120, 30);
+            randomRoadNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 2 * m_UIPadding.right - randomRoadNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+            randomRoadNameButton.eventClicked += RandomRoadNameButton_eventClicked;
+            randomRoadNameButton.tooltip = "Generate a random name for the road";
+
+            UIButton randomRouteNameButton = CustomUI.UIUtils.CreateButton(this);
+            randomRouteNameButton.text = "Random Route";
+            randomRouteNameButton.size = new Vector2(120, 30);
+            randomRouteNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 3 * m_UIPadding.right - randomRoadNameButton.width - randomRouteNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+            randomRouteNameButton.eventClicked += RandomRouteNameButton_eventClicked;
+            randomRouteNameButton.tooltip = "Generate a random route name for the road";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
         }
@@ -124,9 +131,14 @@ namespace RoadNamer.Panels
             }
         }
 
-        private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
+        private void RandomRoadNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
             GetRandomName();
+        }
+
+        private void RandomRouteNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            GetRandomRoute();
         }
 
         private void NameRoadButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
@@ -134,14 +146,19 @@ namespace RoadNamer.Panels
             SetRoadData();
         }
 
-        private void GetRandomName(bool getRoute)
+        private void GetRandomName()
         {
             string randomName = "";
-            do
-            {
-                randomName = "bbbbb";
-            }
-            while( RoadNameManager.Instance().randomNameUsed("blah"));
+            //TODO: Check against usedName hashset to determine random name uniqueness
+            randomName = Utilities.RandomNameUtilities.GenerateRoadName(m_netSegmentName);
+            m_textField.text = randomName;
+        }
+
+        private void GetRandomRoute()
+        {
+            string randomName = "";
+            //TODO: Check against usedName hashset to determine random name uniqueness
+            randomName = Utilities.RandomNameUtilities.GenerateRouteName(m_netSegmentName);
             m_textField.text = randomName;
         }
 
@@ -173,8 +190,7 @@ namespace RoadNamer.Panels
                 string sanitisedLabel = StringUtilities.RemoveTags(text);
 
                 m_textField.textColor = textFieldColour;
-                //m_textField.text = sanitisedLabel;
-                m_textField.text = m_netSegmentName;
+                m_textField.text = sanitisedLabel;
 
                 m_colourSelector.selectedColor = textFieldColour;
             }
