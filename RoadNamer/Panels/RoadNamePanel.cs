@@ -5,6 +5,7 @@ using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 namespace RoadNamer.Panels
 {
@@ -14,6 +15,7 @@ namespace RoadNamer.Panels
 
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
+        private UIColorField m_colourSelector;
         private string m_initialRoadName;
 
         public ushort m_netSegmentId = 0;
@@ -22,10 +24,10 @@ namespace RoadNamer.Panels
             set
             {
                 m_initialRoadName = value;
-                
-                if(m_textField != null)
+
+                if (m_textField != null)
                 {
-                    m_textField.text = value == null ? "" : value;
+                    UpdateTextField(value);
                 }
             }
             get
@@ -38,7 +40,7 @@ namespace RoadNamer.Panels
         {
             this.isInteractive = true;
             this.enabled = true;
-            this.width = 200;
+            this.width = 250;
             this.height = 100;
 
             base.Awake();
@@ -54,7 +56,7 @@ namespace RoadNamer.Panels
             m_panelTitle.iconSprite = "ToolbarFGIcon";
 
             CreatePanelComponents();
-            
+
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
             this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
@@ -63,7 +65,7 @@ namespace RoadNamer.Panels
 
         private void RoadNamePanel_eventKeyPress(UIComponent component, UIKeyEventParameter eventParam)
         {
-            if(eventParam.keycode == KeyCode.KeypadEnter || eventParam.keycode == KeyCode.Return)
+            if (eventParam.keycode == KeyCode.KeypadEnter || eventParam.keycode == KeyCode.Return)
             {
                 SetRoadData();
             }
@@ -71,16 +73,19 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
-            m_textField = CustomUI.UIUtils.CreateTextField(this);
-            m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
-            m_textField.width = this.width - m_UIPadding.left - m_UIPadding.right;
-            m_textField.eventKeyDown += M_textField_eventKeyDown;
-            m_textField.processMarkup = true;
+            m_colourSelector = CustomUI.UIUtils.CreateColorField(this);
+            m_colourSelector.relativePosition = new Vector3(m_UIPadding.left, 0);
+            m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
+            m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
+            m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
+            m_colourSelector.tooltip = "Set the label colour";
+            m_colourSelector.PerformLayout();
 
-            UIColorField colourSelector = CustomUI.UIUtils.CreateColorField(this);
-            colourSelector.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
-            colourSelector.tooltip = "Set the label colour";
+            m_textField = CustomUI.UIUtils.CreateTextField(this);
+            m_textField.relativePosition = new Vector3((m_UIPadding.left * 2) + m_colourSelector.width, m_panelTitle.height + m_UIPadding.bottom);
+            m_textField.width = this.width - m_textField.relativePosition.x - m_UIPadding.right;
+            m_textField.eventKeyDown += M_textField_eventKeyDown;
+            m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
 
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";
@@ -90,6 +95,11 @@ namespace RoadNamer.Panels
             nameRoadButton.tooltip = "Create the label";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
+        }
+
+        private void ColourSelector_eventColorPickerClose(UIColorField dropdown, UIColorPicker popup, ref bool overridden)
+        {
+            m_textField.textColor = popup.color;
         }
 
         private void ColourSelector_eventColorChanged(UIComponent component, Color32 value)
@@ -118,12 +128,33 @@ namespace RoadNamer.Panels
 
                 if (roadName != null)
                 {
+                    string hexColour = UIMarkupStyle.ColorToHex(m_textField.textColor);
+                    roadName = "<color" + hexColour + ">" + roadName + "</color>";
+
                     RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
                     RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName);
                     Hide();
 
                     roadRenderingManager.ForceUpdate();
                 }
+            }
+        }
+
+        private void UpdateTextField(string text)
+        {
+            if (text != null)
+            {
+                Color textFieldColour = StringUtilities.ExtractColourFromTags(text, new Color(1, 1, 1));
+                string sanitisedLabel = StringUtilities.RemoveTags(text);
+
+                m_textField.textColor = textFieldColour;
+                m_textField.text = sanitisedLabel;
+
+                m_colourSelector.selectedColor = textFieldColour;
+            }
+            else
+            {
+                m_textField.text = "";
             }
         }
     }
