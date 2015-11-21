@@ -34,6 +34,7 @@ namespace RoadNamer
         TrainCargoTrackElevated,
 
         BasicRoad,
+        BasicRoadBike,
         BasicRoadDecorationTrees,
         BasicRoadDecorationGrass,
         BasicRoadBridge,

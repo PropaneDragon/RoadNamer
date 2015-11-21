@@ -1,79 +1,38 @@
-﻿using System;
+﻿using ColossalFramework.IO;
+using SimpleJSON;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
 namespace RoadNamer.Utilities
 {
-    /// <summary>
-    /// List of names for the random name generator
-    /// </summary>
-    class RandomNameUtilities
+
+    internal class RandomNameConfiguration
     {
 
-        public static readonly List<string> roadNames = new List<string>()
+        private static readonly string ROAD_NAME_KEY = "roadnames";
+        private static readonly string ROUTE_TYPE_KEY = "routetypes";
+        private static readonly string ROAD_TYPE_KEY = "roadTypes";
+
+        //Taken from https://github.com/mabako/reddit-for-city-skylines
+        private static string ConfigPath
         {
-            "Main",
-            "Station",
-            "High",
-            "Park",
-            "Broadway",
-            "Church",
-            "Lake",
-            "Hill",
-            "Bridge",
-            "Ridge",
-            "View",
-            "Water",
-            "Front",
-            "Market",
-            "Fairway",
-            "Canterbury",
-            "Highbury",
-            "Veteran's Memorial",
-            "Oak",
-            "Elm",
-            "Cedar",
-            "Pine",
-            "Hickory",
-            "Maple",
-
-            "First",
-            "Second",
-            "Third",
-            "Fourth",
-            "Fifth",
-
-            "Alaska",
-            "Connecticut",
-            "Illinois",
-            "Michigan",
-            "New York",
-            "Pennsylvania",
-            "Washington",
-            "Yonge",
-            "Bloor",
-            "Charles",
-            "Windsor",
-
-            "TotallyMoo",
-            "BloodyPenguin",
-            "Boformer"
-        };
-
-        public static readonly Dictionary<string, List<string>> routeTypeNames = new Dictionary<string, List<string>>
-        {
-            //TODO: Either redefine the keys as RoadTypes, or create const values for the keys
-            { "highway",new List<string>() { "Route","Highway","Interstate","Autobahn" } },
-            { "road",new List<string>() { "Route","Highway" } },
-            { "singlechar",new List<string>() { "M","A","I-" } }
-        };
+            get
+            {
+                string path = string.Format("{0}/{1}/", DataLocation.localApplicationData, "ModConfig");
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                path += "road-namer.json";
+                return path;
+            }
+        }
 
         /// <summary>
         /// Mapping to reduce all the various RoadTypes to a smaller list for use with roadTypeNames
         /// </summary>
-        public static readonly Dictionary<RoadTypes, RoadTypes> simplifiedMapping = new Dictionary<RoadTypes, RoadTypes>()
+        public static readonly Dictionary<RoadTypes, RoadTypes> m_simplifiedMapping = new Dictionary<RoadTypes, RoadTypes>()
         {
             {RoadTypes.None,RoadTypes.None},
             {RoadTypes.ZonablePedestrianGravel,RoadTypes.PedestrianGravel},
@@ -92,6 +51,7 @@ namespace RoadNamer.Utilities
             {RoadTypes.PedestrianElevatedBicycle,RoadTypes.PedestrianPavementBicycle},
             {RoadTypes.PedestrianElevated,RoadTypes.PedestrianPavement},
             {RoadTypes.BasicRoad,RoadTypes.BasicRoad},
+            {RoadTypes.BasicRoadBike,RoadTypes.BasicRoad},
             {RoadTypes.BasicRoadDecorationTrees,RoadTypes.BasicRoad},
             {RoadTypes.BasicRoadDecorationGrass,RoadTypes.BasicRoad},
             {RoadTypes.BasicRoadBridge,RoadTypes.BasicRoad},
@@ -207,10 +167,35 @@ namespace RoadNamer.Utilities
             {RoadTypes.Dam,RoadTypes.BasicRoad},
         };
 
+        private static List<string> defaultRoadNames
+        {
+            get
+            {
+                var roadNameList = new List<string>();
+                roadNameList.Add("Main");
+                roadNameList.Add("High");
+                roadNameList.Add("Park");
+                return roadNameList;
+            }
+        }
+
+        public static List<string> m_roadNames = defaultRoadNames;
+
+        public static Dictionary<RoadTypes, List<string>> m_routeTypeNames = new Dictionary<RoadTypes, List<string>>
+        {
+            //TODO: Either redefine the keys as RoadTypes, or create const values for the keys
+            { RoadTypes.RuralHighway,new List<string>() { "Route","Highway","Interstate","Autobahn" } },
+            { RoadTypes.Highway,new List<string>() { "Route","Highway","Interstate","Autobahn" } },
+            { RoadTypes.BasicRoad,new List<string>() { "Route","Highway" } },
+            { RoadTypes.MediumRoad,new List<string>() { "Route","Highway" } },
+            { RoadTypes.LargeRoad,new List<string>() { "Route","Highway" } },
+            { RoadTypes.None,new List<string>() { "M","A","I-" } }
+        };
+        
         /// <summary>
         /// Mapping of road types to typical road type names associated with the road type
         /// </summary>
-        public static readonly Dictionary<RoadTypes, List<string>> roadTypeNames = new Dictionary<RoadTypes, List<string>>
+        public static Dictionary<RoadTypes, List<string>> m_roadTypeNames = new Dictionary<RoadTypes, List<string>>
         {
             { RoadTypes.None, new List<string>() { "huh?", "what?" } },
             { RoadTypes.TrainTrack,new List<string>() { "Railway","Railine" } },
@@ -226,9 +211,88 @@ namespace RoadNamer.Utilities
             { RoadTypes.LargeRoad,new List<string>() { "Road","Way","Parkway","Highway"} },
             { RoadTypes.SmallBusway,new List<string>() { "Busway" } },
             { RoadTypes.AirplaneRunway,new List<string>() { "Runway" } }
-            
+
         };
 
+        internal static void Load()
+        {
+           
+
+            try
+            {
+                string buffer = File.ReadAllText(ConfigPath);
+                var json = JSON.Parse(buffer).AsObject;
+                if (json[ROAD_NAME_KEY] != null )
+                {
+                    var roadNameList = json[ROAD_NAME_KEY];
+                    m_roadNames = new List<string>();
+                    foreach (JSONNode node in roadNameList.Childs)
+                    {
+                        m_roadNames.Add(node.Value);
+                    }
+                }
+                if (json[ROUTE_TYPE_KEY] != null)
+                {
+                    var routeTypeMapping = json[ROUTE_TYPE_KEY].AsObject;
+                    foreach(string roadTypeStr in routeTypeMapping.Keys)
+                    {
+                        try
+                        {
+                            RoadTypes roadType;
+                            roadType = (RoadTypes)Enum.Parse(typeof(RoadTypes), roadTypeStr);
+                            List<JSONNode> routeTypeList = routeTypeMapping[roadTypeStr].AsArray.List();
+                            m_routeTypeNames[roadType] = new List<string>();
+                            foreach( JSONNode node in routeTypeList)
+                            {
+                                m_routeTypeNames[roadType].Add(node.Value);
+                            }
+                        }
+                        catch
+                        {
+                            Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                        }
+                    }
+                }
+                if (json[ROAD_TYPE_KEY] != null)
+                {
+                    var roadTypeMapping = json[ROAD_TYPE_KEY].AsObject;
+                    foreach (string roadTypeStr in roadTypeMapping.Keys)
+                    {
+                        try
+                        {
+                            RoadTypes roadType;
+                            roadType = (RoadTypes)Enum.Parse(typeof(RoadTypes), roadTypeStr);
+                            List<JSONNode> roadTypeList = roadTypeMapping[roadTypeStr].AsArray.List();
+                            m_roadTypeNames[roadType] = new List<string>();
+                            foreach (JSONNode node in roadTypeList)
+                            {
+                                m_roadTypeNames[roadType].Add(node.Value);
+                            }
+                        }
+                        catch
+                        {
+                            Debug.Log("Road Namer:roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                        }
+                    }
+                }
+                Debug.Log("Road Namer: Random road names have been loaded!");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Road Namer: JSON file loading failed, use defaults");
+                DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Message, string.Format("JSON file loading failed: {0}: {1}", e.GetType().ToString(), e.Message));
+
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// List of names for the random name generator
+    /// </summary>
+    internal static class RandomNameUtilities
+    {
+       
         /// <summary>
         /// Generates a route name(i.e: M1, I-234, Highway 101, etc)
         /// </summary>
@@ -247,13 +311,13 @@ namespace RoadNamer.Utilities
             }
             catch
             {
-                Debug.Log("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                 //Don't bother, the default type is suitable for a fallback type
             }
 
-            if (simplifiedMapping.ContainsKey(routeType))
+            if ( RandomNameConfiguration.m_simplifiedMapping.ContainsKey(routeType))
             {
-                routeType = simplifiedMapping[routeType];
+                routeType = RandomNameConfiguration.m_simplifiedMapping[routeType];
             }
             else
             {
@@ -261,39 +325,28 @@ namespace RoadNamer.Utilities
                 return GenerateRoadName(roadTypeStr);
             }
 
-            switch (routeType)
+            if (RandomNameConfiguration.m_routeTypeNames.ContainsKey(routeType))
             {
-                //Single character route types (i.e:M1,I-111)
-                //TODO:Maybe replace single letter route type with a seperate enum value?
-                case RoadTypes.None:
-                    routeTypeNameList = routeTypeNames["prepend"];
-                    roadTypeStr = routeTypeNameList[random.Next(routeTypeNames["prepend"].Count)];
-                    returnString.Append(routeTypeStr);
-                    returnString.Append(routeNum);
-                    break;
-                //Highway route types (i.e:Highway 101, Interstate 128, etc)
-                case RoadTypes.RuralHighway:
-                case RoadTypes.Highway:
-                    routeTypeNameList = routeTypeNames["highway"];
-                    routeTypeStr = routeTypeNameList[random.Next(routeTypeNames["highway"].Count)];
-                    returnString.Append(routeTypeStr);
-                    returnString.Append(" ");
-                    returnString.Append(routeNum);
-                    break;
-                //basic road route types (i.e:Route 1, highway 128, etc)
-                case RoadTypes.BasicRoad:
-                case RoadTypes.MediumRoad:
-                case RoadTypes.LargeRoad:
-                    routeTypeNameList = routeTypeNames["road"];
-                    routeTypeStr = routeTypeNameList[random.Next(routeTypeNames["road"].Count)];
-                    returnString.Append(routeTypeStr);
-                    returnString.Append(" ");
-                    returnString.Append(routeNum);
-                    break;
-                default:
-                    //Type is not applicable, return a road name instead
-                    return GenerateRoadName(roadTypeStr);
-            };
+                routeTypeNameList = RandomNameConfiguration.m_routeTypeNames[routeType];
+            }
+            else
+            {
+                routeTypeNameList = RandomNameConfiguration.m_routeTypeNames[RoadTypes.MediumRoad];
+            }
+
+            if (routeType == RoadTypes.None)
+            {
+                roadTypeStr = routeTypeNameList[random.Next(RandomNameConfiguration.m_routeTypeNames[routeType].Count)];
+                returnString.Append(routeTypeStr);
+                returnString.Append(routeNum);
+            }
+            else
+            {
+                routeTypeStr = routeTypeNameList[random.Next(RandomNameConfiguration.m_routeTypeNames[routeType].Count)];
+                returnString.Append(routeTypeStr);
+                returnString.Append(" ");
+                returnString.Append(routeNum);
+            }
 
             return returnString.ToString();
         }
@@ -313,24 +366,23 @@ namespace RoadNamer.Utilities
             }
             catch
             {
-                Debug.Log("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                 //Don't bother, the default type is suitable for a fallback type
             }
 
             //If a road type exists in the simplified mapping, then use it, otherwise,
             //fall back to Medium Roads
-            if (simplifiedMapping.ContainsKey(roadType))
+            if (RandomNameConfiguration.m_simplifiedMapping.ContainsKey(roadType))
             {
-                roadType = simplifiedMapping[roadType];
+                roadType = RandomNameConfiguration.m_simplifiedMapping[roadType];
             }
 
-            roadTypeNameList = roadTypeNames[roadType];
+            roadTypeNameList = RandomNameConfiguration.m_roadTypeNames[roadType];
             roadTypeName = roadTypeNameList[random.Next(roadTypeNameList.Count)];
-            roadName = roadNames[random.Next(roadNames.Count)];
+            roadName = RandomNameConfiguration.m_roadNames[random.Next(RandomNameConfiguration.m_roadNames.Count)];
             returnString.Append(roadName);
             returnString.Append(" ");
             returnString.Append(roadTypeName);
-
             return returnString.ToString();
         }
     }

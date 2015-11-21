@@ -35,13 +35,7 @@ namespace RoadNamer.Managers
 
         public string GetRoadName(ushort segmentId)
         {
-            string returnString = null;
-
-            if (m_roadDict.ContainsKey(segmentId))
-            {
-                returnString = m_roadDict[segmentId].m_roadName;
-            }
-            return returnString;
+            return m_roadDict.ContainsKey(segmentId) ? m_roadDict[segmentId].m_roadName : null;
         }
 
         public bool RoadExists(ushort segmentId)

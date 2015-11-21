@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Xml.Serialization;
 using UnityEngine;
 
+
 namespace RoadNamer
 {
     public class RoadNamerLoading : LoadingExtensionBase
@@ -27,8 +28,9 @@ namespace RoadNamer
             try //So we don't fuck up loading the city
             {
                 LoadSprites();
+                
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.LogException(ex);
             }
@@ -45,6 +47,9 @@ namespace RoadNamer
                 m_roadNamePanel = m_roadNamePanelObject.AddComponent<RoadNamePanel>();
                 m_roadNamePanel.transform.parent = view.transform;
                 m_roadNamePanel.Hide();
+
+                DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Message, "load roadnames");
+                RandomNameConfiguration.Load();
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
