@@ -19,6 +19,8 @@ namespace RoadNamer.Panels
         private string m_initialRoadName;
 
         public ushort m_netSegmentId = 0;
+        public string m_netSegmentName;
+
         public string initialRoadName
         {
             set
@@ -40,7 +42,7 @@ namespace RoadNamer.Panels
         {
             this.isInteractive = true;
             this.enabled = true;
-            this.width = 250;
+            this.width = 300;
             this.height = 100;
 
             base.Awake();
@@ -94,6 +96,13 @@ namespace RoadNamer.Panels
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
 
+            UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
+            randomNameButton.text = "Random";
+            randomNameButton.size = new Vector2(80, 30);
+            randomNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 2 * m_UIPadding.right - randomNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+            randomNameButton.eventClicked += RandomNameButton_eventClicked;
+            randomNameButton.tooltip = "Generate a random name for the road";
+
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
         }
 
@@ -115,9 +124,25 @@ namespace RoadNamer.Panels
             }
         }
 
+        private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            GetRandomName();
+        }
+
         private void NameRoadButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
             SetRoadData();
+        }
+
+        private void GetRandomName(bool getRoute)
+        {
+            string randomName = "";
+            do
+            {
+                randomName = "bbbbb";
+            }
+            while( RoadNameManager.Instance().randomNameUsed("blah"));
+            m_textField.text = randomName;
         }
 
         private void SetRoadData()
@@ -148,7 +173,8 @@ namespace RoadNamer.Panels
                 string sanitisedLabel = StringUtilities.RemoveTags(text);
 
                 m_textField.textColor = textFieldColour;
-                m_textField.text = sanitisedLabel;
+                //m_textField.text = sanitisedLabel;
+                m_textField.text = m_netSegmentName;
 
                 m_colourSelector.selectedColor = textFieldColour;
             }

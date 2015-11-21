@@ -10,9 +10,12 @@ namespace RoadNamer.Managers
     public class RoadNameManager
     {
         private static RoadNameManager instance = null;
+        
+        //Dictionary of the segmentId to the road name container
+        public Dictionary<ushort, RoadContainer> m_roadDict = new Dictionary<ushort, RoadContainer>();
 
-        public List<RoadContainer> m_roadList = new List<RoadContainer>();        
-        private RoadContainer[] m_roads = null;        
+        //Hashset of names already used( for random name generator)
+        public HashSet<string> m_usedNames = new HashSet<string>();
 
         public static RoadNameManager Instance()
         {
@@ -26,80 +29,44 @@ namespace RoadNamer.Managers
 
         public void SetRoadName(ushort segmentId, string name)
         {
-            bool foundRoad = false;
-
-            foreach (RoadContainer road in m_roadList)
-            {
-                if (road.m_segmentId == segmentId)
-                {
-                    road.m_roadName = name;
-                    foundRoad = true;
-                }
-            }
-
-            if(!foundRoad)
-            {
-                RoadContainer newRoad = new RoadContainer();
-                newRoad.m_roadName = name;
-                newRoad.m_segmentId = segmentId;
-
-                m_roadList.Add(newRoad);
-            }
-
-            //Save();
+			RoadContainer container = new RoadContainer( segmentId, name );
+            m_roadDict[segmentId] = container;
         }
 
         public string GetRoadName(ushort segmentId)
         {
             string returnString = null;
 
-            foreach (RoadContainer road in m_roadList)
+            if (m_roadDict.ContainsKey(segmentId))
             {
-                if (road.m_segmentId == segmentId)
-                {
-                    returnString = road.m_roadName;
-                }
+                returnString = m_roadDict[segmentId].m_roadName;
             }
-
             return returnString;
         }
 
         public bool RoadExists(ushort segmentId)
         {
-            foreach(RoadContainer road in m_roadList)
-            {
-                if(road.m_segmentId == segmentId)
-                {
-                    return true;
-                }
-            }
+            return m_roadDict.ContainsKey(segmentId);
+        }
 
-            return false;
+        public bool randomNameUsed(string roadName)
+        {
+            return m_usedNames.Contains(roadName);
         }
 
         public RoadContainer[] Save()
         {
-            m_roads = m_roadList.ToArray();
-
-            return m_roads;
+            List<RoadContainer> returnList = new List<RoadContainer>(m_roadDict.Values);
+            return returnList.ToArray();
         }
 
         public void Load(RoadContainer[] roadNames)
         {
             if (roadNames != null)
             {
-                m_roads = roadNames;
-                Initialise();
-            }
-        }
-
-        public void Initialise()
-        {
-            if (m_roads != null)
-            {
-                foreach (RoadContainer road in m_roads)
+                foreach (RoadContainer road in roadNames)
                 {
-                    m_roadList.Add(road);
+                    m_roadDict[road.m_segmentId] = road;
                 }
             }
             else
@@ -107,6 +74,7 @@ namespace RoadNamer.Managers
                 Debug.LogError("Something went wrong loading the road names!");
             }
         }
+
     }
 
     [Serializable]
@@ -114,5 +82,11 @@ namespace RoadNamer.Managers
     {
         public string m_roadName = null;
         public ushort m_segmentId = 0;
+
+        public RoadContainer( ushort segmentId, string roadName )
+        {
+            m_roadName = roadName;
+            m_segmentId = segmentId;
+        }
     }
 }
