@@ -18,8 +18,6 @@ namespace RoadNamer.Utilities
           multiple sprites, and locations to those areas of the atlas.
           It's much better than storing individual sprites.
         */
-
-        public const ulong m_workshopId = 558960454ul;
         public static Dictionary<string, UITextureAtlas> m_atlasStore = new Dictionary<string, UITextureAtlas>();
 
         /// <summary>
@@ -48,16 +46,7 @@ namespace RoadNamer.Utilities
         public static bool InitialiseAtlas(string texturePath, string atlasName)
         {
             bool returnValue = false;
-            string modPath = null;
-            PluginManager pluginManager = Singleton<PluginManager>.instance;
-
-            foreach (PluginManager.PluginInfo pluginInfo in pluginManager.GetPluginsInfo())
-            {
-                if (pluginInfo.name == "RoadNamer" || pluginInfo.publishedFileID.AsUInt64 == m_workshopId)
-                {
-                    modPath = pluginInfo.modPath;
-                }
-            }
+            string modPath = FileUtilities.GetModPath();
 
             if(modPath != null)
             {
@@ -75,6 +64,7 @@ namespace RoadNamer.Utilities
 
                         fileStream.Read(imageData, 0, (int)fileStream.Length);
                         spriteTexture.LoadImage(imageData);
+                        FixTransparency(spriteTexture);
 
                         Material atlasMaterial = new Material(shader)
                         {
@@ -132,8 +122,7 @@ namespace RoadNamer.Utilities
                 {
                     name = spriteName,
                     region = relativeLocation,
-                    texture = spriteTexture,
-                    border = new RectOffset()
+                    texture = spriteTexture
                 };
 
                 foundAtlas.AddSprite(createdSprite);
@@ -142,5 +131,50 @@ namespace RoadNamer.Utilities
 
             return returnValue;
         }
+
+        //I also copied this from Traffic++, which was copied from below
+        //=========================================================================
+        // Methods created by petrucio -> http://answers.unity3d.com/questions/238922/png-transparency-has-white-borderhalo.html
+        //
+        // Copy the values of adjacent pixels to transparent pixels color info, to
+        // remove the white border artifact when importing transparent .PNGs.
+        public static void FixTransparency(Texture2D texture)
+        {
+            Color32[] pixels = texture.GetPixels32();
+            int w = texture.width;
+            int h = texture.height;
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int idx = y * w + x;
+                    Color32 pixel = pixels[idx];
+                    if (pixel.a == 0)
+                    {
+                        bool done = false;
+                        if (!done && x > 0) done = TryAdjacent(ref pixel, pixels[idx - 1]);        // Left   pixel
+                        if (!done && x < w - 1) done = TryAdjacent(ref pixel, pixels[idx + 1]);        // Right  pixel
+                        if (!done && y > 0) done = TryAdjacent(ref pixel, pixels[idx - w]);        // Top    pixel
+                        if (!done && y < h - 1) done = TryAdjacent(ref pixel, pixels[idx + w]);        // Bottom pixel
+                        pixels[idx] = pixel;
+                    }
+                }
+            }
+
+            texture.SetPixels32(pixels);
+            texture.Apply();
+        }
+
+        private static bool TryAdjacent(ref Color32 pixel, Color32 adjacent)
+        {
+            if (adjacent.a == 0) return false;
+
+            pixel.r = adjacent.r;
+            pixel.g = adjacent.g;
+            pixel.b = adjacent.b;
+            return true;
+        }
+        //=========================================================================
     }
 }

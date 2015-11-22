@@ -52,7 +52,7 @@ namespace RoadNamer.Tools
                         {
                             if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
                             {
-                                ShowToolInfo(true, null, new Vector3());
+                                ShowToolInfo(false, null, new Vector3());
 
                                 if (m_roadNamePanel != null)
                                 {
@@ -68,6 +68,10 @@ namespace RoadNamer.Tools
                         }
                     }
                 }
+            }
+            else
+            {
+                ShowToolInfo(false, null, new Vector3());
             }
         }
 
