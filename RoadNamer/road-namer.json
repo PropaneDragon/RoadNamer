@@ -74,34 +74,34 @@
       "Highway"
     ]
   },
-  "roadTypes":{  
-    "None":[  
+  "roadTypes": {
+    "None": [
       "huh?",
       "what?"
     ],
-    "TrainTrack":[  
+    "TrainTrack": [
       "Railway",
       "Railine"
     ],
-    "MetroTrack":[  
+    "MetroTrack": [
       "Metro",
       "Line",
       "Subway"
     ],
-    "PedestrianPavement":[  
+    "PedestrianPavement": [
       "Walkway",
       "Pathway"
     ],
-    "PedestrianGravel":[  
+    "PedestrianGravel": [
       "Trail",
       "Pathway"
     ],
-    "PedestrianPavementBicycle":[  
+    "PedestrianPavementBicycle": [
       "Trail",
       "Pathway",
       "Bikeway"
     ],
-    "GravelRoad":[  
+    "GravelRoad": [
       "Trail",
       "Pathway",
       "Backroad",
@@ -110,19 +110,19 @@
       "Road",
       "Byway"
     ],
-    "RuralHighway":[  
+    "RuralHighway": [
       "Expressway",
       "Freeway",
       "Highway",
       "Motorway"
     ],
-    "Highway":[  
+    "Highway": [
       "Expressway",
       "Freeway",
       "Highway",
       "Motorway"
     ],
-    "BasicRoad":[  
+    "BasicRoad": [
       "Road",
       "Street",
       "Court",
@@ -130,7 +130,7 @@
       "Drive",
       "Court"
     ],
-    "MediumRoad":[  
+    "MediumRoad": [
       "Road",
       "Drive",
       "Avenue",
@@ -139,18 +139,21 @@
       "Highway",
       "Boulevard"
     ],
-    "LargeRoad":[  
+    "LargeRoad": [
       "Road",
       "Way",
       "Parkway",
       "Highway",
       "Boulevard"
     ],
-    "SmallBusway":[  
+    "SmallBusway": [
       "Busway"
     ],
-    "AirplaneRunway":[  
+    "AirplaneRunway": [
       "Runway"
     ]
+  },
+  "roadTypeMappings": {
+	  "BasicRoad": "Highway" 
   }
 }

@@ -268,7 +268,7 @@ namespace RoadNamer.Utilities
                         }
                         catch
                         {
-                            Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                            LoggerUtilities.Log("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                         }
                     }
                 }
@@ -299,7 +299,7 @@ namespace RoadNamer.Utilities
                         }
                         catch
                         {
-                            Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                            LoggerUtilities.LogWarning("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                         }
                     }
                 }
@@ -321,17 +321,16 @@ namespace RoadNamer.Utilities
                         }
                         catch (ArgumentException)
                         {
-                            Debug.Log("Road Namer: RoadType from JSON is not valid!");
+                            LoggerUtilities.Log("RoadType from JSON is not valid!");
                         }
                     }
                 }
 
-                Debug.Log("Road Namer: Random road names have been loaded!");
-
+                LoggerUtilities.Log("Random road names have been loaded!");
             }
             catch (Exception e)
             {
-                Debug.LogError("Road Namer: JSON file loading failed, use defaults");
+                LoggerUtilities.LogException(e);
             }
         }
 
@@ -361,7 +360,7 @@ namespace RoadNamer.Utilities
             }
             catch
             {
-                Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                LoggerUtilities.LogWarning("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                 //Don't bother, the default type is suitable for a fallback type
             }
 
@@ -416,7 +415,7 @@ namespace RoadNamer.Utilities
             }
             catch
             {
-                Debug.Log("Road Namer: roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
+                LoggerUtilities.LogWarning("roadTypeStr does not map to any RoadTypes value: " + roadTypeStr);
                 //Don't bother, the default type is suitable for a fallback type
             }
 

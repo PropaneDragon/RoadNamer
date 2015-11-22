@@ -1,4 +1,5 @@
 ﻿using ColossalFramework;
+using RoadNamer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,7 +59,7 @@ namespace RoadNamer.Managers
             }
             else
             {
-                Debug.LogError("Something went wrong loading the road names!");
+                LoggerUtilities.LogError("Something went wrong loading the road names!");
             }
         }
 

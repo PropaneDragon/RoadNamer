@@ -91,17 +91,17 @@ namespace RoadNamer.Utilities
                     }
                     else
                     {
-                        Debug.LogError("Road Namer: Could not find atlas at " + fullPath);
+                        LoggerUtilities.Log.LogError("Road Namer: Could not find atlas at " + fullPath);
                     }
                 }
                 else
                 {
-                    Debug.LogError("Road Namer: Couldn't find the default UI Shader!");
+                    LoggerUtilities.Log.LogError("Road Namer: Couldn't find the default UI Shader!");
                 }
             }
             else
             {
-                Debug.LogError("Road Namer: Could not find the mod path, which is odd.");
+                LoggerUtilities.Log.LogError("Road Namer: Could not find the mod path, which is odd.");
             }
 
             return returnValue;

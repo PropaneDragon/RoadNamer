@@ -1,5 +1,6 @@
 ﻿using ICities;
 using RoadNamer.Managers;
+using RoadNamer.Utilities;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -13,7 +14,7 @@ namespace RoadNamer
 
         public override void OnSaveData()
         {
-            Debug.Log("Road Namer: Saving road names");
+            LoggerUtilities.Log("Saving road names");
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream();
@@ -26,16 +27,16 @@ namespace RoadNamer
                 {
                     binaryFormatter.Serialize(memoryStream, roadNames);
                     serializableDataManager.SaveData(dataKey, memoryStream.ToArray());
-                    Debug.Log("Road Namer: Road names have been saved!");
+                    LoggerUtilities.Log("Road names have been saved!");
                 }
                 else
                 {
-                    Debug.LogWarning("Road Namer: Couldn't save road names, as the array is null!");
+                    LoggerUtilities.LogWarning("Couldn't save road names, as the array is null!");
                 }
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                LoggerUtilities.LogException(ex);
             }
             finally
             {
@@ -45,7 +46,7 @@ namespace RoadNamer
 
         public override void OnLoadData()
         {
-            Debug.Log("Road Namer: Loading road names");
+            LoggerUtilities.Log("Loading road names");
 
             byte[] loadedData = serializableDataManager.LoadData(dataKey);
 
@@ -67,12 +68,12 @@ namespace RoadNamer
                     }
                     else
                     {
-                        Debug.LogWarning("Road Namer: Couldn't load road names, as the array is null!");
+                        LoggerUtilities.LogWarning("Couldn't load road names, as the array is null!");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(ex);
+                    LoggerUtilities.LogException(ex);
                 }
                 finally
                 {
@@ -81,7 +82,7 @@ namespace RoadNamer
             }
             else
             {
-                Debug.LogWarning("Road Namer: Found no data to load");
+                LoggerUtilities.LogWarning("Found no data to load");
             }
         }
     }

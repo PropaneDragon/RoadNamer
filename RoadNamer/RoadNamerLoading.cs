@@ -32,7 +32,7 @@ namespace RoadNamer
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                LoggerUtilities.LogException(ex);
             }
         }
 
@@ -48,7 +48,6 @@ namespace RoadNamer
                 m_roadNamePanel.transform.parent = view.transform;
                 m_roadNamePanel.Hide();
 
-                DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Message, "load roadnames");
                 RandomNameConfiguration.Load();
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
@@ -86,7 +85,7 @@ namespace RoadNamer
                     }
                     else
                     {
-                        Debug.LogError("Road Namer: Could not find atlas.");
+                        LoggerUtilities.LogError("Could not find atlas.");
                     }
                 }
 
@@ -116,12 +115,12 @@ namespace RoadNamer
 
                 if (!spriteSuccess)
                 {
-                    Debug.LogError("Road Namer: Failed to load some sprites!");
+                    LoggerUtilities.LogError("Failed to load some sprites!");
                 }
             }
             else
             {
-                Debug.LogError("Road Namer: Failed to load the atlas!");
+                LoggerUtilities.LogError("Failed to load the atlas!");
             }
         }
 
@@ -148,7 +147,7 @@ namespace RoadNamer
 
                 if (roadSelectTool == null)
                 {
-                    Debug.Log("Tool failed to initialise!");
+                    LoggerUtilities.Log("Tool failed to initialise!");
                 }
                 else
                 {
