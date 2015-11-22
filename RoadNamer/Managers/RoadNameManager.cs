@@ -14,8 +14,6 @@ namespace RoadNamer.Managers
         //Dictionary of the segmentId to the road name container
         public Dictionary<ushort, RoadContainer> m_roadDict = new Dictionary<ushort, RoadContainer>();
 
-        //Hashset of names already used( for random name generator)
-        public HashSet<string> m_usedNames = new HashSet<string>();
 
         public static RoadNameManager Instance()
         {
@@ -41,11 +39,6 @@ namespace RoadNamer.Managers
         public bool RoadExists(ushort segmentId)
         {
             return m_roadDict.ContainsKey(segmentId);
-        }
-
-        public bool randomNameUsed(string roadName)
-        {
-            return m_usedNames.Contains(roadName);
         }
 
         public RoadContainer[] Save()

@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Libs\SimpleJSON.cs" />
     <Compile Include="RoadTypes.cs" />
+    <Compile Include="Utilities\LoggerUtilities.cs" />
     <Compile Include="Utilities\RandomNameUtilities.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
     <Compile Include="CustomUI\UITitleBar.cs" />
