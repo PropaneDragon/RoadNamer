@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using RoadNamer.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace RoadNamer.Managers
         {
             base.Awake();
 
-            Debug.Log("Road Namer: Initialising RoadRenderingManager");
+            LoggerUtilities.Log("Initialising RoadRenderingManager");
 
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
@@ -46,7 +47,7 @@ namespace RoadNamer.Managers
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(ex);
+                    LoggerUtilities.LogException(ex);
                 }
             }
 

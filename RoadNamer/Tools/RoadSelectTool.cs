@@ -4,6 +4,7 @@ using RoadNamer.Managers;
 using ColossalFramework.UI;
 using System;
 using RoadNamer.Panels;
+using RoadNamer.Utilities;
 
 namespace RoadNamer.Tools
 {
@@ -14,7 +15,7 @@ namespace RoadNamer.Tools
 
         protected override void Awake()
         {
-            Debug.Log("Road Namer: Tool awake");
+            LoggerUtilities.Log("Tool awake");
 
             base.Awake();
         }
