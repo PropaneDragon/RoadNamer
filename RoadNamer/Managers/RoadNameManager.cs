@@ -11,8 +11,14 @@ namespace RoadNamer.Managers
     {
         private static RoadNameManager instance = null;
 
-        public List<RoadContainer> m_roadList = new List<RoadContainer>();        
-        private RoadContainer[] m_roads = null;        
+        /// <summary>
+        /// Dictionary of the segmentId to the road name container
+        /// </summary>
+        public Dictionary<ushort, RoadContainer> m_roadDict = new Dictionary<ushort, RoadContainer>();
+        /// <summary>
+        /// Hashset of names already used( for random name generator)
+        /// </summary> 
+        public HashSet<string> m_usedNames = new HashSet<string>();
 
         public static RoadNameManager Instance()
         {
@@ -24,29 +30,16 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string name)
+        public void SetRoadName(ushort segmentId, string newName, string oldName=null)
         {
-            bool foundRoad = false;
-
-            foreach (RoadContainer road in m_roadList)
+			RoadContainer container = new RoadContainer( segmentId, newName );
+            m_roadDict[segmentId] = container;
+            if(oldName != null)
             {
-                if (road.m_segmentId == segmentId)
-                {
-                    road.m_roadName = name;
-                    foundRoad = true;
-                }
+                m_usedNames.Remove(StringUtilities.RemoveTags(oldName));
             }
-
-            if(!foundRoad)
-            {
-                RoadContainer newRoad = new RoadContainer();
-                newRoad.m_roadName = name;
-                newRoad.m_segmentId = segmentId;
-
-                m_roadList.Add(newRoad);
-            }
-
-            //Save();
+            m_usedNames.Add(StringUtilities.RemoveTags(newName));
+            EventBusManager.Instance().Publish("forceupdateroadnames", null);
         }
 
         public string GetRoadName(ushort segmentId)
@@ -99,7 +92,8 @@ namespace RoadNamer.Managers
             {
                 foreach (RoadContainer road in m_roads)
                 {
-                    m_roadList.Add(road);
+                    m_roadDict[road.m_segmentId] = road;
+                    m_usedNames.Add(StringUtilities.RemoveTags(road.m_roadName));
                 }
             }
             else

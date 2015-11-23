@@ -17,7 +17,10 @@ namespace RoadNamer
     public class RoadNamerLoading : LoadingExtensionBase
     {
         private GameObject m_roadNamePanelObject;
+        private GameObject m_usedNamesPanelObject;
         private RoadNamePanel m_roadNamePanel;
+        private UsedNamesPanel m_usedNamesPanel;
+    
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
         private UIButton m_tabButton = null;
         private RoadRenderingManager m_roadRenderingManager = null;
@@ -45,6 +48,16 @@ namespace RoadNamer
                 m_roadNamePanel = m_roadNamePanelObject.AddComponent<RoadNamePanel>();
                 m_roadNamePanel.transform.parent = view.transform;
                 m_roadNamePanel.Hide();
+
+                m_usedNamesPanelObject = new GameObject("UsedNamesPanel");
+                m_usedNamesPanel = m_usedNamesPanelObject.AddComponent<UsedNamesPanel>();
+                m_usedNamesPanel.transform.parent = view.transform;
+                m_usedNamesPanel.Hide();
+
+                EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
+
+                RandomNameConfiguration.Load();
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
@@ -149,12 +162,15 @@ namespace RoadNamer
                 else
                 {
                     roadSelectTool.m_roadNamePanel = m_roadNamePanel;
+                    roadSelectTool.m_usedNamesPanel = m_usedNamesPanel;
                 }
             }
         }
 
         public override void OnLevelUnloading()
         {
+            EventBusManager.Instance().UnSubscribe("forceUpdate", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("updateText", m_roadNamePanel);
         }
 
         public override void OnReleased()

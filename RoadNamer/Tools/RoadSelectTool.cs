@@ -10,6 +10,7 @@ namespace RoadNamer.Tools
     public class RoadSelectTool : DefaultTool
     {
         public RoadNamePanel m_roadNamePanel = null;
+        public UsedNamesPanel m_usedNamesPanel = null;
 
         protected override void Awake()
         {
@@ -58,7 +59,11 @@ namespace RoadNamer.Tools
                                 {
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
+                                    m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
+                                    m_roadNamePanel.m_usedNamesPanel = m_usedNamesPanel;
                                     m_roadNamePanel.Show();
+                                    m_usedNamesPanel.RefreshList();
+                                    m_usedNamesPanel.Show();
                                 }
                             }
                             else
