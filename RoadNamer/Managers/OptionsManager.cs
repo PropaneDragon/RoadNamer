@@ -9,19 +9,37 @@ using ColossalFramework;
 
 namespace RoadNamer.Managers
 {
+    /// <summary>
+    /// Manages all ingame options. Handles the interface between ingame options
+    /// storage and saving/loading from disk.
+    /// </summary>
     public class OptionsManager : MonoBehaviour
     {
+        public static bool m_isIngame = false;
+
+        /// <summary>
+        /// Contains all options that can be set using a checkbox. These
+        /// options automatically generate a checkbox in the options panel
+        /// </summary>
         private static RoadCheckBoxOption[] checkboxOptions = new RoadCheckBoxOption[]
         {
             new RoadCheckBoxOption() { uniqueName = "showCamera", readableName = "Show road names in camera mode", value = false, enabled = true }
         };
 
+        /// <summary>
+        /// Contains all options that can be set using a slider. These
+        /// options automatically generate a slider in the options panel
+        /// </summary>
         private static RoadSliderOption[] sliderOptions = new RoadSliderOption[]
         {
             new RoadSliderOption() { uniqueName = "textDisappearDistance", readableName = "Rendering distance", min = 100f, max = 2000f, value = 1000f, step = 10f, enabled = true },
-            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.6f, step = 0.1f, enabled = true }
+            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.5f, step = 0.1f, enabled = true }
         };
 
+        /// <summary>
+        /// Creates options on a panel using the helper
+        /// </summary>
+        /// <param name="helper">The UIHelper to put the options on</param>
         public void CreateOptions(UIHelperBase helper)
         {
             UIHelperBase optionGroup = helper.AddGroup("Road Namer Options");
@@ -108,6 +126,12 @@ namespace RoadNamer.Managers
             UpdateEverything();
         }
 
+        /// <summary>
+        /// Gets a bool from an option that was set using a checkbox
+        /// </summary>
+        /// <param name="uniqueName">The unique name of the checkbox option</param>
+        /// <param name="returnValue">The value to replace</param>
+        /// <returns>Whether the value was found and set</returns>
         public static bool GetCheckBoxValue(string uniqueName, ref bool returnValue)
         {
             bool successful = false;
@@ -124,6 +148,12 @@ namespace RoadNamer.Managers
             return successful;
         }
 
+        /// <summary>
+        /// Gets a float from an option that was set using a slider
+        /// </summary>
+        /// <param name="uniqueName">The unique name of the slider option</param>
+        /// <param name="returnValue">The value to replace</param>
+        /// <returns>Whether the value was found and set</returns>
         public static bool GetSliderValue(string uniqueName, ref float returnValue)
         {
             bool successful = false;
@@ -141,6 +171,9 @@ namespace RoadNamer.Managers
             return successful;
         }
 
+        /// <summary>
+        /// Save options to disk
+        /// </summary>
         public static void SaveOptions()
         {
             SavedOptionManager.Instance().SetCheckBoxOptions(checkboxOptions);
@@ -148,6 +181,10 @@ namespace RoadNamer.Managers
             SavedOptionManager.SaveOptions();
         }
 
+        /// <summary>
+        /// Load options from disk and replace default values
+        /// with stored ones.
+        /// </summary>
         public static void LoadOptions()
         {
             SavedOptionManager.LoadOptions();
@@ -184,15 +221,24 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Updates everything ingame. Should be used when one of the options has updated
+        /// and ingame elements need immediately refreshing.
+        /// </summary>
         public static void UpdateEverything()
         {
-            RoadRenderingManager renderingManager = Singleton<RoadRenderingManager>.instance;
-
-            if(renderingManager != null)
+            if (m_isIngame)
             {
-                GetCheckBoxValue("showCamera", ref renderingManager.m_alwaysShowText);
-                GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
-                GetSliderValue("textScale", ref renderingManager.m_textScale);
+                RoadRenderingManager renderingManager = Singleton<RoadRenderingManager>.instance;
+
+                if (renderingManager != null)
+                {
+                    GetCheckBoxValue("showCamera", ref renderingManager.m_alwaysShowText);
+                    GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
+                    GetSliderValue("textScale", ref renderingManager.m_textScale);
+
+                    renderingManager.ForceUpdate();
+                }
             }
         }
     }

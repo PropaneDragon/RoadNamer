@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
+    /// <summary>
+    /// Handles all ingame rendering.
+    /// </summary>
     public class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
     {
         private Mesh m_nameMesh = null;
@@ -58,6 +61,9 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Draws the road text mesh
+        /// </summary>
         private void DrawMesh()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
@@ -80,6 +86,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Redraw the text to be drawn later with a mesh. Use sparingly, as 
+        /// this is an expensive task.
+        /// </summary>
         private void RenderText()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
@@ -134,6 +144,8 @@ namespace RoadNamer.Managers
                                     dynamicFontRenderer.spriteAtlas = districtManager.m_properties.m_areaIconAtlas;
                                     dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
                                 }
+
+                                Debug.LogWarning(m_textScale);
 
                                 fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
                                 fontRenderer.textScale = m_textScale;
@@ -230,6 +242,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Forces rendering to update immediately. Use sparingly, as it
+        /// can be quite expensive.
+        /// </summary>
         public void ForceUpdate()
         {
             m_lastCount = -1;
