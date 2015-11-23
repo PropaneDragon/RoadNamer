@@ -30,9 +30,9 @@ namespace RoadNamer.Managers
                     netSegment.CountLanes(netSegmentId, NetInfo.LaneType.Vehicle | NetInfo.LaneType.PublicTransport | NetInfo.LaneType.TransportVehicle, VehicleInfo.VehicleType.All, ref forwardLanes, ref backwardLanes);
                     totalLanes = forwardLanes + backwardLanes;
 
-                    Debug.Log(roadName);
-                    Debug.Log(forwardLanes.ToString());
-                    Debug.Log(backwardLanes.ToString());
+                    LoggerUtilities.Log(roadName);
+                    LoggerUtilities.Log(forwardLanes.ToString());
+                    LoggerUtilities.Log(backwardLanes.ToString());
 
                     RandomRoadPrefix checkingPrefix = new RandomRoadPrefix()
                     {
@@ -87,7 +87,7 @@ namespace RoadNamer.Managers
                 {
                     string fileExtension = Path.GetExtension(filePath);
 
-                    Debug.Log(fileExtension);
+                    LoggerUtilities.Log(fileExtension);
 
                     if (fileExtension == ".xml")
                     {
@@ -101,24 +101,24 @@ namespace RoadNamer.Managers
 
                             if (nameUtility != null)
                             {
-                                Debug.Log(nameUtility.m_alwaysAssignPostfixes.ToString());
-                                Debug.Log(nameUtility.m_alwaysAssignPrefixes.ToString());
+                                LoggerUtilities.Log(nameUtility.m_alwaysAssignPostfixes.ToString());
+                                LoggerUtilities.Log(nameUtility.m_alwaysAssignPrefixes.ToString());
 
                                 RandomNameUtility.SetInstance(nameUtility);
                             }
                             else
                             {
-                                Debug.LogError("Road Namer: Couldn't load random names!");
+                                LoggerUtilities.LogError("Couldn't load random names!");
                             }
 
-                            Debug.Log("Road Namer: Loaded name XML \"" + filePath + "\"");
+                            LoggerUtilities.Log("Loaded name XML \"" + filePath + "\"");
                         }
                     }
                 }
             }
             else
             {
-                Debug.LogError("Road Namer: Couldn't find the \"Names\" directory!");
+                LoggerUtilities.LogError("Couldn't find the \"Names\" directory!");
             }
         }
     }

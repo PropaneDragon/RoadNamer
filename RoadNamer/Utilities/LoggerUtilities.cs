@@ -8,7 +8,7 @@ namespace RoadNamer.Utilities
 {
     static class LoggerUtilities
     {
-        private static readonly string TAG = "Road Name: ";
+        private static readonly string TAG = "Road Namer: ";
 
         public static void Log(string message)
         {

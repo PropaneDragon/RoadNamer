@@ -37,9 +37,9 @@ namespace RoadNamer.Managers
 
         protected override void BeginOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
-            if (m_lastCount != RoadNameManager.Instance().m_roadList.Count)
+            if (m_lastCount != RoadNameManager.Instance().m_roadDict.Count)
             {
-                m_lastCount = RoadNameManager.Instance().m_roadList.Count;
+                m_lastCount = RoadNameManager.Instance().m_roadDict.Count;
 
                 try
                 {
@@ -109,7 +109,7 @@ namespace RoadNamer.Managers
                 PoolList<Vector2> dynamicFontUvs = dynamicFontRenderData.uvs;
                 PoolList<int> dynamicFontTriangles = dynamicFontRenderData.triangles;
 
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     if (road.m_segmentId != 0)
                     {

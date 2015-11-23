@@ -45,53 +45,25 @@ namespace RoadNamer.Managers
 
         public string GetRoadName(ushort segmentId)
         {
-            string returnString = null;
-
-            foreach (RoadContainer road in m_roadList)
-            {
-                if (road.m_segmentId == segmentId)
-                {
-                    returnString = road.m_roadName;
-                }
-            }
-
-            return returnString;
+            return RoadExists(segmentId) ? m_roadDict[segmentId].m_roadName : null;
         }
 
         public bool RoadExists(ushort segmentId)
         {
-            foreach(RoadContainer road in m_roadList)
-            {
-                if(road.m_segmentId == segmentId)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return m_roadDict.ContainsKey(segmentId);
         }
 
         public RoadContainer[] Save()
         {
-            m_roads = m_roadList.ToArray();
-
-            return m_roads;
+            List<RoadContainer> returnList = new List<RoadContainer>(m_roadDict.Values);
+            return returnList.ToArray();
         }
 
         public void Load(RoadContainer[] roadNames)
         {
-            if (roadNames != null)
+            if (m_roadDict != null)
             {
-                m_roads = roadNames;
-                Initialise();
-            }
-        }
-
-        public void Initialise()
-        {
-            if (m_roads != null)
-            {
-                foreach (RoadContainer road in m_roads)
+                foreach (RoadContainer road in m_roadDict.Values)
                 {
                     m_roadDict[road.m_segmentId] = road;
                     m_usedNames.Add(StringUtilities.RemoveTags(road.m_roadName));
@@ -109,5 +81,11 @@ namespace RoadNamer.Managers
     {
         public string m_roadName = null;
         public ushort m_segmentId = 0;
+
+        public RoadContainer(ushort segmentId, string roadName)
+        {
+            this.m_segmentId = segmentId;
+            this.m_roadName = roadName;
+        }
     }
 }
