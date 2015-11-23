@@ -86,6 +86,7 @@ namespace RoadNamer.CustomUI
 
             m_title.relativePosition = new Vector3(50, 13);
             m_title.text = title;
+            m_title.textAlignment = UIHorizontalAlignment.Center;
 
             m_close.atlas = UIUtils.defaultAtlas;
             m_close.relativePosition = new Vector3(width - 35, 2);
@@ -93,6 +94,8 @@ namespace RoadNamer.CustomUI
             m_close.hoveredBgSprite = "buttonclosehover";
             m_close.pressedBgSprite = "buttonclosepressed";
             m_close.eventClick += (component, param) => parent.Hide();
+
+            m_title.width = parent.width - relativePosition.x - m_close.width - 10;
         }
     }
 }

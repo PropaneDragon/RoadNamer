@@ -104,10 +104,11 @@ namespace RoadNamer
             {
                 bool spriteSuccess = true;
 
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons");
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
 
                 if (!spriteSuccess)
                 {

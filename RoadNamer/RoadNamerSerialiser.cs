@@ -1,8 +1,10 @@
 ﻿using ICities;
 using RoadNamer.Managers;
+using RoadNamer.Utilities;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace RoadNamer
@@ -45,6 +47,12 @@ namespace RoadNamer
 
         public override void OnLoadData()
         {
+            LoadRoadNames();
+            RandomNameManager.LoadRandomNames();           
+        }
+
+        private void LoadRoadNames()
+        {
             Debug.Log("Road Namer: Loading road names");
 
             byte[] loadedData = serializableDataManager.LoadData(dataKey);
@@ -61,7 +69,7 @@ namespace RoadNamer
                 {
                     RoadContainer[] roadNames = binaryFormatter.Deserialize(memoryStream) as RoadContainer[];
 
-                    if(roadNames != null)
+                    if (roadNames != null)
                     {
                         RoadNameManager.Instance().Load(roadNames);
                     }
