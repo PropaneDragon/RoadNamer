@@ -98,19 +98,16 @@ namespace RoadNamer.Utilities
             if (prefixToCheck.MinimumLanes > 0 && checkingPrefix.MinimumLanes <= prefixToCheck.MinimumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Min lane fail " + prefixToCheck.MinimumLanes + ", " + prefixToCheck.MinimumLanes);
             }
 
             if (prefixToCheck.MaximumLanes > 0 && checkingPrefix.MaximumLanes > prefixToCheck.MaximumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Max lane fail " + prefixToCheck.MaximumLanes + ", " + prefixToCheck.MaximumLanes);
             }
 
             if (prefixToCheck.NameHasToContain != null && prefixToCheck.NameHasToContain != "" && !checkingPrefix.NameHasToContain.Contains(prefixToCheck.NameHasToContain.ToLower()))
             {
                 valid = false;
-                Debug.LogWarning("Road name fail " + prefixToCheck.NameHasToContain + ", " + prefixToCheck.NameHasToContain);
             }
 
             return valid;
@@ -155,13 +152,11 @@ namespace RoadNamer.Utilities
             if (nameToCheck.MinimumLanes > 0 && checkingName.MinimumLanes <= nameToCheck.MinimumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Min lanes fail " + checkingName.MinimumLanes + ", " + nameToCheck.MinimumLanes);
             }
 
             if (nameToCheck.MaximumLanes > 0 && checkingName.MaximumLanes > nameToCheck.MaximumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Max lanes fail " + checkingName.MaximumLanes + ", " + nameToCheck.MaximumLanes);
             }
 
             if (nameToCheck.NameHasToContain != null && nameToCheck.NameHasToContain != "" && !checkingName.NameHasToContain.Contains(nameToCheck.NameHasToContain.ToLower()))
@@ -217,19 +212,16 @@ namespace RoadNamer.Utilities
             if (postfixToCheck.MinimumLanes > 0 && checkingPostfix.MinimumLanes <= postfixToCheck.MinimumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Min lane fail " + postfixToCheck.MinimumLanes + ", " + postfixToCheck.MinimumLanes);
             }
 
             if (postfixToCheck.MaximumLanes > 0 && checkingPostfix.MaximumLanes > postfixToCheck.MaximumLanes)
             {
                 valid = false;
-                Debug.LogWarning("Max lane fail " + postfixToCheck.MaximumLanes + ", " + postfixToCheck.MaximumLanes);
             }
 
             if (postfixToCheck.NameHasToContain != null && postfixToCheck.NameHasToContain != "" && !checkingPostfix.NameHasToContain.Contains(postfixToCheck.NameHasToContain.ToLower()))
             {
                 valid = false;
-                Debug.LogWarning("Road name fail " + postfixToCheck.NameHasToContain + ", " + postfixToCheck.NameHasToContain);
             }
 
             return valid;

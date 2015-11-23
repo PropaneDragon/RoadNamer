@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
+    /// <summary>
+    /// Handles all ingame rendering.
+    /// </summary>
     public class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
     {
         private Mesh m_nameMesh = null;
@@ -15,8 +18,10 @@ namespace RoadNamer.Managers
         private Material m_iconMaterial = null;
 
         private int m_lastCount = 0;
-        private double m_renderHeight = 1000.0;
 
+        public float m_renderHeight = 1000f;
+        public float m_textScale = 0.5f;
+        public bool m_alwaysShowText = false;
         public bool m_registered = false;
 
         protected override void Awake()
@@ -56,11 +61,14 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Draws the road text mesh
+        /// </summary>
         private void DrawMesh()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (districtManager.NamesVisible) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
+            if (districtManager.NamesVisible || m_alwaysShowText) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
             {
                 if (this.m_nameMesh != null && this.m_nameMaterial != null)
                 {
@@ -78,6 +86,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Redraw the text to be drawn later with a mesh. Use sparingly, as 
+        /// this is an expensive task.
+        /// </summary>
         private void RenderText()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
@@ -133,8 +145,10 @@ namespace RoadNamer.Managers
                                     dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
                                 }
 
+                                Debug.LogWarning(m_textScale);
+
                                 fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
-                                fontRenderer.textScale = 0.5f;
+                                fontRenderer.textScale = m_textScale;
                                 fontRenderer.pixelRatio = 1f;
                                 fontRenderer.processMarkup = true;
                                 fontRenderer.wordWrap = true;
@@ -228,6 +242,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Forces rendering to update immediately. Use sparingly, as it
+        /// can be quite expensive.
+        /// </summary>
         public void ForceUpdate()
         {
             m_lastCount = -1;

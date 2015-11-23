@@ -93,9 +93,15 @@ namespace RoadNamer
                     RenderManager.RegisterRenderableManager(m_roadRenderingManager);
                     m_roadRenderingManager.m_registered = true;
                 }
+
+                OptionsManager.m_isIngame = true;
+                OptionsManager.UpdateEverything();
             }
         }
 
+        /// <summary>
+        /// Loads all custom sprites
+        /// </summary>
         private void LoadSprites()
         {
             bool atlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
@@ -155,6 +161,7 @@ namespace RoadNamer
 
         public override void OnLevelUnloading()
         {
+            OptionsManager.m_isIngame = false;
         }
 
         public override void OnReleased()
