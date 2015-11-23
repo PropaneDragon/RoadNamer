@@ -20,7 +20,6 @@ namespace RoadNamer.Panels
 
         public ushort m_netSegmentId = 0;
         public string m_netSegmentName;
-        public UsedNamesPanel m_usedNamesPanel;
 
         public string initialRoadName
         {
@@ -160,8 +159,8 @@ namespace RoadNamer.Panels
                     roadName = StringUtilities.WrapNameWithColorTags(roadName, m_textField.textColor);
                     RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
                     RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName);
-                    m_usedNamesPanel.Hide();
                     Hide();
+                    EventBusManager.Instance().Publish("closeUsedNamePanel", null);
                     EventBusManager.Instance().Publish("forceupdateroadnames", null);
                     roadRenderingManager.ForceUpdate();
                 }

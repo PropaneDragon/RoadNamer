@@ -61,7 +61,6 @@ namespace RoadNamer.Tools
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
-                                    m_roadNamePanel.m_usedNamesPanel = m_usedNamesPanel;
                                     m_roadNamePanel.Show();
                                     m_usedNamesPanel.RefreshList();
                                     m_usedNamesPanel.Show();

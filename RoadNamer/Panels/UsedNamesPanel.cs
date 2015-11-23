@@ -80,6 +80,9 @@ namespace RoadNamer.Panels
                 case "forceupdateroadnames":
                     RefreshList();
                     break;
+                case "closeUsedNamePanel":
+                    Hide();
+                    break;
                 default:
                     break;
             }

@@ -55,6 +55,7 @@ namespace RoadNamer
                 m_usedNamesPanel.Hide();
 
                 EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedNamesPanel);
                 EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
@@ -167,8 +168,9 @@ namespace RoadNamer
 
         public override void OnLevelUnloading()
         {
-            EventBusManager.Instance().UnSubscribe("forceUpdate", m_usedNamesPanel);
-            EventBusManager.Instance().UnSubscribe("updateText", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
         }
 
         public override void OnReleased()
