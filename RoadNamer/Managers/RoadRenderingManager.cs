@@ -23,6 +23,7 @@ namespace RoadNamer.Managers
         public float m_textScale = 0.5f;
         public bool m_alwaysShowText = false;
         public bool m_registered = false;
+        public bool m_textEnabled = true;
 
         protected override void Awake()
         {
@@ -68,7 +69,7 @@ namespace RoadNamer.Managers
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (districtManager.NamesVisible || m_alwaysShowText) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
+            if (m_textEnabled && (districtManager.NamesVisible || m_alwaysShowText)) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
             {
                 if (this.m_nameMesh != null && this.m_nameMaterial != null)
                 {

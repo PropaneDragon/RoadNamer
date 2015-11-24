@@ -13,6 +13,7 @@ namespace RoadNamer.Panels
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
+        private InfoPanel m_infoPanel;
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIColorField m_colourSelector;
@@ -50,12 +51,16 @@ namespace RoadNamer.Panels
         {
             base.Start();
 
+            m_infoPanel = this.AddUIComponent<InfoPanel>();
+            m_infoPanel.Hide();
+
             m_panelTitle = this.AddUIComponent<UITitleBar>();
             m_panelTitle.title = "Set a name";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
 
             CreatePanelComponents();
+            CreateUpdatePanel();
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
@@ -73,6 +78,8 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
+            m_infoPanel.relativePosition = new Vector3(this.width - 20, -(m_infoPanel.height - 20));
+
             m_textField = CustomUI.UIUtils.CreateTextField(this);
             m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
             m_textField.height = 21;
@@ -112,6 +119,15 @@ namespace RoadNamer.Panels
             nameRoadButton.tooltip = "Create the label";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
+        }
+
+        private void CreateUpdatePanel()
+        {
+            if (OptionsManager.m_versionStringFull != SavedOptionManager.Instance().m_lastSavedVersion)
+            {
+                OptionsManager.SaveOptions();
+                m_infoPanel.Show();
+            }
         }
 
         private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)

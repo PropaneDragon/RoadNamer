@@ -2,11 +2,10 @@
 using ICities;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Xml.Serialization;
 using System.IO;
 using ColossalFramework;
 using RoadNamer.Utilities;
+using System.Reflection;
 
 namespace RoadNamer.Managers
 {
@@ -17,7 +16,13 @@ namespace RoadNamer.Managers
     public class OptionsManager : MonoBehaviour
     {
         public static bool m_isIngame = false;
+        public static bool m_hasOpenedPanel = false;
         public static string m_randomNamesLocation = FileUtilities.GetModPath() + "/Names/";
+        public static readonly int m_major = Assembly.GetExecutingAssembly().GetName().Version.Major;
+        public static readonly int m_minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
+        public static readonly int m_build = Assembly.GetExecutingAssembly().GetName().Version.Build;
+        public static readonly int m_revision = Assembly.GetExecutingAssembly().GetName().Version.Revision;
+        public static readonly string m_versionStringFull = m_major.ToString() + "." + m_minor.ToString() + "." + m_build.ToString() + "." + m_revision.ToString();
 
         /// <summary>
         /// Contains all options that can be set using a checkbox. These
@@ -25,7 +30,8 @@ namespace RoadNamer.Managers
         /// </summary>
         private static RoadCheckBoxOption[] checkboxOptions = new RoadCheckBoxOption[]
         {
-            new RoadCheckBoxOption() { uniqueName = "showCamera", readableName = "Show road names in camera mode", value = false, enabled = true }
+            new RoadCheckBoxOption() { uniqueName = "showCamera", readableName = "Show road names in camera mode", value = false, enabled = true },
+            new RoadCheckBoxOption() { uniqueName = "show", readableName = "Show road names", value = true, enabled = true }
         };
 
         /// <summary>
@@ -275,6 +281,11 @@ namespace RoadNamer.Managers
         /// </summary>
         public static void SaveOptions()
         {
+            if (m_hasOpenedPanel)
+            {
+                SavedOptionManager.Instance().m_lastSavedVersion = m_versionStringFull;
+            }
+
             SavedOptionManager.Instance().SetCheckBoxOptions(checkboxOptions);
             SavedOptionManager.Instance().SetSliderOptions(sliderOptions);
             SavedOptionManager.Instance().SetDropdownOptions(dropdownOptions);
@@ -382,6 +393,7 @@ namespace RoadNamer.Managers
                 if (renderingManager != null)
                 {
                     GetCheckBoxValue("showCamera", ref renderingManager.m_alwaysShowText);
+                    GetCheckBoxValue("show", ref renderingManager.m_textEnabled);
                     GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
                     GetSliderValue("textScale", ref renderingManager.m_textScale);
 

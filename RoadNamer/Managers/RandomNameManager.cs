@@ -87,8 +87,6 @@ namespace RoadNamer.Managers
             {
                 string fullFilePath = OptionsManager.m_randomNamesLocation + m_fileName + ".xml";
 
-                Debug.Log(fullFilePath);
-
                 if (File.Exists(fullFilePath))
                 {
                     XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RandomNameUtility));
