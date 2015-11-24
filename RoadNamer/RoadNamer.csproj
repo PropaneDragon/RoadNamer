@@ -53,7 +53,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Managers\OptionsManager.cs" />
     <Compile Include="Managers\RandomNameManager.cs" />
+    <Compile Include="Managers\SavedOptionManager.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
     <Compile Include="CustomUI\UIFastList.cs" />

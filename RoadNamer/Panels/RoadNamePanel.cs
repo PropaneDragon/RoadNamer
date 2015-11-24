@@ -104,6 +104,8 @@ namespace RoadNamer.Panels
             m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
             m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
             m_colourSelector.tooltip = "Set the text colour";
+            m_colourSelector.selectedColor = new Color(1, 1, 1);
+            m_colourSelector.color = new Color(1, 1, 1);
             
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";

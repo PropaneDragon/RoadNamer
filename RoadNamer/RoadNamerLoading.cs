@@ -105,6 +105,8 @@ namespace RoadNamer
                     RenderManager.RegisterRenderableManager(m_roadRenderingManager);
                     m_roadRenderingManager.m_registered = true;
                 }
+
+                OptionsManager.UpdateEverything();
             }
         }
 
