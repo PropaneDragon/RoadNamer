@@ -56,6 +56,7 @@ namespace RoadNamer.Tools
 
                                 if (m_roadNamePanel != null)
                                 {
+                                    RandomNameManager.LoadRandomNames();
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.Show();
