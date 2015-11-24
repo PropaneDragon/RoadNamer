@@ -11,23 +11,27 @@ namespace RoadNamer
 {
     public class RoadNamerSerialiser : SerializableDataExtensionBase
     {
-        const string dataKey = "RoadNamerTool";
+        const string roadDataKey = "RoadNamerTool";
+        const string routeDataKey = "RoadNamerToolRoutes";
 
         public override void OnSaveData()
         {
             Debug.Log("Road Namer: Saving road names");
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            MemoryStream memoryStream = new MemoryStream();
+            MemoryStream roadMemoryStream = new MemoryStream();
+            MemoryStream routeMemoryStream = new MemoryStream();
 
             try
             {
-                RoadContainer[] roadNames = RoadNameManager.Instance().Save();
-
+                RoadContainer[] roadNames = RoadNameManager.Instance().SaveRoads();
+                RouteContainer[] routeNames = RoadNameManager.Instance().SaveRoutes();
                 if (roadNames != null)
                 {
-                    binaryFormatter.Serialize(memoryStream, roadNames);
-                    serializableDataManager.SaveData(dataKey, memoryStream.ToArray());
+                    binaryFormatter.Serialize(roadMemoryStream, roadNames);
+                    serializableDataManager.SaveData(roadDataKey, roadMemoryStream.ToArray());
+                    binaryFormatter.Serialize(routeMemoryStream, routeNames);
+                    serializableDataManager.SaveData(routeDataKey, routeMemoryStream.ToArray());
                     Debug.Log("Road Namer: Road names have been saved!");
                 }
                 else
@@ -41,37 +45,43 @@ namespace RoadNamer
             }
             finally
             {
-                memoryStream.Close();
+                roadMemoryStream.Close();
+                routeMemoryStream.Close();
             }
         }
 
         public override void OnLoadData()
         {
-            LoadRoadNames();
+            LoadNames();
             RandomNameManager.LoadRandomNames();           
         }
 
-        private void LoadRoadNames()
+        private void LoadNames()
         {
             Debug.Log("Road Namer: Loading road names");
 
-            byte[] loadedData = serializableDataManager.LoadData(dataKey);
+            byte[] loadedRoadData = serializableDataManager.LoadData(roadDataKey);
+            byte[] loadedRouteData = serializableDataManager.LoadData(routeDataKey);
 
-            if (loadedData != null)
+            if (loadedRoadData != null)
             {
-                MemoryStream memoryStream = new MemoryStream();
-                memoryStream.Write(loadedData, 0, loadedData.Length);
-                memoryStream.Position = 0;
+                MemoryStream roadMemoryStream = new MemoryStream();
+                MemoryStream routeMemoryStream = new MemoryStream();
+                roadMemoryStream.Write(loadedRoadData, 0, loadedRoadData.Length);
+                roadMemoryStream.Position = 0;
+                routeMemoryStream.Write(loadedRouteData, 0, loadedRouteData.Length);
+                routeMemoryStream.Position = 0;
 
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
 
                 try
                 {
-                    RoadContainer[] roadNames = binaryFormatter.Deserialize(memoryStream) as RoadContainer[];
+                    RoadContainer[] roadNames = binaryFormatter.Deserialize(roadMemoryStream) as RoadContainer[];
+                    RouteContainer[] routeNames = binaryFormatter.Deserialize(routeMemoryStream) as RouteContainer[];
 
                     if (roadNames != null)
                     {
-                        RoadNameManager.Instance().Load(roadNames);
+                        RoadNameManager.Instance().Load(roadNames,routeNames);
                     }
                     else
                     {
@@ -84,7 +94,8 @@ namespace RoadNamer
                 }
                 finally
                 {
-                    memoryStream.Close();
+                    roadMemoryStream.Close();
+                    routeMemoryStream.Close();
                 }
             }
             else

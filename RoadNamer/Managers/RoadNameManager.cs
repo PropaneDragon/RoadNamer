@@ -11,6 +11,7 @@ namespace RoadNamer.Managers
     {
         private static RoadNameManager instance = null;
 
+        public Dictionary<ushort, RouteContainer> m_routeMap = new Dictionary<ushort, RouteContainer>();
         public List<RoadContainer> m_roadList = new List<RoadContainer>();        
         private RoadContainer[] m_roads = null;        
 
@@ -24,7 +25,7 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string name)
+        public void SetRoadName(ushort segmentId, string name, string routeName = null)
         {
             bool foundRoad = false;
 
@@ -46,7 +47,11 @@ namespace RoadNamer.Managers
                 m_roadList.Add(newRoad);
             }
 
-            //Save();
+            if(routeName != null)
+            {
+                RouteContainer newRoute = new RouteContainer(segmentId, routeName);
+                m_routeMap[segmentId] = newRoute;
+            }
         }
 
         public string GetRoadName(ushort segmentId)
@@ -77,19 +82,42 @@ namespace RoadNamer.Managers
             return false;
         }
 
-        public RoadContainer[] Save()
+        public string getRouteName(ushort segmentId)
+        {
+            return routeExists(segmentId) ? m_routeMap[segmentId].m_routeName : null;
+        }
+
+        public bool routeExists(ushort segmentId)
+        {
+            return m_routeMap.ContainsKey(segmentId);
+        }
+
+        public RoadContainer[] SaveRoads()
         {
             m_roads = m_roadList.ToArray();
 
             return m_roads;
         }
 
-        public void Load(RoadContainer[] roadNames)
+        public RouteContainer[] SaveRoutes()
+        {
+            return new List<RouteContainer>(m_routeMap.Values).ToArray();
+        }
+
+        public void Load(RoadContainer[] roadNames, RouteContainer[] routeNames)
         {
             if (roadNames != null)
             {
                 m_roads = roadNames;
                 Initialise();
+            }
+
+            if(routeNames != null)
+            {
+                foreach (RouteContainer route in routeNames)
+                {
+                    m_routeMap[route.m_segmentId] = route;
+                }
             }
         }
 
@@ -114,5 +142,19 @@ namespace RoadNamer.Managers
     {
         public string m_roadName = null;
         public ushort m_segmentId = 0;
+    }
+
+    [Serializable]
+    public class RouteContainer
+    {
+
+        public string m_routeName = null;
+        public ushort m_segmentId = 0;
+
+        public RouteContainer(ushort segmentId, string routeName)
+        {
+            this.m_segmentId = segmentId;
+            this.m_routeName = routeName;
+        }
     }
 }
