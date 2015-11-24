@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
+    /// <summary>
+    /// Handles all saving and loading from disk.
+    /// </summary>
     [Serializable()]
     [XmlRoot(ElementName = "SavedOptions")]
     public class SavedOptionManager
@@ -32,6 +35,10 @@ namespace RoadNamer.Managers
             return instance;
         }
 
+        /// <summary>
+        /// Change the instance used for the options.
+        /// </summary>
+        /// <param name="optionManager">The SavedOptionManager to replace the existing manager with.</param>
         public static void SetInstance(SavedOptionManager optionManager)
         {
             if(optionManager != null)
@@ -40,6 +47,9 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Saves all options to the disk. Make sure you've updated the options first.
+        /// </summary>
         public static void SaveOptions()
         {
             XmlSerializer xmlSerialiser = new XmlSerializer(typeof(SavedOptionManager));
@@ -47,8 +57,13 @@ namespace RoadNamer.Managers
 
             xmlSerialiser.Serialize(writer, Instance());
             writer.Close();
+
+            Debug.Log("Road Namer: Saved options file.");
         }
 
+        /// <summary>
+        /// Load all options from the disk.
+        /// </summary>
         public static void LoadOptions()
         {
             if (File.Exists("RoadNameOptions.xml"))
@@ -76,6 +91,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Sets all internal checkbox option values for saving.
+        /// </summary>
+        /// <param name="options">Checkbox options which are going to be saved to disk</param>
         public void SetCheckBoxOptions(RoadCheckBoxOption[] options)
         {
             m_toggles = new StoredCheckBox[options.Length];
@@ -90,6 +109,10 @@ namespace RoadNamer.Managers
             }
         }
 
+        /// <summary>
+        /// Sets all internal slider option values for saving.
+        /// </summary>
+        /// <param name="options">Slider options which are going to be saved to disk</param>
         public void SetSliderOptions(RoadSliderOption[] options)
         {
             m_sliders = new StoredSlider[options.Length];
@@ -105,6 +128,9 @@ namespace RoadNamer.Managers
         }
     }
 
+    /// <summary>
+    /// All checkbox data that gets saved to XML
+    /// </summary>
     [Serializable()]
     public class StoredCheckBox
     {
@@ -115,6 +141,9 @@ namespace RoadNamer.Managers
         public bool data = false;
     }
 
+    /// <summary>
+    /// All slider data that gets saved to XML
+    /// </summary>
     [Serializable()]
     public class StoredSlider
     {

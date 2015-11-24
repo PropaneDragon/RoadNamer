@@ -106,10 +106,14 @@ namespace RoadNamer
                     m_roadRenderingManager.m_registered = true;
                 }
 
+                OptionsManager.m_isIngame = true;
                 OptionsManager.UpdateEverything();
             }
         }
 
+        /// <summary>
+        /// Loads all custom sprites
+        /// </summary>
         private void LoadSprites()
         {
             bool atlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
@@ -173,6 +177,7 @@ namespace RoadNamer
             EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
             EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
             EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
+            OptionsManager.m_isIngame = false;
         }
 
         public override void OnReleased()

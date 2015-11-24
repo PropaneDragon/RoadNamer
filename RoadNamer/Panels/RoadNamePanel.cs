@@ -99,14 +99,13 @@ namespace RoadNamer.Panels
             colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             
             m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
-            m_colourSelector.relativePosition = new Vector3(0, 0);
+            m_colourSelector.selectedColor = new Color(1, 1, 1);
             m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
             m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
             m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
             m_colourSelector.tooltip = "Set the text colour";
-            m_colourSelector.selectedColor = new Color(1, 1, 1);
-            m_colourSelector.color = new Color(1, 1, 1);
-            
+            m_colourSelector.relativePosition = new Vector3(0, 0);
+
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
@@ -150,6 +149,9 @@ namespace RoadNamer.Panels
             SetRoadData();
         }
 
+        /// <summary>
+        /// Gets the colour from the panel and sets it to be rendered/saved
+        /// </summary>
         private void SetRoadData()
         {
             if (m_netSegmentId != 0)
@@ -169,6 +171,10 @@ namespace RoadNamer.Panels
             }
         }
 
+        /// <summary>
+        /// Sets the panel text field to road data. Converts colours.
+        /// </summary>
+        /// <param name="text"></param>
         private void UpdateTextField(string text)
         {
             if (text != null)
