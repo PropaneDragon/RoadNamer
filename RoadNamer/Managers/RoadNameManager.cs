@@ -25,7 +25,7 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string name, string routeName = null)
+        public void SetRoadName(ushort segmentId, string name, string routePrefix = null, int routeNum = -1)
         {
             bool foundRoad = false;
 
@@ -47,9 +47,9 @@ namespace RoadNamer.Managers
                 m_roadList.Add(newRoad);
             }
 
-            if(routeName != null)
+            if(routePrefix != null)
             {
-                RouteContainer newRoute = new RouteContainer(segmentId, routeName);
+                RouteContainer newRoute = new RouteContainer(segmentId, routePrefix, routeNum);
                 m_routeMap[segmentId] = newRoute;
             }
         }
@@ -82,12 +82,20 @@ namespace RoadNamer.Managers
             return false;
         }
 
-        public string getRouteName(ushort segmentId)
+        public string getRoute(ushort segmentId)
         {
-            return routeExists(segmentId) ? m_routeMap[segmentId].m_routeName : null;
+            if( RouteExists(segmentId))
+            {
+                RouteContainer container = m_routeMap[segmentId];
+                return container.m_routePrefix + container.m_routeNum.ToString();
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public bool routeExists(ushort segmentId)
+        public bool RouteExists(ushort segmentId)
         {
             return m_routeMap.ContainsKey(segmentId);
         }
@@ -148,13 +156,16 @@ namespace RoadNamer.Managers
     public class RouteContainer
     {
 
-        public string m_routeName = null;
+        public string m_routePrefix = null;
+        public int m_routeNum = 0;
+
         public ushort m_segmentId = 0;
 
-        public RouteContainer(ushort segmentId, string routeName)
+        public RouteContainer(ushort segmentId, string routePrefix, int routeNum)
         {
             this.m_segmentId = segmentId;
-            this.m_routeName = routeName;
+            this.m_routePrefix = routePrefix;
+            this.m_routeNum = routeNum;
         }
     }
 }
