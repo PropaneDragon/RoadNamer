@@ -138,7 +138,7 @@ namespace RoadNamer.CustomUI
             colorField.size = new Vector2(40f, 26f);
             colorField.normalBgSprite = "ColorPickerOutline";
             colorField.hoveredBgSprite = "ColorPickerOutlineHovered";
-            colorField.selectedColor = Color.black;
+            colorField.selectedColor = Color.white;
             colorField.pickerPosition = UIColorField.ColorPickerPosition.RightAbove;
 
             return colorField;
