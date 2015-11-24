@@ -60,6 +60,9 @@ namespace RoadNamer.Tools
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.Show();
+
+                                    OptionsManager.m_hasOpenedPanel = true;
+                                    OptionsManager.SaveOptions();
                                 }
                             }
                             else

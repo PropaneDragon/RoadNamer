@@ -29,6 +29,9 @@ namespace RoadNamer.Managers
         [XmlArrayItem("StoredDropdownOption", typeof(StoredDropdown))]
         public StoredDropdown[] m_dropdowns = null;
 
+        [XmlElement("SavedVersion", IsNullable = false)]
+        public string m_lastSavedVersion = "";
+
         public static SavedOptionManager Instance()
         {
             if(instance == null)
