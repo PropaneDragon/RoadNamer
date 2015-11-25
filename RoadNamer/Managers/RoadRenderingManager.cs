@@ -11,16 +11,16 @@ namespace RoadNamer.Managers
     /// </summary>
     public class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
     {
-        private Mesh m_nameMesh = null;
-        private Mesh m_iconMesh = null;
-
         private Material m_nameMaterial = null;
         private Material m_iconMaterial = null;
 
         private int m_lastCount = 0;
+        private bool textHidden = false;
 
         public float m_renderHeight = 1000f;
         public float m_textScale = 0.5f;
+        public float m_textQuality = 20f;
+        public float m_textHeightOffset = -2f;
         public bool m_alwaysShowText = false;
         public bool m_registered = false;
         public bool m_textEnabled = true;
@@ -42,6 +42,8 @@ namespace RoadNamer.Managers
 
         protected override void BeginOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
+            DistrictManager districtManager = Singleton<DistrictManager>.instance;
+
             if (m_lastCount != RoadNameManager.Instance().m_roadList.Count)
             {
                 m_lastCount = RoadNameManager.Instance().m_roadList.Count;
@@ -54,6 +56,25 @@ namespace RoadNamer.Managers
                 {
                     Debug.LogException(ex);
                 }
+            }
+
+            if(!textHidden && cameraInfo.m_height > m_renderHeight)
+            {
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                {
+                    road.m_textMesh.GetComponent<Renderer>().enabled = false;
+                }
+
+                textHidden = true;
+            }
+            else if(textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
+            {
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                {
+                    road.m_textMesh.GetComponent<Renderer>().enabled = true;
+                }
+
+                textHidden = false;
             }
         }
 
@@ -85,19 +106,25 @@ namespace RoadNamer.Managers
 
                             if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
                             {
+                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
+                                NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
+
                                 Vector3 segmentLocation = netSegment.m_bounds.center;
-                                
-                                GameObject Text = new GameObject();
-                                TextMesh testTextMesh = Text.AddComponent<TextMesh>();
-                                testTextMesh.anchor = TextAnchor.MiddleCenter;
-                                testTextMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
-                                testTextMesh.GetComponent<Renderer>().material = testTextMesh.font.material;
-                                testTextMesh.fontSize = 20;
-                                testTextMesh.transform.position = segmentLocation;
-                                testTextMesh.transform.rotation = netSegment.Info.transform.rotation * Quaternion.Euler(90, 0, 90);
-                                testTextMesh.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-                                testTextMesh.richText = true;
-                                testTextMesh.text = roadName;
+
+                                float scaleMultiplier = m_textQuality / 20f;
+
+                                road.m_textMesh.anchor = TextAnchor.MiddleCenter;
+                                road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
+                                road.m_textMesh.transform.position = startNode.m_position;
+                                road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                road.m_textMesh.transform.Rotate(90f, 0f, 90f);
+                                road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
+                                road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                road.m_textMesh.offsetZ = m_textHeightOffset;
+                                road.m_textMesh.richText = true;
+                                road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
                             }
                         }
                     }
