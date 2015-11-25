@@ -58,12 +58,16 @@ namespace RoadNamer.Tools
 
                                 if (m_roadNamePanel != null)
                                 {
+                                    RandomNameManager.LoadRandomNames();
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
                                     m_roadNamePanel.Show();
                                     m_usedNamesPanel.RefreshList();
                                     m_usedNamesPanel.Show();
+
+                                    OptionsManager.m_hasOpenedPanel = true;
+                                    OptionsManager.SaveOptions();
                                 }
                             }
                             else

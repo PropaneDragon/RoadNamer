@@ -13,6 +13,7 @@ namespace RoadNamer.Panels
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
+        private InfoPanel m_infoPanel;
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIColorField m_colourSelector;
@@ -52,12 +53,16 @@ namespace RoadNamer.Panels
         {
             base.Start();
 
+            m_infoPanel = this.AddUIComponent<InfoPanel>();
+            m_infoPanel.Hide();
+
             m_panelTitle = this.AddUIComponent<UITitleBar>();
             m_panelTitle.title = "Set a name";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
 
             CreatePanelComponents();
+            CreateUpdatePanel();
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
@@ -75,12 +80,15 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
+            m_infoPanel.relativePosition = new Vector3(this.width - 20, -(m_infoPanel.height - 20));
+
             m_textField = CustomUI.UIUtils.CreateTextField(this);
             m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
             m_textField.height = 21;
             m_textField.width = this.width - m_UIPadding.left - (m_UIPadding.right * 2) - m_textField.height;
             m_textField.eventKeyDown += M_textField_eventKeyDown;
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
+            m_textField.textColor = Color.white;
             
             UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
             randomNameButton.text = "";
@@ -99,7 +107,6 @@ namespace RoadNamer.Panels
             colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             
             m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
-            m_colourSelector.selectedColor = new Color(1, 1, 1);
             m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
             m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
             m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
@@ -114,6 +121,15 @@ namespace RoadNamer.Panels
             nameRoadButton.tooltip = "Create the label";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
+        }
+
+        private void CreateUpdatePanel()
+        {
+            if (OptionsManager.m_versionStringFull != SavedOptionManager.Instance().m_lastSavedVersion)
+            {
+                OptionsManager.SaveOptions();
+                m_infoPanel.Show();
+            }
         }
 
         private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)

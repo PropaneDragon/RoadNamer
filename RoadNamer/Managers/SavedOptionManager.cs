@@ -25,6 +25,13 @@ namespace RoadNamer.Managers
         [XmlArrayItem("StoredSliderOption", typeof(StoredSlider))]
         public StoredSlider[] m_sliders = null;
 
+        [XmlArray("StoredDropdownOptions")]
+        [XmlArrayItem("StoredDropdownOption", typeof(StoredDropdown))]
+        public StoredDropdown[] m_dropdowns = null;
+
+        [XmlElement("SavedVersion", IsNullable = false)]
+        public string m_lastSavedVersion = "";
+
         public static SavedOptionManager Instance()
         {
             if(instance == null)
@@ -126,6 +133,24 @@ namespace RoadNamer.Managers
                 };
             }
         }
+
+        /// <summary>
+        /// Sets all internal slider option values for saving.
+        /// </summary>
+        /// <param name="options">Slider options which are going to be saved to disk</param>
+        public void SetDropdownOptions(RoadDropdownOption[] options)
+        {
+            m_dropdowns = new StoredDropdown[options.Length];
+
+            for (int index = 0; index < options.Length; ++index)
+            {
+                m_dropdowns[index] = new StoredDropdown()
+                {
+                    linkedOption = options[index].uniqueName,
+                    data = options[index].value
+                };
+            }
+        }
     }
 
     /// <summary>
@@ -152,5 +177,18 @@ namespace RoadNamer.Managers
 
         [XmlElement("OptionData", IsNullable = false)]
         public float data = .0f;
+    }
+
+    /// <summary>
+    /// All slider data that gets saved to XML
+    /// </summary>
+    [Serializable()]
+    public class StoredDropdown
+    {
+        [XmlElement("LinkedOption", IsNullable = false)]
+        public string linkedOption = "";
+
+        [XmlElement("OptionData", IsNullable = false)]
+        public int data = 0;
     }
 }
