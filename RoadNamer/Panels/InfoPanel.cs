@@ -58,11 +58,11 @@ namespace RoadNamer.Panels
         {
             float lastHeight = m_infoLabel.height;
 
-            m_infoLabel.text =
-                "- <color#c8f582>Make your own random road names!</color> Visit the workshop page to find out how to make your own.\n\n" +
+            m_infoLabel.text = "- <color#c8f582>Text now aligns to roads!</color> That's right, text no longer follows your screen and sticks to roads. There's some more options to play with too.\n\n";
+                /*"- <color#c8f582>Make your own random road names!</color> Visit the workshop page to find out how to make your own.\n\n" +
                 "- <color#c8f582>US style</color> random road names added. Change the random names in the options panel.\n\n" +
                 "- Ability to <color#c8f582>disable all text rendering</color> added to the options panel.\n\n" +
-                "- Default road names are now white. (They can be changed using the colour selector)";
+                "- Default road names are now white. (They can be changed using the colour selector)";*/
 
             float heightDifference = m_infoLabel.height - lastHeight;
 

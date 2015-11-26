@@ -38,10 +38,10 @@ namespace RoadNamer.Managers
             if(oldName != null)
             {
                 m_usedNames.Remove(StringUtilities.RemoveTags(oldName));
-            }
+                }
             m_usedNames.Add(StringUtilities.RemoveTags(newName));
             EventBusManager.Instance().Publish("forceupdateroadnames", null);
-        }
+            }
 
         public string GetRoadName(ushort segmentId)
         {
@@ -65,6 +65,16 @@ namespace RoadNamer.Managers
             {
                 foreach (RoadContainer road in m_roadDict.Values)
                 {
+                    if(road.m_textObject == null)
+                    {
+                        road.m_textObject = new GameObject();
+                    }
+
+                    if(road.m_textMesh == null)
+                    {
+                        road.m_textMesh = road.m_textObject.AddComponent<TextMesh>();
+                    }
+
                     m_roadDict[road.m_segmentId] = road;
                     m_usedNames.Add(StringUtilities.RemoveTags(road.m_roadName));
                 }
@@ -81,6 +91,12 @@ namespace RoadNamer.Managers
     {
         public string m_roadName = null;
         public ushort m_segmentId = 0;
+
+        [NonSerialized]
+        public GameObject m_textObject;
+
+        [NonSerialized]
+        public TextMesh m_textMesh;
 
         public RoadContainer(ushort segmentId, string roadName)
         {
