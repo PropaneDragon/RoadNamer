@@ -42,6 +42,8 @@ namespace RoadNamer.Managers
                 RoadContainer newRoad = new RoadContainer();
                 newRoad.m_roadName = name;
                 newRoad.m_segmentId = segmentId;
+                newRoad.m_textObject = new GameObject();
+                newRoad.m_textMesh = newRoad.m_textObject.AddComponent<TextMesh>();
 
                 m_roadList.Add(newRoad);
             }
@@ -99,6 +101,16 @@ namespace RoadNamer.Managers
             {
                 foreach (RoadContainer road in m_roads)
                 {
+                    if(road.m_textObject == null)
+                    {
+                        road.m_textObject = new GameObject();
+                    }
+
+                    if(road.m_textMesh == null)
+                    {
+                        road.m_textMesh = road.m_textObject.AddComponent<TextMesh>();
+                    }
+
                     m_roadList.Add(road);
                 }
             }
@@ -114,5 +126,11 @@ namespace RoadNamer.Managers
     {
         public string m_roadName = null;
         public ushort m_segmentId = 0;
+
+        [NonSerialized]
+        public GameObject m_textObject;
+
+        [NonSerialized]
+        public TextMesh m_textMesh;
     }
 }
