@@ -45,7 +45,7 @@ namespace RoadNamer.Managers
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
-            if (m_lastCount != RoadNameManager.Instance().m_roadList.Count)
+            if (m_lastCount != RoadNameManager.Instance().m_roadDict.Count)
             {
                 m_lastCount = RoadNameManager.Instance().m_roadDict.Count;
 
@@ -61,7 +61,7 @@ namespace RoadNamer.Managers
 
             if(!textHidden && cameraInfo.m_height > m_renderHeight)
             {
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = false;
             }
@@ -70,7 +70,7 @@ namespace RoadNamer.Managers
             }
             else if(textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
         {
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
             {
                     road.m_textMesh.GetComponent<Renderer>().enabled = true;
                     }
