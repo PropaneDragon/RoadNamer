@@ -81,6 +81,7 @@ namespace RoadNamer
                 catch (Exception ex)
                 {
                     LoggerUtilities.LogException(ex);
+
                 }
                 finally
                 {

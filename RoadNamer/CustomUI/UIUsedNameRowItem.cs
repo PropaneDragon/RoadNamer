@@ -27,12 +27,11 @@ namespace RoadNamer.CustomUI
             background.zOrder = 0;
 
             label = this.AddUIComponent<UILabel>();
-            label.textScale = 0.6f;
+            label.textScale = 1f;
             label.size = new Vector2(width, height);
             label.textColor = new Color32(180, 180, 180, 255);
-            label.relativePosition = Vector2.zero;
+            label.relativePosition = new Vector2(0,height*0.25f);
             label.textAlignment = UIHorizontalAlignment.Left;
-            label.processMarkup = true;
         }
 
         protected override void OnClick(UIMouseEventParameter p)

@@ -33,5 +33,14 @@ namespace RoadNamer.Utilities
 
             return returnName;
         }
+
+        //Taken from http://stackoverflow.com/a/644115
+        public static string PadCenter(this string s, int width, char c)
+        {
+            if (s == null || width <= s.Length) return s;
+
+            int padding = width - s.Length;
+            return s.PadLeft(s.Length + padding / 2, c).PadRight(width, c);
+        }
     }
 }

@@ -116,9 +116,9 @@ namespace RoadNamer
         /// </summary>
         private void LoadSprites()
         {
-            bool atlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
+            bool iconAtlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
 
-            if (atlasSuccess)
+            if (iconAtlasSuccess )
             {
                 bool spriteSuccess = true;
 
@@ -127,6 +127,13 @@ namespace RoadNamer
                 spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons") && spriteSuccess;
                 spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons") && spriteSuccess;
                 spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
+
+                //TODO: Replace with a loader function( JSON mapping available )
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/ontario.png","ontario") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/bc.png", "bc") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/australia.png", "australia") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/interstate.png", "interstate") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/usroute.png", "usroute") && spriteSuccess;
 
                 if (!spriteSuccess)
                 {

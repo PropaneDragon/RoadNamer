@@ -59,25 +59,30 @@ namespace RoadNamer.Managers
                 }
             }
 
-            if(!textHidden && cameraInfo.m_height > m_renderHeight)
+            if (!textHidden && cameraInfo.m_height > m_renderHeight)
             {
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = false;
-            }
+                    road.m_shieldMesh.GetComponent<Renderer>().enabled = false;
+                    road.m_numMesh.GetComponent<Renderer>().enabled = false;
+
+                }
 
                 textHidden = true;
             }
-            else if(textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
-        {
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+            else if (textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
             {
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+                {
                     road.m_textMesh.GetComponent<Renderer>().enabled = true;
-                    }
+                    road.m_shieldMesh.GetComponent<Renderer>().enabled = true;
+                    road.m_numMesh.GetComponent<Renderer>().enabled = true;
+                }
 
                 textHidden = false;
-                }
             }
+        }
 
         /// <summary>
         /// Redraw the text to be drawn later with a mesh. Use sparingly, as 
@@ -92,7 +97,6 @@ namespace RoadNamer.Managers
                 UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
 
                 NetManager netManager = Singleton<NetManager>.instance;
-                //NetSegment[] netSegments = netManager.m_segments.m_buffer;
 
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
@@ -120,15 +124,48 @@ namespace RoadNamer.Managers
                                 road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
                                 road.m_textMesh.transform.position = startNode.m_position;
                                 road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
                                 road.m_textMesh.transform.Rotate(90f, 0f, 90f);
                                 road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
                                 road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
                                 road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.richText = true;
                                 road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
+
+                                //road.m_shieldObject.GetComponent<Renderer>().material = SpriteUtilities.m_textureStore["Interstate"];
+                                Material mat = SpriteUtilities.m_textureStore["ontario"];
+                                if (road.m_shieldObject.GetComponent<Renderer>() != null)
+                                {
+                                    road.m_shieldObject.GetComponent<Renderer>().material = mat;
+                                    road.m_shieldMesh.mesh = MeshUtilities.CreateSquareMesh(mat.mainTexture.width, mat.mainTexture.height);
+                                    Vector3 startNodePosition = startNode.m_position;
+                                    road.m_shieldMesh.transform.position = startNodePosition;
+                                    road.m_shieldMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                    road.m_shieldMesh.transform.Rotate(90f, 0f, 90f);
+                                    road.m_shieldMesh.transform.position += (Vector3.up *(0.5f));
+                                    road.m_shieldMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                    road.m_shieldObject.GetComponent<Renderer>().sortingOrder = 1000;
+
+                                    road.m_numMesh.anchor = TextAnchor.MiddleCenter;
+                                    road.m_numMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                    road.m_numMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                    road.m_numMesh.fontSize = 50;
+                                    road.m_numMesh.transform.position = startNode.m_position;
+                                    road.m_numMesh.transform.parent = road.m_shieldObject.transform;
+                                    road.m_numMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                    road.m_numMesh.transform.Rotate(90f, 0f, 90f);
+                                    road.m_numMesh.transform.position = road.m_shieldObject.GetComponent<Renderer>().bounds.center;
+                                    road.m_numMesh.offsetZ = 0.001f;
+                                    road.m_numMesh.transform.localPosition += (Vector3.up * -0.65f);
+                                    road.m_numMesh.transform.localScale = new Vector3(m_textScale / (scaleMultiplier*2f), m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f));
+                                    road.m_numMesh.color = Color.black;
+                                    road.m_numMesh.text = "401"; //Convert from Colossal to Unity tags
+                                    road.m_numTextObject.GetComponent<Renderer>().sortingOrder = 1001;
+                                }
+
+                            }
+                        }
                     }
-                }
-                }
                 }
             }
         }

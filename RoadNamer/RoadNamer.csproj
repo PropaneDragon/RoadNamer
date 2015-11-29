@@ -58,6 +58,7 @@
     <Compile Include="Managers\SavedOptionManager.cs" />
     <Compile Include="Panels\InfoPanel.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
+    <Compile Include="Utilities\MeshUtilities.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
     <Compile Include="CustomUI\UIFastList.cs" />
     <Compile Include="CustomUI\UIUsedNameRowItem.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="Utilities\SpriteUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Icons\shields.png" />
+    <Content Include="Icons\shield.txt" />
     <Content Include="Icons\UIIcons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -85,7 +88,10 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\SteamApps\workshop\content\255710\558960454\"</PostBuildEvent>
+    <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"
+del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)"
+xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"
+xcopy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\SteamApps\workshop\content\255710\558960454\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

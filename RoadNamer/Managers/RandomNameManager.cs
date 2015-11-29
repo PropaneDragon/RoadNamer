@@ -105,7 +105,7 @@ namespace RoadNamer.Managers
                                 LoggerUtilities.LogError("Couldn't load random names!");
                             }
 
-                            LoggerUtilities.Log("Loaded name XML \"" + filePath + "\"");
+                            LoggerUtilities.Log("Loaded name XML \"" + fullFilePath + "\"");
                         }
                     }
                 }

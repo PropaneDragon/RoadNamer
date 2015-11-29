@@ -20,6 +20,8 @@ namespace RoadNamer.Utilities
         */
         public static Dictionary<string, UITextureAtlas> m_atlasStore = new Dictionary<string, UITextureAtlas>();
 
+        public static Dictionary<string, Material> m_textureStore = new Dictionary<string, Material>();
+
         /// <summary>
         /// Returns a stored atlas.
         /// </summary>
@@ -29,7 +31,7 @@ namespace RoadNamer.Utilities
         {
             UITextureAtlas returnAtlas = null;
 
-            if(m_atlasStore.ContainsKey(atlasName))
+            if (m_atlasStore.ContainsKey(atlasName))
             {
                 returnAtlas = m_atlasStore[atlasName];
             }
@@ -48,15 +50,15 @@ namespace RoadNamer.Utilities
             bool returnValue = false;
             string modPath = FileUtilities.GetModPath();
 
-            if(modPath != null)
+            if (modPath != null)
             {
                 Shader shader = Shader.Find("UI/Default UI Shader");
 
-                if(shader != null)
+                if (shader != null)
                 {
                     string fullPath = modPath + "/" + texturePath;
 
-                    if(File.Exists(fullPath))
+                    if (File.Exists(fullPath))
                     {
                         Texture2D spriteTexture = new Texture2D(2, 2);
                         FileStream fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
@@ -130,6 +132,31 @@ namespace RoadNamer.Utilities
             }
 
             return returnValue;
+        }
+
+        public static bool AddTexture( string texturePath, string textureName )
+        {
+            Shader shader = Shader.Find("UI/Default UI Shader");
+            string modPath = FileUtilities.GetModPath();
+            string fullPath = modPath + "/" + texturePath;
+
+            if (!shader || !File.Exists(fullPath))
+            {
+                return false;
+            }
+
+            Texture2D texture = new Texture2D(2, 2);
+            FileStream fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+            byte[] imageData = new byte[fileStream.Length];
+
+            fileStream.Read(imageData, 0, (int)fileStream.Length);
+            texture.LoadImage(imageData);
+            FixTransparency(texture);
+
+            Material material = new Material(shader);
+            material.mainTexture = texture;
+            m_textureStore[textureName] = material;
+            return true;
         }
 
         //I also copied this from Traffic++, which was copied from below

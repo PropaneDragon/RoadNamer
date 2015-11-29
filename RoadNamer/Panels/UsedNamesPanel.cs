@@ -63,7 +63,7 @@ namespace RoadNamer.Panels
         public void RefreshList()
         {
             scrollOptionsList.rowsData.Clear();
-            foreach (string usedName in RoadNameManager.Instance().m_usedNames)
+            foreach (string usedName in RoadNameManager.Instance().m_usedNames.Keys)
             {
                 scrollOptionsList.rowsData.Add(usedName);
             }
@@ -73,7 +73,6 @@ namespace RoadNamer.Panels
 
         public void onReceiveEvent(string eventName, object eventData)
         {
-            LoggerUtilities.LogToConsole(eventName);
             string message = eventData as string;
             switch (eventName)
             {

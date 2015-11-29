@@ -19,7 +19,7 @@ namespace RoadNamer.Managers
         /// <summary>
         /// Hashset of names already used( for random name generator)
         /// </summary> 
-        public HashSet<string> m_usedNames = new HashSet<string>();
+        public Dictionary<string,int > m_usedNames = new Dictionary<string, int>();
 
         public static RoadNameManager Instance()
         {
@@ -31,17 +31,53 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string newName, string oldName=null)
+        public void SetRoadName(ushort segmentId, string newName, string oldName = null)
         {
-			RoadContainer container = new RoadContainer( segmentId, newName );
-            m_roadDict[segmentId] = container;
-            if(oldName != null)
+            RoadContainer container = null;
+            if (m_roadDict.ContainsKey(segmentId))
             {
-                m_usedNames.Remove(StringUtilities.RemoveTags(oldName));
-                }
-            m_usedNames.Add(StringUtilities.RemoveTags(newName));
-            EventBusManager.Instance().Publish("forceupdateroadnames", null);
+                container = m_roadDict[segmentId];
+                container.m_roadName = newName;
             }
+            else
+            {
+                container = new RoadContainer(segmentId, newName);
+                if (container.m_textObject == null)
+                {
+                    container.m_textObject = new GameObject();
+                    container.m_textObject.AddComponent<MeshRenderer>();
+                    container.m_textMesh = container.m_textObject.AddComponent<TextMesh>();
+                    container.m_shieldObject = new GameObject();
+                    container.m_shieldObject.AddComponent<MeshRenderer>();
+                    container.m_shieldMesh = container.m_shieldObject.AddComponent<MeshFilter>();
+                    container.m_numTextObject = new GameObject();
+                    container.m_numTextObject.AddComponent<MeshRenderer>();
+                    container.m_numMesh = container.m_numTextObject.AddComponent<TextMesh>();
+                }
+            }
+            m_roadDict[segmentId] = container;
+
+            if (oldName != null)
+            {
+                string strippedOldName = StringUtilities.RemoveTags(oldName);
+                if (m_usedNames.ContainsKey(strippedOldName))
+                {
+                    m_usedNames[strippedOldName] -= 1;
+                    if (m_usedNames[strippedOldName] <= 0)
+                    {
+                        m_usedNames.Remove(strippedOldName);
+                    }
+
+                }
+            }
+            string strippedNewName = StringUtilities.RemoveTags(newName);
+            if (!m_usedNames.ContainsKey(strippedNewName))
+            {
+                m_usedNames[strippedNewName] = 0;
+            }
+            m_usedNames[strippedNewName] += 1;
+            EventBusManager.Instance().Publish("forceupdateroadnames", null);
+        }
 
         public string GetRoadName(ushort segmentId)
         {
@@ -63,20 +99,28 @@ namespace RoadNamer.Managers
         {
             if (m_roadDict != null)
             {
-                foreach (RoadContainer road in m_roadDict.Values)
+                foreach (RoadContainer road in roadNames)
                 {
-                    if(road.m_textObject == null)
+                    if (road.m_textObject == null)
                     {
                         road.m_textObject = new GameObject();
-                    }
+                        road.m_textObject.AddComponent<MeshRenderer>();
 
-                    if(road.m_textMesh == null)
-                    {
                         road.m_textMesh = road.m_textObject.AddComponent<TextMesh>();
+                        road.m_shieldObject = new GameObject();
+                        road.m_shieldObject.AddComponent<MeshRenderer>();
+                        road.m_shieldMesh = road.m_shieldObject.AddComponent<MeshFilter>();
+                        road.m_numTextObject = new GameObject();
+                        road.m_numTextObject.AddComponent<MeshRenderer>();
+                        road.m_numMesh = road.m_numTextObject.AddComponent<TextMesh>();
                     }
-
                     m_roadDict[road.m_segmentId] = road;
-                    m_usedNames.Add(StringUtilities.RemoveTags(road.m_roadName));
+                    string strippedNewName = StringUtilities.RemoveTags(road.m_roadName);
+                    if (!m_usedNames.ContainsKey(strippedNewName))
+                    {
+                        m_usedNames[strippedNewName] = 0;
+                    }
+                    m_usedNames[strippedNewName] += 1;
                 }
             }
             else
@@ -96,7 +140,19 @@ namespace RoadNamer.Managers
         public GameObject m_textObject;
 
         [NonSerialized]
+        public GameObject m_shieldObject;
+
+        [NonSerialized]
         public TextMesh m_textMesh;
+
+        [NonSerialized]
+        public MeshFilter m_shieldMesh;
+
+        [NonSerialized]
+        public GameObject m_numTextObject;
+
+        [NonSerialized]
+        public TextMesh m_numMesh;
 
         public RoadContainer(ushort segmentId, string roadName)
         {

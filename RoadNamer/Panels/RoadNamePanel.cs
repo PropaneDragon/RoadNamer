@@ -211,7 +211,6 @@ namespace RoadNamer.Panels
 
         public void onReceiveEvent(string eventName, object eventData)
         {
-            LoggerUtilities.LogToConsole(eventName);
             string message = eventData as string;
             switch (eventName)
             {
