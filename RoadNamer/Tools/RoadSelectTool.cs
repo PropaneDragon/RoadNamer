@@ -58,13 +58,17 @@ namespace RoadNamer.Tools
 
                                 if (m_roadNamePanel != null)
                                 {
+#if DEBUG
                                     NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
                                     NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
                                     Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
                                     LoggerUtilities.LogToConsole(rotation.ToString());
-
+#endif
                                     RandomNameManager.LoadRandomNames();
+                                    m_roadNamePanel.m_initialRouteNum = RoadNameManager.Instance().getRouteNum(netSegmentId);
+                                    m_roadNamePanel.m_initialRoutePrefix = RoadNameManager.Instance().getRouteType(netSegmentId);
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
+
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
                                     m_roadNamePanel.Show();

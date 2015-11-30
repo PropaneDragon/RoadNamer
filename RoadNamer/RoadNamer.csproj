@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomUI\UIUsedRouteRowItem.cs" />
     <Compile Include="Managers\OptionsManager.cs" />
     <Compile Include="Managers\RandomNameManager.cs" />
     <Compile Include="Managers\SavedOptionManager.cs" />

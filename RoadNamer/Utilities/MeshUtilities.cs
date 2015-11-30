@@ -8,7 +8,7 @@ namespace RoadNamer.Utilities
 {
     public static class MeshUtilities
     {
-        public static Mesh CreateSquareMesh(float width, float height)
+        public static Mesh CreateRectMesh(float width, float height)
         {
 
             Mesh mesh = new Mesh();

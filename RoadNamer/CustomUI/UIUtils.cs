@@ -74,11 +74,11 @@ namespace RoadNamer.CustomUI
             return textField;
         }
 
-        public static UIDropDown CreateDropDown(UIComponent parent)
+        public static UIDropDown CreateDropDown(UIComponent parent, Vector2 size)
         {
             UIDropDown dropDown = parent.AddUIComponent<UIDropDown>();
             dropDown.atlas = defaultAtlas;
-            dropDown.size = new Vector2(90f, 30f);
+            dropDown.size = size;
             dropDown.listBackground = "GenericPanelLight";
             dropDown.itemHeight = 30;
             dropDown.itemHover = "ListItemHover";

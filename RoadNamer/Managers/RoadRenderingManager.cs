@@ -64,11 +64,12 @@ namespace RoadNamer.Managers
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = false;
-                    road.m_shieldMesh.GetComponent<Renderer>().enabled = false;
-                    road.m_numMesh.GetComponent<Renderer>().enabled = false;
-
                 }
-
+                foreach( RouteContainer route in RoadNameManager.Instance().m_routeMap.Values )
+                {
+                    route.m_shieldMesh.GetComponent<Renderer>().enabled = false;
+                    route.m_numMesh.GetComponent<Renderer>().enabled = false;
+                }
                 textHidden = true;
             }
             else if (textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
@@ -76,10 +77,12 @@ namespace RoadNamer.Managers
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = true;
-                    road.m_shieldMesh.GetComponent<Renderer>().enabled = true;
-                    road.m_numMesh.GetComponent<Renderer>().enabled = true;
                 }
-
+                foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                {
+                    route.m_shieldMesh.GetComponent<Renderer>().enabled = true;
+                    route.m_numMesh.GetComponent<Renderer>().enabled = true;
+                }
                 textHidden = false;
             }
         }
@@ -97,6 +100,7 @@ namespace RoadNamer.Managers
                 UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
 
                 NetManager netManager = Singleton<NetManager>.instance;
+                float scaleMultiplier = m_textQuality / 20f;
 
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
@@ -115,9 +119,6 @@ namespace RoadNamer.Managers
                                 NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
 
                                 Vector3 segmentLocation = netSegment.m_bounds.center;
-
-                                float scaleMultiplier = m_textQuality / 20f;
-
                                 road.m_textMesh.anchor = TextAnchor.MiddleCenter;
                                 road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
                                 road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
@@ -131,37 +132,58 @@ namespace RoadNamer.Managers
                                 road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.richText = true;
                                 road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
+                            }
+                        }
+                    }
+                }
+                foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                {
+                    if (route.m_segmentId != 0)
+                    {
+                        int routeNum = route.m_routeNum;
 
-                                //road.m_shieldObject.GetComponent<Renderer>().material = SpriteUtilities.m_textureStore["Interstate"];
+                        if (routeNum != 0)
+                        {
+                            NetSegment netSegment = netManager.m_segments.m_buffer[route.m_segmentId];
+                            NetSegment.Flags segmentFlags = netSegment.m_flags;
+
+                            if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
+                            {
+                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
+                                NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
+                                //TODO: Make texture addition/selection based on prefix type
                                 Material mat = SpriteUtilities.m_textureStore["ontario"];
-                                if (road.m_shieldObject.GetComponent<Renderer>() != null)
-                                {
-                                    road.m_shieldObject.GetComponent<Renderer>().material = mat;
-                                    road.m_shieldMesh.mesh = MeshUtilities.CreateSquareMesh(mat.mainTexture.width, mat.mainTexture.height);
-                                    Vector3 startNodePosition = startNode.m_position;
-                                    road.m_shieldMesh.transform.position = startNodePosition;
-                                    road.m_shieldMesh.transform.LookAt(endNode.m_position, Vector3.up);
-                                    road.m_shieldMesh.transform.Rotate(90f, 0f, 90f);
-                                    road.m_shieldMesh.transform.position += (Vector3.up *(0.5f));
-                                    road.m_shieldMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
-                                    road.m_shieldObject.GetComponent<Renderer>().sortingOrder = 1000;
+                                route.m_shieldObject.GetComponent<Renderer>().material = mat;
+                                //TODO: Make mesh size dependent on text size
+                                route.m_shieldMesh.mesh = MeshUtilities.CreateRectMesh(mat.mainTexture.width, mat.mainTexture.height);
+                                Vector3 startNodePosition = startNode.m_position;
+                                route.m_shieldMesh.transform.position = startNodePosition;
+                                route.m_shieldMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                route.m_shieldMesh.transform.Rotate(90f, 0f, 90f);
+                                //TODO: Bind the elevation of the mesh to the text z offset
+                                route.m_shieldMesh.transform.position += (Vector3.up * (0.5f));
+                                route.m_shieldMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                route.m_shieldObject.GetComponent<Renderer>().sortingOrder = 1000;
 
-                                    road.m_numMesh.anchor = TextAnchor.MiddleCenter;
-                                    road.m_numMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
-                                    road.m_numMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
-                                    road.m_numMesh.fontSize = 50;
-                                    road.m_numMesh.transform.position = startNode.m_position;
-                                    road.m_numMesh.transform.parent = road.m_shieldObject.transform;
-                                    road.m_numMesh.transform.LookAt(endNode.m_position, Vector3.up);
-                                    road.m_numMesh.transform.Rotate(90f, 0f, 90f);
-                                    road.m_numMesh.transform.position = road.m_shieldObject.GetComponent<Renderer>().bounds.center;
-                                    road.m_numMesh.offsetZ = 0.001f;
-                                    road.m_numMesh.transform.localPosition += (Vector3.up * -0.65f);
-                                    road.m_numMesh.transform.localScale = new Vector3(m_textScale / (scaleMultiplier*2f), m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f));
-                                    road.m_numMesh.color = Color.black;
-                                    road.m_numMesh.text = "401"; //Convert from Colossal to Unity tags
-                                    road.m_numTextObject.GetComponent<Renderer>().sortingOrder = 1001;
-                                }
+                                route.m_numMesh.anchor = TextAnchor.MiddleCenter;
+                                route.m_numMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                route.m_numMesh.GetComponent<Renderer>().material = route.m_numMesh.font.material;
+                                //TODO: Tie the font size to the font size option
+                                route.m_numMesh.fontSize = 50;
+                                route.m_numMesh.transform.position = startNode.m_position;
+                                route.m_numMesh.transform.parent = route.m_shieldObject.transform;
+                                route.m_numMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                route.m_numMesh.transform.Rotate(90f, 0f, 90f);
+                                route.m_numMesh.transform.position = route.m_shieldObject.GetComponent<Renderer>().bounds.center;
+                                //Just a hack, to make sure the text actually shows up above the shield
+                                route.m_numMesh.offsetZ = 0.001f;
+                                //TODO: Definitely get a map of the texture to the required text offsets 
+                                route.m_numMesh.transform.localPosition += (Vector3.up * -0.61f);
+                                route.m_numMesh.transform.localPosition += (Vector3.left * 0f);
+                                route.m_numMesh.transform.localScale = new Vector3(m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f));
+                                route.m_numMesh.color = Color.black;
+                                route.m_numMesh.text = route.m_routeNum.ToString();
+                                route.m_numTextObject.GetComponent<Renderer>().sortingOrder = 1001;
 
                             }
                         }

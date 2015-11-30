@@ -1,14 +1,19 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-using RoadNamer.Utilities;
+﻿using ColossalFramework.UI;
 using RoadNamer.Managers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 
 namespace RoadNamer.CustomUI
 {
-     public class UIUsedNameRowItem : UIPanel, IUIFastListRow
+    public class UIUsedRouteRowItem : UIPanel, IUIFastListRow
     {
         private UIPanel background;
         private UILabel label;
+        private int routeNum;
+        private string routePrefix;
 
         public override void Start()
         {
@@ -30,26 +35,27 @@ namespace RoadNamer.CustomUI
             label.textScale = 1f;
             label.size = new Vector2(width, height);
             label.textColor = new Color32(180, 180, 180, 255);
-            label.relativePosition = new Vector2(0,height*0.25f);
+            label.relativePosition = new Vector2(0, height * 0.25f);
             label.textAlignment = UIHorizontalAlignment.Left;
         }
 
         protected override void OnClick(UIMouseEventParameter p)
         {
             base.OnClick(p);
-            EventBusManager.Instance().Publish("updateroadnamepaneltext", label.text);
+            EventBusManager.Instance().Publish("updateroutepaneltext", routePrefix+'/'+routeNum);
         }
-        
+
         public void Display(object data, bool isRowOdd)
         {
             if (data != null)
             {
-                string text = data as string;
+                RouteContainer route = data as RouteContainer;
 
-                if (text != null && background != null)
+                if (route != null && background != null)
                 {
-                    label.text = text;
-
+                    label.text = route.m_routePrefix+route.m_routeNum.ToString();
+                    routeNum = route.m_routeNum;
+                    routePrefix = route.m_routePrefix;
                     if (isRowOdd)
                     {
                         background.backgroundSprite = "UnlockingItemBackground";

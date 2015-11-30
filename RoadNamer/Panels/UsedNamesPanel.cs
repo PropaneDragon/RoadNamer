@@ -16,7 +16,9 @@ namespace RoadNamer.Panels
 
         private int titleOffset = 40;
         private UITitleBar m_panelTitle;
-        public UIFastList scrollOptionsList = null;
+        public UIFastList usedNamesList = null;
+        public UIFastList usedRoutesList = null;
+
         private Vector2 offset = Vector2.zero;
 
         public override void Awake()
@@ -47,28 +49,44 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
-            offset = new Vector2(m_UIPadding.left, titleOffset+m_UIPadding.top);
-            scrollOptionsList = UIFastList.Create<UIUsedNameRowItem>(this);
-            scrollOptionsList.backgroundSprite = "UnlockingPanel";
-            scrollOptionsList.size = new Vector2(350-m_UIPadding.left-m_UIPadding.right, 600-titleOffset-m_UIPadding.top-m_UIPadding.bottom);        
-            scrollOptionsList.canSelect = false;
-            scrollOptionsList.relativePosition = offset;
-            scrollOptionsList.rowHeight = 40f;
-            scrollOptionsList.rowsData.Clear();
-            scrollOptionsList.selectedIndex = -1;
+            usedNamesList = UIFastList.Create<UIUsedNameRowItem>(this);
+            usedNamesList.backgroundSprite = "UnlockingPanel";
+            usedNamesList.size = new Vector2(350-m_UIPadding.left-m_UIPadding.right, (600-titleOffset- m_UIPadding.top-2*m_UIPadding.bottom)/2);        
+            usedNamesList.canSelect = true;
+            usedNamesList.relativePosition = new Vector2(m_UIPadding.left, titleOffset + m_UIPadding.top);
+            usedNamesList.rowHeight = 40f;
+            usedNamesList.rowsData.Clear();
+            usedNamesList.selectedIndex = -1;
+
+            usedRoutesList = UIFastList.Create<UIUsedRouteRowItem>(this);
+            usedRoutesList.backgroundSprite = "UnlockingPanel";
+            usedRoutesList.size = new Vector2(350 - m_UIPadding.left - m_UIPadding.right, (600 - titleOffset - m_UIPadding.top - 2*m_UIPadding.bottom) / 2);
+            usedRoutesList.canSelect = true;
+            usedRoutesList.relativePosition = new Vector2(m_UIPadding.left, usedNamesList.relativePosition.y + usedNamesList.height + m_UIPadding.bottom);
+            usedRoutesList.rowHeight = 40f;
+            usedRoutesList.rowsData.Clear();
+            usedRoutesList.selectedIndex = -1;
 
             RefreshList();
         }
 
         public void RefreshList()
         {
-            scrollOptionsList.rowsData.Clear();
+            usedNamesList.rowsData.Clear();
             foreach (string usedName in RoadNameManager.Instance().m_usedNames.Keys)
             {
-                scrollOptionsList.rowsData.Add(usedName);
+                usedNamesList.rowsData.Add(usedName);
             }
-            scrollOptionsList.DisplayAt(0);
-            scrollOptionsList.selectedIndex = 0;
+            usedNamesList.DisplayAt(0);
+            usedNamesList.selectedIndex = 0;
+
+            usedRoutesList.rowsData.Clear();
+            foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+            {
+                usedRoutesList.rowsData.Add(route);
+            }
+            usedRoutesList.DisplayAt(0);
+            usedRoutesList.selectedIndex = 0;
         }
 
         public void onReceiveEvent(string eventName, object eventData)
