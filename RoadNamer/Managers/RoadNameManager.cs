@@ -20,6 +20,7 @@ namespace RoadNamer.Managers
         /// Hashset of names already used( for random name generator)
         /// </summary> 
         public Dictionary<string,int > m_usedNames = new Dictionary<string, int>();
+        public Dictionary<ushort, RouteContainer> m_routeMap = new Dictionary<ushort, RouteContainer>();
 
         public static RoadNameManager Instance()
         {
@@ -31,7 +32,7 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string newName, string oldName = null)
+        public void SetRoadName(ushort segmentId, string newName, string oldName = null, string routePrefix = null,)
         {
             RoadContainer container = null;
             if (m_roadDict.ContainsKey(segmentId))
@@ -40,7 +41,7 @@ namespace RoadNamer.Managers
                 container.m_roadName = newName;
             }
             else
-            {
+                {
                 container = new RoadContainer(segmentId, newName);
                 if (container.m_textObject == null)
                 {
@@ -66,18 +67,23 @@ namespace RoadNamer.Managers
                     if (m_usedNames[strippedOldName] <= 0)
                     {
                         m_usedNames.Remove(strippedOldName);
-                    }
+            }
 
-                }
+            if(routePrefix != null)
+            {
+                RouteContainer newRoute = new RouteContainer(segmentId, routePrefix, routeNum);
+                m_routeMap[segmentId] = newRoute;
+            }
+        }
             }
             string strippedNewName = StringUtilities.RemoveTags(newName);
             if (!m_usedNames.ContainsKey(strippedNewName))
-            {
+        {
                 m_usedNames[strippedNewName] = 0;
-            }
+                }
             m_usedNames[strippedNewName] += 1;
             EventBusManager.Instance().Publish("forceupdateroadnames", null);
-        }
+            }
 
         public string GetRoadName(ushort segmentId)
         {
@@ -89,20 +95,43 @@ namespace RoadNamer.Managers
             return m_roadDict.ContainsKey(segmentId);
         }
 
-        public RoadContainer[] Save()
+        public string getRoute(ushort segmentId)
+        {
+            if( RouteExists(segmentId))
+            {
+                RouteContainer container = m_routeMap[segmentId];
+                return container.m_routePrefix + container.m_routeNum.ToString();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public bool RouteExists(ushort segmentId)
+        {
+            return m_routeMap.ContainsKey(segmentId);
+        }
+
+        public RoadContainer[] SaveRoads()
         {
             List<RoadContainer> returnList = new List<RoadContainer>(m_roadDict.Values);
             return returnList.ToArray();
         }
 
-        public void Load(RoadContainer[] roadNames)
+        public RouteContainer[] SaveRoutes()
+        {
+            return new List<RouteContainer>(m_routeMap.Values).ToArray();
+        }
+
+        public void Load(RoadContainer[] roadNames, RouteContainer[] routeNames)
         {
             if (m_roadDict != null)
             {
                 foreach (RoadContainer road in roadNames)
-                {
+        {
                     if (road.m_textObject == null)
-                    {
+            {
                         road.m_textObject = new GameObject();
                         road.m_textObject.AddComponent<MeshRenderer>();
 
@@ -117,16 +146,20 @@ namespace RoadNamer.Managers
                     m_roadDict[road.m_segmentId] = road;
                     string strippedNewName = StringUtilities.RemoveTags(road.m_roadName);
                     if (!m_usedNames.ContainsKey(strippedNewName))
-                    {
+                {
                         m_usedNames[strippedNewName] = 0;
                     }
                     m_usedNames[strippedNewName] += 1;
                 }
             }
-            else
+            if (routeNames != null)
             {
-                LoggerUtilities.LogError("Something went wrong loading the road names!");
+                foreach (RouteContainer route in routeNames)
+                {
+                    m_routeMap[route.m_segmentId] = route;
+                }
             }
+
         }
     }
 
@@ -158,6 +191,22 @@ namespace RoadNamer.Managers
         {
             this.m_segmentId = segmentId;
             this.m_roadName = roadName;
+        }
+    }
+    [Serializable]
+    public class RouteContainer
+    {
+
+        public string m_routePrefix = null;
+        public int m_routeNum = 0;
+
+        public ushort m_segmentId = 0;
+
+        public RouteContainer(ushort segmentId, string routePrefix, int routeNum)
+        {
+            this.m_segmentId = segmentId;
+            this.m_routePrefix = routePrefix;
+            this.m_routeNum = routeNum;
         }
     }
 }
