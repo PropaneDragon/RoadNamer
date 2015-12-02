@@ -34,6 +34,8 @@ namespace RoadNamer.Tools
         protected override void OnDisable()
         {
             base.OnDisable();
+            EventBusManager.Instance().Publish("closeAll", null);
+
         }
 
         protected override void OnToolUpdate()

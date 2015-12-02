@@ -2,6 +2,7 @@
 using ColossalFramework.UI;
 using System;
 using RoadNamer.Managers;
+using System.Collections.Generic;
 
 namespace RoadNamer.CustomUI
 {
@@ -11,6 +12,8 @@ namespace RoadNamer.CustomUI
         private UILabel m_title;
         private UIButton m_close;
         private UIDragHandle m_drag;
+
+        public List<String> m_closeActions = new List<string>();
 
         public string iconSprite
         {
@@ -103,6 +106,10 @@ namespace RoadNamer.CustomUI
         private void CloseButton_clickedEventHandler(UIComponent component, UIMouseEventParameter eventParam)
         {
             parent.Hide();
+            foreach (string closeAction in m_closeActions)
+            {
+                EventBusManager.Instance().Publish(closeAction, null);
+            }
         }
     }
 }

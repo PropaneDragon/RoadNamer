@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.UI;
 using RoadNamer.CustomUI;
+using RoadNamer.Managers;
 using RoadNamer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using UnityEngine;
 
 namespace RoadNamer.Panels
 {
-    public class InfoPanel : UIPanel
+    public class InfoPanel : UIPanel, IEventSubscriber
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
         private UITitleBar m_panelTitle;
@@ -28,6 +29,7 @@ namespace RoadNamer.Panels
         public override void Start()
         {
             base.Start();
+            EventBusManager.Instance().Subscribe("closeAll", this);
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
             m_panelTitle.title = "I've updated!";
@@ -68,6 +70,19 @@ namespace RoadNamer.Panels
 
             this.height = m_infoLabel.relativePosition.y + m_infoLabel.height + m_UIPadding.bottom + 20;
             this.relativePosition -= new Vector3(0, heightDifference);
+        }
+
+        public void onReceiveEvent(string eventName, object eventData)
+        {
+            string message = eventData as string;
+            switch (eventName)
+            {
+                case "closeAll":
+                    Hide();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

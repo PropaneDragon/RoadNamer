@@ -80,11 +80,14 @@
     <Compile Include="Utilities\SpriteUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icons\shields.png" />
-    <Content Include="Icons\shield.txt" />
+    <Content Include="Icons\AUS.png" />
+    <Content Include="Icons\BC.png" />
+    <Content Include="Icons\I.png" />
+    <Content Include="Icons\ON.png" />
     <Content Include="Icons\UIIcons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Icons\US.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

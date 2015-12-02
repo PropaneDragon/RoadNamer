@@ -69,6 +69,7 @@ namespace RoadNamer.Panels
             m_panelTitle.title = "Set a name";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
+            m_panelTitle.m_closeActions.Add("closeAll");
 
             CreatePanelComponents();
             CreateUpdatePanel();
@@ -312,6 +313,9 @@ namespace RoadNamer.Panels
                         m_routeTypeDropdown.selectedIndex = routeType;
                         m_routeNumField.text = routeValues[1];
                     }
+                    break;
+                case "closeAll":
+                    Hide();
                     break;
                 default:
                     break;

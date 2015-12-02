@@ -67,6 +67,9 @@ namespace RoadNamer
                 EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedRoutesPanel);
                 EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
                 EventBusManager.Instance().Subscribe("updateroutepaneltext", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_usedRoutesPanel);
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
@@ -198,7 +201,9 @@ namespace RoadNamer
             EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedRoutesPanel);
             EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
             EventBusManager.Instance().UnSubscribe("updateroutepaneltext", m_roadNamePanel);
-
+            EventBusManager.Instance().UnSubscribe("closeAll", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_usedRoutesPanel);
             OptionsManager.m_isIngame = false;
         }
 

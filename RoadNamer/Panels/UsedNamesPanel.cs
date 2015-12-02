@@ -38,6 +38,7 @@ namespace RoadNamer.Panels
             m_panelTitle.title = "Existing names";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
+            m_panelTitle.m_closeActions.Add("closeAll");
 
             CreatePanelComponents();
 
@@ -82,6 +83,9 @@ namespace RoadNamer.Panels
                 case "closeUsedNamePanel":
                     Hide();
                     break;
+                case "closeAll":
+                    Hide();
+                    break;
                 default:
                     break;
             }
@@ -116,6 +120,7 @@ namespace RoadNamer.Panels
             m_panelTitle.title = "Existing routes";
             m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
+            m_panelTitle.m_closeActions.Add("closeAll");
 
             CreatePanelComponents();
 
@@ -160,6 +165,9 @@ namespace RoadNamer.Panels
                     RefreshList();
                     break;
                 case "closeUsedNamePanel":
+                    Hide();
+                    break;
+                case "closeAll":
                     Hide();
                     break;
                 default:
