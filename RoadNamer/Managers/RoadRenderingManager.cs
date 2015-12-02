@@ -25,6 +25,7 @@ namespace RoadNamer.Managers
         public bool m_alwaysShowText = false;
         public bool m_registered = false;
         public bool m_textEnabled = true;
+        public bool m_routeEnabled = true;
 
         protected override void Awake()
         {
@@ -72,16 +73,22 @@ namespace RoadNamer.Managers
                 }
                 textHidden = true;
             }
-            else if (textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
+            else if (textHidden  && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
             {
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+                if (m_textEnabled)
                 {
-                    road.m_textMesh.GetComponent<Renderer>().enabled = true;
+                    foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+                    {
+                        road.m_textMesh.GetComponent<Renderer>().enabled = true;
+                    }
                 }
-                foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                if (m_routeEnabled)
                 {
-                    route.m_shieldMesh.GetComponent<Renderer>().enabled = true;
-                    route.m_numMesh.GetComponent<Renderer>().enabled = true;
+                    foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                    {
+                        route.m_shieldMesh.GetComponent<Renderer>().enabled = true;
+                        route.m_numMesh.GetComponent<Renderer>().enabled = true;
+                    }
                 }
                 textHidden = false;
             }

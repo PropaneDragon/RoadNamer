@@ -31,6 +31,7 @@ namespace RoadNamer.Managers
         private static RoadCheckBoxOption[] checkboxOptions = new RoadCheckBoxOption[]
         {
             new RoadCheckBoxOption() { uniqueName = "showCamera", readableName = "Show road names in camera mode", value = false, enabled = true },
+            new RoadCheckBoxOption() { uniqueName = "showRoute", readableName = "Show route numbers", value = true, enabled = true },
             new RoadCheckBoxOption() { uniqueName = "show", readableName = "Show road names", value = true, enabled = true }
         };
 
@@ -65,7 +66,7 @@ namespace RoadNamer.Managers
 
             UIHelperBase optionGroup = helper.AddGroup("Road Namer Options");
 
-            foreach(RoadCheckBoxOption checkboxOption in checkboxOptions)
+            foreach (RoadCheckBoxOption checkboxOption in checkboxOptions)
             {
                 UICheckBox checkBox = optionGroup.AddCheckbox(checkboxOption.readableName, checkboxOption.value, OptionChanged) as UICheckBox;
                 checkBox.readOnly = !checkboxOption.enabled;
@@ -73,7 +74,7 @@ namespace RoadNamer.Managers
                 checkBox.eventCheckChanged += CheckBox_eventCheckChanged;
             }
 
-            foreach(RoadSliderOption sliderOption in sliderOptions)
+            foreach (RoadSliderOption sliderOption in sliderOptions)
             {
                 UISlider slider = optionGroup.AddSlider(sliderOption.readableName, sliderOption.min, sliderOption.max, sliderOption.step, sliderOption.value, OptionChanged) as UISlider;
                 slider.enabled = sliderOption.enabled;
@@ -98,7 +99,7 @@ namespace RoadNamer.Managers
         {
             UIDropDown dropdown = component as UIDropDown;
 
-            if(dropdown != null)
+            if (dropdown != null)
             {
                 RoadDropdownOption foundOption = null;
 
@@ -148,19 +149,19 @@ namespace RoadNamer.Managers
         {
             UICheckBox checkBox = component as UICheckBox;
 
-            if(checkBox != null) //Should bloody well not be null!
+            if (checkBox != null) //Should bloody well not be null!
             {
                 RoadCheckBoxOption foundOption = null;
 
-                foreach(RoadCheckBoxOption option in checkboxOptions)
+                foreach (RoadCheckBoxOption option in checkboxOptions)
                 {
-                    if(checkBox.name == option.uniqueName)
+                    if (checkBox.name == option.uniqueName)
                     {
                         foundOption = option;
                     }
                 }
 
-                if(foundOption != null)
+                if (foundOption != null)
                 {
                     foundOption.value = value;
                 }
@@ -195,9 +196,9 @@ namespace RoadNamer.Managers
         {
             bool successful = false;
 
-            foreach(RoadCheckBoxOption option in checkboxOptions)
+            foreach (RoadCheckBoxOption option in checkboxOptions)
             {
-                if(option.uniqueName == uniqueName)
+                if (option.uniqueName == uniqueName)
                 {
                     returnValue = option.value;
                     successful = true;
@@ -353,20 +354,20 @@ namespace RoadNamer.Managers
         /// </summary>
         public static void Populate()
         {
-            foreach(RoadDropdownOption option in dropdownOptions)
+            foreach (RoadDropdownOption option in dropdownOptions)
             {
-                if(option.uniqueName == "randomNameLocalisation")
+                if (option.uniqueName == "randomNameLocalisation")
                 {
-                    if(Directory.Exists(m_randomNamesLocation))
+                    if (Directory.Exists(m_randomNamesLocation))
                     {
                         List<string> fileNames = new List<string>();
 
-                        foreach(string fileLocation in Directory.GetFiles(m_randomNamesLocation))
+                        foreach (string fileLocation in Directory.GetFiles(m_randomNamesLocation))
                         {
                             string fileExtension = Path.GetExtension(fileLocation);
                             string fileName = Path.GetFileNameWithoutExtension(fileLocation);
 
-                            if(fileExtension != null && fileName != null && fileExtension.ToLower() == ".xml" && fileName != "")
+                            if (fileExtension != null && fileName != null && fileExtension.ToLower() == ".xml" && fileName != "")
                             {
                                 fileNames.Add(fileName);
                             }
@@ -395,6 +396,7 @@ namespace RoadNamer.Managers
                 if (renderingManager != null)
                 {
                     GetCheckBoxValue("showCamera", ref renderingManager.m_alwaysShowText);
+                    GetCheckBoxValue("showRoute", ref renderingManager.m_routeEnabled);
                     GetCheckBoxValue("show", ref renderingManager.m_textEnabled);
                     GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
                     GetSliderValue("textScale", ref renderingManager.m_textScale);
