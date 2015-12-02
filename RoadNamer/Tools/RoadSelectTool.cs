@@ -12,6 +12,7 @@ namespace RoadNamer.Tools
     {
         public RoadNamePanel m_roadNamePanel = null;
         public UsedNamesPanel m_usedNamesPanel = null;
+        public UsedRoutesPanel m_usedRoutesPanel = null;
 
         protected override void Awake()
         {
@@ -60,8 +61,7 @@ namespace RoadNamer.Tools
                                 {
 #if DEBUG
                                     NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
-                                    NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
-                                    Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
+                                    Vector3 rotation = netSegment.GetDirection(netSegment.m_startNode);
                                     LoggerUtilities.LogToConsole(rotation.ToString());
 #endif
                                     RandomNameManager.LoadRandomNames();
@@ -74,6 +74,8 @@ namespace RoadNamer.Tools
                                     m_roadNamePanel.Show();
                                     m_usedNamesPanel.RefreshList();
                                     m_usedNamesPanel.Show();
+                                    m_usedRoutesPanel.RefreshList();
+                                    m_usedRoutesPanel.Show();
 
                                     OptionsManager.m_hasOpenedPanel = true;
                                     OptionsManager.SaveOptions();

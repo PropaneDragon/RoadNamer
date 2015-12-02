@@ -18,9 +18,11 @@ namespace RoadNamer
     {
         private GameObject m_roadNamePanelObject;
         private GameObject m_usedNamesPanelObject;
+        private GameObject m_usedRoutesPanelObject;
         private RoadNamePanel m_roadNamePanel;
         private UsedNamesPanel m_usedNamesPanel;
-    
+        private UsedRoutesPanel m_usedRoutesPanel;
+
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
         private UIButton m_tabButton = null;
         private RoadRenderingManager m_roadRenderingManager = null;
@@ -54,8 +56,15 @@ namespace RoadNamer
                 m_usedNamesPanel.transform.parent = view.transform;
                 m_usedNamesPanel.Hide();
 
+                m_usedRoutesPanelObject = new GameObject("UsedRoutesPanel");
+                m_usedRoutesPanel = m_usedRoutesPanelObject.AddComponent<UsedRoutesPanel>();
+                m_usedRoutesPanel.transform.parent = view.transform;
+                m_usedRoutesPanel.Hide();
+
                 EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedRoutesPanel);
                 EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedRoutesPanel);
                 EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
                 EventBusManager.Instance().Subscribe("updateroutepaneltext", m_roadNamePanel);
 
@@ -130,11 +139,11 @@ namespace RoadNamer
                 spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
 
                 //TODO: Replace with a loader function( JSON mapping available )
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/ontario.png","ontario") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/bc.png", "bc") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/australia.png", "australia") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/interstate.png", "interstate") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/usroute.png", "usroute") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/ON.png","ON") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/BC.png", "BC") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/AUS.png", "AUS") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/I.png", "I") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddTexture("Icons/US.png", "US") && spriteSuccess;
 
                 if (!spriteSuccess)
                 {
@@ -176,14 +185,17 @@ namespace RoadNamer
                 {
                     roadSelectTool.m_roadNamePanel = m_roadNamePanel;
                     roadSelectTool.m_usedNamesPanel = m_usedNamesPanel;
-                }
+                    roadSelectTool.m_usedRoutesPanel = m_usedRoutesPanel;
+}
             }
         }
 
         public override void OnLevelUnloading()
         {
             EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedRoutesPanel);
             EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedRoutesPanel);
             EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
             EventBusManager.Instance().UnSubscribe("updateroutepaneltext", m_roadNamePanel);
 

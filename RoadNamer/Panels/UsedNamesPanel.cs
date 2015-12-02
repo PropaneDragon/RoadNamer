@@ -17,7 +17,6 @@ namespace RoadNamer.Panels
         private int titleOffset = 40;
         private UITitleBar m_panelTitle;
         public UIFastList usedNamesList = null;
-        public UIFastList usedRoutesList = null;
 
         private Vector2 offset = Vector2.zero;
 
@@ -26,7 +25,7 @@ namespace RoadNamer.Panels
             this.isInteractive = true;
             this.enabled = true;
             this.width = 350;
-            this.height = 600;
+            this.height = 300;
 
             base.Awake();
         }
@@ -42,7 +41,7 @@ namespace RoadNamer.Panels
 
             CreatePanelComponents();
 
-            this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+            this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2 ) - height - m_UIPadding.top);
             this.backgroundSprite = "MenuPanel2";
             this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
         }
@@ -51,21 +50,12 @@ namespace RoadNamer.Panels
         {
             usedNamesList = UIFastList.Create<UIUsedNameRowItem>(this);
             usedNamesList.backgroundSprite = "UnlockingPanel";
-            usedNamesList.size = new Vector2(350-m_UIPadding.left-m_UIPadding.right, (600-titleOffset- m_UIPadding.top-2*m_UIPadding.bottom)/2);        
-            usedNamesList.canSelect = true;
+            usedNamesList.size = new Vector2(this.width-m_UIPadding.left-m_UIPadding.right, (this.height-titleOffset- m_UIPadding.top-m_UIPadding.bottom));
+            usedNamesList.canSelect = false;
             usedNamesList.relativePosition = new Vector2(m_UIPadding.left, titleOffset + m_UIPadding.top);
             usedNamesList.rowHeight = 40f;
             usedNamesList.rowsData.Clear();
             usedNamesList.selectedIndex = -1;
-
-            usedRoutesList = UIFastList.Create<UIUsedRouteRowItem>(this);
-            usedRoutesList.backgroundSprite = "UnlockingPanel";
-            usedRoutesList.size = new Vector2(350 - m_UIPadding.left - m_UIPadding.right, (600 - titleOffset - m_UIPadding.top - 2*m_UIPadding.bottom) / 2);
-            usedRoutesList.canSelect = true;
-            usedRoutesList.relativePosition = new Vector2(m_UIPadding.left, usedNamesList.relativePosition.y + usedNamesList.height + m_UIPadding.bottom);
-            usedRoutesList.rowHeight = 40f;
-            usedRoutesList.rowsData.Clear();
-            usedRoutesList.selectedIndex = -1;
 
             RefreshList();
         }
@@ -79,9 +69,81 @@ namespace RoadNamer.Panels
             }
             usedNamesList.DisplayAt(0);
             usedNamesList.selectedIndex = 0;
+        }
 
+        public void onReceiveEvent(string eventName, object eventData)
+        {
+            string message = eventData as string;
+            switch (eventName)
+            {
+                case "forceupdateroadnames":
+                    RefreshList();
+                    break;
+                case "closeUsedNamePanel":
+                    Hide();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public class UsedRoutesPanel : UIPanel, IEventSubscriber
+    {
+        protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
+
+        private int titleOffset = 40;
+        private UITitleBar m_panelTitle;
+        public UIFastList usedRoutesList = null;
+
+        private Vector2 offset = Vector2.zero;
+
+        public override void Awake()
+        {
+            this.isInteractive = true;
+            this.enabled = true;
+            this.width = 350;
+            this.height = 300;
+
+            base.Awake();
+        }
+
+        public override void Start()
+        {
+            base.Start();
+
+            m_panelTitle = this.AddUIComponent<UITitleBar>();
+            m_panelTitle.title = "Existing routes";
+            m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+            m_panelTitle.iconSprite = "ToolbarFGIcon";
+
+            CreatePanelComponents();
+
+            this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+            this.backgroundSprite = "MenuPanel2";
+            this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
+        }
+
+        private void CreatePanelComponents()
+        {
+            
+            usedRoutesList = UIFastList.Create<UIUsedRouteRowItem>(this);
+            usedRoutesList.backgroundSprite = "UnlockingPanel";
+            usedRoutesList.size = new Vector2(this.width - m_UIPadding.left - m_UIPadding.right, (this.height - titleOffset - m_UIPadding.top - m_UIPadding.bottom));
+            usedRoutesList.canSelect = false;
+            usedRoutesList.relativePosition = new Vector2(m_UIPadding.left, titleOffset + m_UIPadding.top );
+            usedRoutesList.rowHeight = 40f;
             usedRoutesList.rowsData.Clear();
-            foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+            usedRoutesList.selectedIndex = -1;
+
+            RefreshList();
+        }
+
+        public void RefreshList()
+        {
+        
+            usedRoutesList.rowsData.Clear();
+            foreach (string route in RoadNameManager.Instance().m_usedRoutes.Keys)
             {
                 usedRoutesList.rowsData.Add(route);
             }

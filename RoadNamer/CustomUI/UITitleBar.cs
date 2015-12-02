@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using ColossalFramework.UI;
+using System;
+using RoadNamer.Managers;
 
 namespace RoadNamer.CustomUI
 {
@@ -93,9 +95,14 @@ namespace RoadNamer.CustomUI
             m_close.normalBgSprite = "buttonclose";
             m_close.hoveredBgSprite = "buttonclosehover";
             m_close.pressedBgSprite = "buttonclosepressed";
-            m_close.eventClick += (component, param) => parent.Hide();
+            m_close.eventClick += CloseButton_clickedEventHandler;
 
             m_title.width = parent.width - relativePosition.x - m_close.width - 10;
+        }
+
+        private void CloseButton_clickedEventHandler(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            parent.Hide();
         }
     }
 }

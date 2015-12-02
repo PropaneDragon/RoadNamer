@@ -113,16 +113,16 @@ namespace RoadNamer.Panels
             m_routeLabel.textColor = new Color32(180, 180, 180, 255);
             m_routeLabel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             m_routeLabel.textAlignment = UIHorizontalAlignment.Left;
-            m_routeLabel.text = "Road Name";
+            m_routeLabel.text = "Route Name";
 
             m_routeTypeDropdown = CustomUI.UIUtils.CreateDropDown(this, new Vector2(((this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f), 25));
             //TODO: Replace with Random namer values
             m_routeTypeDropdown.AddItem("Route ");
             m_routeTypeDropdown.AddItem("Hwy ");
-            m_routeTypeDropdown.AddItem("I-");
-            m_routeTypeDropdown.AddItem("M-");
-            m_routeTypeDropdown.AddItem("A-");
-            m_routeTypeDropdown.AddItem("E-");
+            m_routeTypeDropdown.AddItem("I");
+            m_routeTypeDropdown.AddItem("M");
+            m_routeTypeDropdown.AddItem("A");
+            m_routeTypeDropdown.AddItem("E");
             m_routeTypeDropdown.selectedIndex = 0;
             m_routeTypeDropdown.relativePosition = new Vector3(m_UIPadding.left, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
 
@@ -220,13 +220,15 @@ namespace RoadNamer.Panels
                 string roadName = m_textField.text;
                 int routeNum = -1;
                 bool validRouteNum = Int32.TryParse(m_routeNumField.text, out routeNum);
+                bool validOldRouteNum = m_initialRouteNum != null && m_initialRoutePrefix != null;
+                string oldRouteStr = validOldRouteNum ? m_initialRoutePrefix + '/' + m_initialRouteNum : null;
                 if (roadName != null)
                 {
                     roadName = StringUtilities.WrapNameWithColorTags(roadName, m_textField.textColor);
                     RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
                     if(validRouteNum)
                     {
-                        RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName, m_routeTypeDropdown.selectedValue, routeNum);
+                        RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName, m_routeTypeDropdown.selectedValue, routeNum, oldRouteStr);
                     }
                     else
                     {
@@ -298,9 +300,6 @@ namespace RoadNamer.Panels
                     {
 
                         string[] routeValues = message.Split('/');
-#if DEBUG
-                        LoggerUtilities.LogToConsole(routeValues[1]);
-#endif
                         int routeType = 0;
                         for (int i = 0; i < m_routeTypeDropdown.items.Length; i++)
                         {

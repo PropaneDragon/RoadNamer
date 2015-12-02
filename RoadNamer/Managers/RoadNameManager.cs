@@ -82,9 +82,18 @@ namespace RoadNamer.Managers
 
             if (routePrefix != null)
             {
-                routeContainer = new RouteContainer(segmentId, routePrefix, routeNum);
+                if (m_routeMap.ContainsKey(segmentId))
+                {
+                    routeContainer = m_routeMap[segmentId];
+                    routeContainer.m_routePrefix = routePrefix;
+                    routeContainer.m_routeNum = routeNum;
+                }
+                else
+                {
+                    routeContainer = new RouteContainer(segmentId, routePrefix, routeNum);
+                }
                 m_routeMap[segmentId] = routeContainer;
-                if (routeContainer.m_shieldObject == null)
+                if (routeContainer.m_shieldObject == null && routeContainer.m_numTextObject == null)
                 {
                     routeContainer.m_shieldObject = new GameObject();
                     routeContainer.m_shieldObject.AddComponent<MeshRenderer>();
@@ -93,7 +102,7 @@ namespace RoadNamer.Managers
                     routeContainer.m_numTextObject.AddComponent<MeshRenderer>();
                     routeContainer.m_numMesh = routeContainer.m_numTextObject.AddComponent<TextMesh>();
                 }
-                string routeStr = routePrefix + routeNum.ToString();
+                string routeStr = routePrefix + '/' + routeNum.ToString();
                 if (!m_usedRoutes.ContainsKey(routeStr))
                 {
                     m_usedRoutes[routeStr] = 0;
@@ -199,7 +208,7 @@ namespace RoadNamer.Managers
                 foreach (RouteContainer route in routeNames)
                 {
                     m_routeMap[route.m_segmentId] = route;
-                    if (route.m_shieldObject == null) {
+                    if (route.m_shieldObject == null && route.m_numTextObject == null) {
                         route.m_shieldObject = new GameObject();
                         route.m_shieldObject.AddComponent<MeshRenderer>();
                         route.m_shieldMesh = route.m_shieldObject.AddComponent<MeshFilter>();
@@ -208,7 +217,7 @@ namespace RoadNamer.Managers
                         route.m_numMesh = route.m_numTextObject.AddComponent<TextMesh>();
                     }
 
-                    string routeStr = route.m_routePrefix + route.m_routeNum.ToString();
+                    string routeStr = route.m_routePrefix + '/'+ route.m_routeNum.ToString();
                     if (!m_usedRoutes.ContainsKey(routeStr))
                     {
                         m_usedRoutes[routeStr] = 0;

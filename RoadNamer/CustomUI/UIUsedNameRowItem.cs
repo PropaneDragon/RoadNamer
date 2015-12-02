@@ -34,9 +34,9 @@ namespace RoadNamer.CustomUI
             label.textAlignment = UIHorizontalAlignment.Left;
         }
 
-        protected override void OnClick(UIMouseEventParameter p)
+        protected override void OnMouseDown(UIMouseEventParameter p)
         {
-            base.OnClick(p);
+            base.OnMouseDown(p);
             EventBusManager.Instance().Publish("updateroadnamepaneltext", label.text);
         }
         

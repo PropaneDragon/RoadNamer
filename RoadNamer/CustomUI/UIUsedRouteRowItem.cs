@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.UI;
 using RoadNamer.Managers;
+using RoadNamer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,9 +40,10 @@ namespace RoadNamer.CustomUI
             label.textAlignment = UIHorizontalAlignment.Left;
         }
 
-        protected override void OnClick(UIMouseEventParameter p)
+        protected override void OnMouseDown(UIMouseEventParameter p)
         {
-            base.OnClick(p);
+
+            base.OnMouseDown(p);
             EventBusManager.Instance().Publish("updateroutepaneltext", routePrefix+'/'+routeNum);
         }
 
@@ -49,13 +51,16 @@ namespace RoadNamer.CustomUI
         {
             if (data != null)
             {
-                RouteContainer route = data as RouteContainer;
+                string route = data as string;
+
+                string[] routeValues = route.Split('/');
 
                 if (route != null && background != null)
                 {
-                    label.text = route.m_routePrefix+route.m_routeNum.ToString();
-                    routeNum = route.m_routeNum;
-                    routePrefix = route.m_routePrefix;
+                    Int32.TryParse(routeValues[1],out routeNum);
+                    routePrefix = routeValues[0];
+                    label.text = routePrefix + routeNum.ToString();
+
                     if (isRowOdd)
                     {
                         background.backgroundSprite = "UnlockingItemBackground";

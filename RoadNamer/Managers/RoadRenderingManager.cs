@@ -152,7 +152,7 @@ namespace RoadNamer.Managers
                                 NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
                                 NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
                                 //TODO: Make texture addition/selection based on prefix type
-                                Material mat = SpriteUtilities.m_textureStore["ontario"];
+                                Material mat = SpriteUtilities.m_textureStore["ON"];
                                 route.m_shieldObject.GetComponent<Renderer>().material = mat;
                                 //TODO: Make mesh size dependent on text size
                                 route.m_shieldMesh.mesh = MeshUtilities.CreateRectMesh(mat.mainTexture.width, mat.mainTexture.height);
