@@ -62,6 +62,9 @@ namespace RoadNamer.Managers
 
                     if (selectedRoadName != null)
                     {
+                        bool lowercaseInitial = false;
+                        returnRoadName = "";
+
                         if (!selectedRoadName.NoPrefix)
                         {
                             selectedPrefix = RandomNameUtility.GetRoadPrefix(checkingPrefix, selectedRoadName.ForcePrefix);
@@ -72,7 +75,21 @@ namespace RoadNamer.Managers
                             selectedPostfix = RandomNameUtility.GetRoadPostfix(checkingPostfix, selectedRoadName.ForcePostfix);
                         }
 
-                        returnRoadName = (selectedPrefix != null ? selectedPrefix.Name + " " : "") + selectedRoadName.Name + (selectedPostfix != null ? " " + selectedPostfix.Name : "");
+                        if(selectedPrefix != null)
+                        {
+                            returnRoadName += selectedPrefix.Name;
+                            returnRoadName += selectedPrefix.SpaceBetweenName ? " " : "";
+                            lowercaseInitial = selectedPrefix.LowercaseInitialOnName;
+                        }
+
+                        returnRoadName += lowercaseInitial ? selectedRoadName.Name.ToLower() : selectedRoadName.Name; //TODO: There might be an instance where we actually only want the initial to be lowercase. Needs improvement
+
+                        if (selectedPostfix != null)
+                        {
+                            returnRoadName += selectedPostfix.SpaceBetweenName ? " " : "";
+                            returnRoadName += selectedPostfix.Name;
+                        }
+
                         returnRoadName = TranslateRoadName(netSegmentId, returnRoadName);
                     }
                 }
@@ -105,6 +122,10 @@ namespace RoadNamer.Managers
                     }
 
                     Debug.Log("Road Namer: Loaded name XML \"" + fullFilePath + "\"");
+                }
+                else
+                {
+                    Debug.LogError("File doesn't exist anymore, so road names can't be loaded!");
                 }
             }
         }
