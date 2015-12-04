@@ -58,11 +58,11 @@ namespace RoadNamer.Panels
         {
             float lastHeight = m_infoLabel.height;
 
-            m_infoLabel.text = "- <color#c8f582>Text now aligns to roads!</color> That's right, text no longer follows your screen and sticks to roads. There's some more options to play with too.\n\n";
-                /*"- <color#c8f582>Make your own random road names!</color> Visit the workshop page to find out how to make your own.\n\n" +
-                "- <color#c8f582>US style</color> random road names added. Change the random names in the options panel.\n\n" +
-                "- Ability to <color#c8f582>disable all text rendering</color> added to the options panel.\n\n" +
-                "- Default road names are now white. (They can be changed using the colour selector)";*/
+            m_infoLabel.text =
+                "- <color#c8f582>German random localisation added!</color> Boformer has provided random road names for German cities.\n\n" +
+                "- <color#c8f582>Greek random localisation added!</color> Φίλιππος Α has provided random road names for Greek cities.\n\n" +
+                "- <color#c8f582>French random localisation added!</color> Φίλιππος Α has provided random road names for French cities.\n\n" +
+                "- <color#c8f582>Options have updated.</color> Random name settings save differently, so you will need to apply the random number localisation settings again.";
 
             float heightDifference = m_infoLabel.height - lastHeight;
 

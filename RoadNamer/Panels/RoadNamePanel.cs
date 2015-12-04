@@ -17,6 +17,7 @@ namespace RoadNamer.Panels
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIColorField m_colourSelector;
+        private UIButton m_randomNameButton;
         private string m_initialRoadName;
 
         public ushort m_netSegmentId = 0;
@@ -88,18 +89,19 @@ namespace RoadNamer.Panels
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
             m_textField.textColor = Color.white;
             
-            UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
-            randomNameButton.text = "";
-            randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
-            randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
-            randomNameButton.atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
-            randomNameButton.disabledBgSprite = "DiceIcon";
-            randomNameButton.normalFgSprite = "DiceIcon";
-            randomNameButton.focusedFgSprite = "DiceIcon";
-            randomNameButton.hoveredFgSprite = "DiceIcon";
-            randomNameButton.pressedFgSprite = "DiceIcon";
-            randomNameButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            randomNameButton.eventClicked += RandomNameButton_eventClicked;
+            m_randomNameButton = CustomUI.UIUtils.CreateButton(this);
+            m_randomNameButton.text = "";
+            m_randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
+            m_randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
+            m_randomNameButton.atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+            m_randomNameButton.disabledBgSprite = "DiceIcon";
+            m_randomNameButton.normalFgSprite = "DiceIcon";
+            m_randomNameButton.focusedFgSprite = "DiceIcon";
+            m_randomNameButton.hoveredFgSprite = "DiceIcon";
+            m_randomNameButton.pressedFgSprite = "DiceIcon";
+            m_randomNameButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
+            //m_randomNameButton.tooltip = RandomNameManager.m_fileName;
+            m_randomNameButton.eventClicked += RandomNameButton_eventClicked;
             
             UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
             colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
@@ -136,7 +138,15 @@ namespace RoadNamer.Panels
 
             if(randomName != null)
             {
+                m_randomNameButton.tooltip = "";
                 m_textField.text = randomName;
+            }
+            else
+            {
+                m_randomNameButton.tooltip = "Could not find any road names :(";
+                m_randomNameButton.RefreshTooltip();
+                m_randomNameButton.bringTooltipToFront = true;
+                m_randomNameButton.tooltipBox.Show();
             }
         }
 

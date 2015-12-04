@@ -189,6 +189,6 @@ namespace RoadNamer.Managers
         public string linkedOption = "";
 
         [XmlElement("OptionData", IsNullable = false)]
-        public int data = 0;
+        public string data = "";
     }
 }
