@@ -59,6 +59,11 @@
     <Compile Include="Panels\InfoPanel.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
+    <Compile Include="CustomUI\UIFastList.cs" />
+    <Compile Include="CustomUI\UIUsedNameRowItem.cs" />
+    <Compile Include="Managers\EventBusManager.cs" />
+    <Compile Include="Panels\UsedNamesPanel.cs" />
+    <Compile Include="Utilities\LoggerUtilities.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
     <Compile Include="CustomUI\UITitleBar.cs" />
     <Compile Include="CustomUI\UIUtils.cs" />

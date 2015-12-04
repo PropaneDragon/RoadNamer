@@ -41,7 +41,9 @@ namespace RoadNamer.Managers
         private static RoadSliderOption[] sliderOptions = new RoadSliderOption[]
         {
             new RoadSliderOption() { uniqueName = "textDisappearDistance", readableName = "Rendering distance", min = 100f, max = 2000f, value = 1000f, step = 10f, enabled = true },
-            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.5f, step = 0.1f, enabled = true }
+            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.5f, step = 0.1f, enabled = true },
+            new RoadSliderOption() { uniqueName = "textQuality", readableName = "Text quality", min = 5f, max = 40f, value = 20f, step = 1f, enabled = true },
+            new RoadSliderOption() { uniqueName = "textHeight", readableName = "Text height offset", min = -2f, max = 2f, value = -2f, step = .2f, enabled = true }
         };
 
         /// <summary>
@@ -396,6 +398,8 @@ namespace RoadNamer.Managers
                     GetCheckBoxValue("show", ref renderingManager.m_textEnabled);
                     GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
                     GetSliderValue("textScale", ref renderingManager.m_textScale);
+                    GetSliderValue("textQuality", ref renderingManager.m_textQuality);
+                    GetSliderValue("textHeight", ref renderingManager.m_textHeightOffset);
 
                     renderingManager.ForceUpdate();
                 }

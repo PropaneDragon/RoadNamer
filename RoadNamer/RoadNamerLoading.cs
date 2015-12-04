@@ -17,7 +17,10 @@ namespace RoadNamer
     public class RoadNamerLoading : LoadingExtensionBase
     {
         private GameObject m_roadNamePanelObject;
+        private GameObject m_usedNamesPanelObject;
         private RoadNamePanel m_roadNamePanel;
+        private UsedNamesPanel m_usedNamesPanel;
+    
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
         private UIButton m_tabButton = null;
         private RoadRenderingManager m_roadRenderingManager = null;
@@ -30,7 +33,7 @@ namespace RoadNamer
             }
             catch(Exception ex)
             {
-                Debug.LogException(ex);
+                LoggerUtilities.LogException(ex);
             }
         }
 
@@ -45,6 +48,15 @@ namespace RoadNamer
                 m_roadNamePanel = m_roadNamePanelObject.AddComponent<RoadNamePanel>();
                 m_roadNamePanel.transform.parent = view.transform;
                 m_roadNamePanel.Hide();
+
+                m_usedNamesPanelObject = new GameObject("UsedNamesPanel");
+                m_usedNamesPanel = m_usedNamesPanelObject.AddComponent<UsedNamesPanel>();
+                m_usedNamesPanel.transform.parent = view.transform;
+                m_usedNamesPanel.Hide();
+
+                EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
@@ -81,7 +93,7 @@ namespace RoadNamer
                     }
                     else
                     {
-                        Debug.LogError("Road Namer: Could not find atlas.");
+                        LoggerUtilities.LogError("Could not find atlas.");
                     }
                 }
 
@@ -118,12 +130,12 @@ namespace RoadNamer
 
                 if (!spriteSuccess)
                 {
-                    Debug.LogError("Road Namer: Failed to load some sprites!");
+                    LoggerUtilities.LogError("Failed to load some sprites!");
                 }
             }
             else
             {
-                Debug.LogError("Road Namer: Failed to load the atlas!");
+                LoggerUtilities.LogError("Failed to load the atlas!");
             }
         }
 
@@ -150,17 +162,21 @@ namespace RoadNamer
 
                 if (roadSelectTool == null)
                 {
-                    Debug.Log("Tool failed to initialise!");
+                    LoggerUtilities.Log("Tool failed to initialise!");
                 }
                 else
                 {
                     roadSelectTool.m_roadNamePanel = m_roadNamePanel;
+                    roadSelectTool.m_usedNamesPanel = m_usedNamesPanel;
                 }
             }
         }
 
         public override void OnLevelUnloading()
         {
+            EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
             OptionsManager.m_isIngame = false;
         }
 

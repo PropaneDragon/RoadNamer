@@ -33,9 +33,9 @@ namespace RoadNamer.Managers
                     netSegment.CountLanes(netSegmentId, NetInfo.LaneType.Vehicle | NetInfo.LaneType.PublicTransport | NetInfo.LaneType.TransportVehicle, VehicleInfo.VehicleType.All, ref forwardLanes, ref backwardLanes);
                     totalLanes = forwardLanes + backwardLanes;
 
-                    Debug.Log(roadName);
-                    Debug.Log(forwardLanes.ToString());
-                    Debug.Log(backwardLanes.ToString());
+                    LoggerUtilities.Log(roadName);
+                    LoggerUtilities.Log(forwardLanes.ToString());
+                    LoggerUtilities.Log(backwardLanes.ToString());
 
                     RandomRoadPrefix checkingPrefix = new RandomRoadPrefix()
                     {
@@ -88,26 +88,27 @@ namespace RoadNamer.Managers
                 string fullFilePath = OptionsManager.m_randomNamesLocation + m_fileName + ".xml";
 
                 if (File.Exists(fullFilePath))
-                {
-                    XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RandomNameUtility));
+                        {
+                            XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RandomNameUtility));
                     StreamReader reader = new StreamReader(fullFilePath);
 
-                    RandomNameUtility nameUtility = xmlSerialiser.Deserialize(reader) as RandomNameUtility;
-                    reader.Close();
+                            RandomNameUtility nameUtility = xmlSerialiser.Deserialize(reader) as RandomNameUtility;
+                            reader.Close();
 
-                    if (nameUtility != null)
-                    {
-                        RandomNameUtility.SetInstance(nameUtility);
-                    }
-                    else
-                    {
-                        Debug.LogError("Road Namer: Couldn't load random names!");
-                    }
+                            if (nameUtility != null)
+                            {
 
-                    Debug.Log("Road Namer: Loaded name XML \"" + fullFilePath + "\"");
+                                RandomNameUtility.SetInstance(nameUtility);
+                            }
+                            else
+                            {
+                                LoggerUtilities.LogError("Couldn't load random names!");
+                            }
+
+                            LoggerUtilities.Log("Loaded name XML \"" + filePath + "\"");
+                        }
+                    }
                 }
-            }
-        }
 
         private static string TranslateRoadName(ushort netSegmentId, string roadName)
         {

@@ -49,7 +49,7 @@ namespace RoadNamer.Utilities
             }
             else
             {
-                Debug.LogError("Road Namer: Tried to set RandomName instance to a null variable!");
+                LoggerUtilities.LogError("Tried to set RandomName instance to a null variable!");
             }
         }
 
@@ -139,7 +139,7 @@ namespace RoadNamer.Utilities
             }
             else
             {
-                Debug.LogWarning("Road Namer: There's no road names in the XML file! Can't use the randomiser!");
+                LoggerUtilities.LogWarning("There's no road names in the XML file! Can't use the randomiser!");
             }
 
             return returnName;

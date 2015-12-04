@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace RoadNamer.Panels
 {
-    public class RoadNamePanel : UIPanel
+    public class RoadNamePanel : UIPanel, IEventSubscriber
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
@@ -20,6 +20,8 @@ namespace RoadNamer.Panels
         private string m_initialRoadName;
 
         public ushort m_netSegmentId = 0;
+        public string m_netSegmentName;
+
         public string initialRoadName
         {
             set
@@ -174,13 +176,12 @@ namespace RoadNamer.Panels
 
                 if (roadName != null)
                 {
-                    string hexColour = UIMarkupStyle.ColorToHex(m_textField.textColor);
-                    roadName = "<color" + hexColour + ">" + roadName + "</color>";
-
+                    roadName = StringUtilities.WrapNameWithColorTags(roadName, m_textField.textColor);
                     RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
-                    RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName);
+                    RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName);
                     Hide();
-
+                    EventBusManager.Instance().Publish("closeUsedNamePanel", null);
+                    EventBusManager.Instance().Publish("forceupdateroadnames", null);
                     roadRenderingManager.ForceUpdate();
                 }
             }
@@ -205,6 +206,22 @@ namespace RoadNamer.Panels
             else
             {
                 m_textField.text = "";
+            }
+        }
+
+        public void onReceiveEvent(string eventName, object eventData)
+        {
+            LoggerUtilities.LogToConsole(eventName);
+            string message = eventData as string;
+            switch (eventName)
+            {
+                case "updateroadnamepaneltext":
+                    if (message != null){
+                        m_textField.text = message;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

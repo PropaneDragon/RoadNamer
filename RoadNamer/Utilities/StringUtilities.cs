@@ -8,7 +8,7 @@ namespace RoadNamer.Utilities
     {
         public static Color ExtractColourFromTags(string text, Color defaultColour)
         {
-            Regex colourExtraction = new Regex("(?:<color)(#[0-9a-fA-F]+?)(>.*)");
+            Regex colourExtraction = new Regex("(?:<color)(#[0-9a-fA-F]{3,6})(>.*)");
             string extractedTag = colourExtraction.Replace(text, "$1");
 
             if(extractedTag != null && extractedTag != text && extractedTag != "")
@@ -24,6 +24,14 @@ namespace RoadNamer.Utilities
             Regex tagRemover = new Regex("(<\\/?color.*?>)");
                         
             return tagRemover.Replace(text, "");
+        }
+
+        public static string WrapNameWithColorTags(string name, Color color)
+        {
+            string hexColour = UIMarkupStyle.ColorToHex(color);
+            string returnName = "<color" + hexColour + ">" + name + "</color>";
+
+            return returnName;
         }
     }
 }
