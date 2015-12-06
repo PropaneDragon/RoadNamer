@@ -59,10 +59,9 @@ namespace RoadNamer.Panels
             float lastHeight = m_infoLabel.height;
 
             m_infoLabel.text =
-                "- <color#c8f582>German random localisation added!</color> Boformer has provided random road names for German cities.\n\n" +
-                "- <color#c8f582>Greek random localisation added!</color> Φίλιππος Α has provided random road names for Greek cities.\n\n" +
-                "- <color#c8f582>French random localisation added!</color> Φίλιππος Α has provided random road names for French cities.\n\n" +
-                "- <color#c8f582>Options have updated.</color> Random name settings save differently, so you will need to apply the random number localisation settings again.";
+                "- <color#c8f582>Dutch random localisations added!</color> Thanks to 854850 from Reddit, Φίλιππος Α and Julia Juneap.\n\n" +
+                "- <color#c8f582>Now supports Cimtographer!</color> You can now export your roads with their names added!\n\n" +
+                "- There'll be more updates coming soon. Sorry for the lack of updates recently.";
 
             float heightDifference = m_infoLabel.height - lastHeight;
 
