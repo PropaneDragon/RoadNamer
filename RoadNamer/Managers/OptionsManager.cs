@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using ColossalFramework;
-using RoadNamer.Utilities;
 using System.Reflection;
 
 namespace RoadNamer.Managers
@@ -17,12 +16,14 @@ namespace RoadNamer.Managers
     {
         public static bool m_isIngame = false;
         public static bool m_hasOpenedPanel = false;
-        public static string m_randomNamesLocation = FileUtilities.GetModPath() + "/Names/";
         public static readonly int m_major = Assembly.GetExecutingAssembly().GetName().Version.Major;
         public static readonly int m_minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
         public static readonly int m_build = Assembly.GetExecutingAssembly().GetName().Version.Build;
         public static readonly int m_revision = Assembly.GetExecutingAssembly().GetName().Version.Revision;
         public static readonly string m_versionStringFull = m_major.ToString() + "." + m_minor.ToString() + "." + m_build.ToString() + "." + m_revision.ToString();
+        public static readonly uint m_workshopId = 558960454u;
+        public static string m_randomNamesLocation = CimTools.File.Path.GetModPath(m_workshopId, "RoadNamer") + "/Names/";
+        public static string m_spritesLocation = CimTools.File.Path.GetModPath(m_workshopId, "RoadNamer") + "/Icons/";
 
         /// <summary>
         /// Contains all options that can be set using a checkbox. These

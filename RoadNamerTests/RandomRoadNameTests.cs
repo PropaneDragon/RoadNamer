@@ -74,17 +74,19 @@ namespace RoadNamerTests
         [TestMethod]
         public void TestRoadDeserialise()
         {
+            TestRoadNames(); //Make sure it's done first
+
             XmlSerializer xmlSerialiser = new XmlSerializer(typeof(RandomNameUtility));
             StreamReader reader = new StreamReader("test.xml");
 
             RandomNameUtility utility = xmlSerialiser.Deserialize(reader) as RandomNameUtility;
             reader.Close();
 
-            Assert.AreEqual<string>(utility.m_roadNames[0].Name, "School");
-            Assert.IsTrue(utility.m_roadNames[0].ForcePostfix);
+            Assert.AreEqual(utility.m_roadNames[0].Name, "School");
+            Assert.IsFalse(utility.m_roadNames[0].ForcePostfix);
             Assert.IsFalse(utility.m_roadNames[0].ForcePrefix);
-            Assert.AreEqual<int>(utility.m_roadNames[0].MinimumLanes, -1);
-            Assert.AreEqual<int>(utility.m_roadNames[0].MaximumLanes, 5);
+            Assert.AreEqual(utility.m_roadNames[0].MinimumLanes, -1);
+            Assert.AreEqual(utility.m_roadNames[0].MaximumLanes, 2);
         }
     }
 }

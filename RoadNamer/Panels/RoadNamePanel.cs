@@ -1,11 +1,12 @@
-﻿using System;
-using ColossalFramework;
+﻿using ColossalFramework;
 using ColossalFramework.UI;
-using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
 using UnityEngine;
-using System.Text.RegularExpressions;
+using CimTools.Elements;
+using CimTools.Utilities;
+using CimTools.Panels;
+using CimTools.Workshop;
 
 namespace RoadNamer.Panels
 {
@@ -13,7 +14,7 @@ namespace RoadNamer.Panels
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
-        private InfoPanel m_infoPanel;
+        private UpdatePanel m_infoPanel;
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIColorField m_colourSelector;
@@ -52,8 +53,15 @@ namespace RoadNamer.Panels
         {
             base.Start();
 
-            m_infoPanel = this.AddUIComponent<InfoPanel>();
+            m_infoPanel = this.AddUIComponent<UpdatePanel>();
             m_infoPanel.Hide();
+
+            Changelog changelogDownloader = m_infoPanel.m_changelogDownloader;
+
+            if(!changelogDownloader.DownloadComplete && !changelogDownloader.DownloadInProgress)
+            {
+                changelogDownloader.DownloadChangelogAsync(OptionsManager.m_workshopId);
+            }
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
             m_panelTitle.title = "Set a name";
@@ -65,7 +73,7 @@ namespace RoadNamer.Panels
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
-            this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
+            this.atlas = UIUtilities.GetAtlas("Ingame");
             this.eventKeyPress += RoadNamePanel_eventKeyPress;
         }
 
@@ -79,9 +87,9 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
-            m_infoPanel.relativePosition = new Vector3(this.width - 20, -(m_infoPanel.height - 20));
+            m_infoPanel.setPositionSpeakyPoint(new Vector2(this.width - 20, -20));
 
-            m_textField = CustomUI.UIUtils.CreateTextField(this);
+            m_textField = UIUtilities.CreateTextField(this);
             m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
             m_textField.height = 21;
             m_textField.width = this.width - m_UIPadding.left - (m_UIPadding.right * 2) - m_textField.height;
@@ -89,7 +97,7 @@ namespace RoadNamer.Panels
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
             m_textField.textColor = Color.white;
             
-            m_randomNameButton = CustomUI.UIUtils.CreateButton(this);
+            m_randomNameButton = UIUtilities.CreateButton(this);
             m_randomNameButton.text = "";
             m_randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
             m_randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
@@ -106,14 +114,14 @@ namespace RoadNamer.Panels
             UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
             colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             
-            m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
+            m_colourSelector = UIUtilities.CreateColorField(colourSelectorPinPanel);
             m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
             m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
             m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
             m_colourSelector.tooltip = "Set the text colour";
             m_colourSelector.relativePosition = new Vector3(0, 0);
 
-            UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
+            UIButton nameRoadButton = UIUtilities.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
             nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
