@@ -17,7 +17,7 @@ namespace RoadNamer.Panels
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIDropDown m_routeTypeDropdown;
-        private UITextField m_routeNumField;
+        private UITextField m_routeStrField;
         private UILabel m_roadNameLabel;
         private UILabel m_routeLabel;
 
@@ -27,7 +27,7 @@ namespace RoadNamer.Panels
 
         public ushort m_netSegmentId = 0;
         public string m_netSegmentName;
-        public string m_initialRouteNum = null;
+        public string m_initialRouteStr = null;
         public string m_initialRoutePrefix = null;
 
         public string initialRoadName
@@ -118,23 +118,20 @@ namespace RoadNamer.Panels
 
             m_routeTypeDropdown = CustomUI.UIUtils.CreateDropDown(this, new Vector2(((this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f), 25));
             //TODO: Replace with Random namer values
-            m_routeTypeDropdown.AddItem("Route ");
-            m_routeTypeDropdown.AddItem("Hwy ");
-            m_routeTypeDropdown.AddItem("I");
-            m_routeTypeDropdown.AddItem("M");
-            m_routeTypeDropdown.AddItem("A");
-            m_routeTypeDropdown.AddItem("E");
+            foreach( string key in RouteShieldUtility.Instance().routeShieldDictionary.Keys)
+            {
+                m_routeTypeDropdown.AddItem(key);
+            }
             m_routeTypeDropdown.selectedIndex = 0;
             m_routeTypeDropdown.relativePosition = new Vector3(m_UIPadding.left, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
 
-            m_routeNumField = CustomUI.UIUtils.CreateTextField(this);
-            m_routeNumField.relativePosition = new Vector3(m_UIPadding.left + m_routeTypeDropdown.width + m_UIPadding.right, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
-            m_routeNumField.height = 25;
-            m_routeNumField.width = (this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f;
-            m_routeNumField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
-            m_routeNumField.textColor = Color.white;
-            m_routeNumField.numericalOnly = true;
-            m_routeNumField.maxLength = 3;
+            m_routeStrField = CustomUI.UIUtils.CreateTextField(this);
+            m_routeStrField.relativePosition = new Vector3(m_UIPadding.left + m_routeTypeDropdown.width + m_UIPadding.right, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
+            m_routeStrField.height = 25;
+            m_routeStrField.width = (this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f;
+            m_routeStrField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
+            m_routeStrField.textColor = Color.white;
+            m_routeStrField.maxLength = 3;
 
             UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
             randomNameButton.text = "";
@@ -150,7 +147,7 @@ namespace RoadNamer.Panels
             randomNameButton.eventClicked += RandomNameButton_eventClicked;
 
             UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
-            colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_routeNumField.relativePosition.y + m_routeNumField.height + m_UIPadding.bottom);
+            colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_routeStrField.relativePosition.y + m_routeStrField.height + m_UIPadding.bottom);
 
             m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
             m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
@@ -162,7 +159,7 @@ namespace RoadNamer.Panels
             UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
-            nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_routeNumField.relativePosition.y + m_routeNumField.height + m_UIPadding.bottom);
+            nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_routeStrField.relativePosition.y + m_routeStrField.height + m_UIPadding.bottom);
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
 
@@ -219,17 +216,18 @@ namespace RoadNamer.Panels
             if (m_netSegmentId != 0)
             {
                 string roadName = m_textField.text;
-                int routeNum = -1;
-                bool validRouteNum = Int32.TryParse(m_routeNumField.text, out routeNum);
-                bool validOldRouteNum = m_initialRouteNum != null && m_initialRoutePrefix != null;
-                string oldRouteStr = validOldRouteNum ? m_initialRoutePrefix + '/' + m_initialRouteNum : null;
+                string routeStr = null;
+                routeStr = m_routeStrField.text;
+                bool validRouteStr = routeStr != null;
+                bool validOldRouteStr = m_initialRouteStr != null && m_initialRoutePrefix != null;
+                string oldRouteStr = validOldRouteStr ? m_initialRoutePrefix + '/' + m_initialRouteStr : null;
                 if (roadName != null)
                 {
                     roadName = StringUtilities.WrapNameWithColorTags(roadName, m_textField.textColor);
                     RoadRenderingManager roadRenderingManager = Singleton<RoadRenderingManager>.instance;
-                    if(validRouteNum)
+                    if(validRouteStr)
                     {
-                        RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName, m_routeTypeDropdown.selectedValue, routeNum, oldRouteStr);
+                        RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName, m_routeTypeDropdown.selectedValue, routeStr, oldRouteStr);
                     }
                     else
                     {
@@ -264,7 +262,7 @@ namespace RoadNamer.Panels
                 m_textField.text = "";
             }
 
-            if(m_initialRouteNum != null && m_initialRoutePrefix != null)
+            if(m_initialRouteStr != null && m_initialRoutePrefix != null)
             {
                 int initialRouteType = 0;
                 for(int i=0; i<m_routeTypeDropdown.items.Length; i++)
@@ -276,12 +274,12 @@ namespace RoadNamer.Panels
                     }
                 }
                 m_routeTypeDropdown.selectedIndex = initialRouteType;
-                m_routeNumField.text = m_initialRouteNum;
+                m_routeStrField.text = m_initialRouteStr;
             }
             else
             {
                 m_routeTypeDropdown.selectedIndex = 0;
-                m_routeNumField.text = "";
+                m_routeStrField.text = "";
             }
         }
 
@@ -311,7 +309,7 @@ namespace RoadNamer.Panels
                             }
                         }
                         m_routeTypeDropdown.selectedIndex = routeType;
-                        m_routeNumField.text = routeValues[1];
+                        m_routeStrField.text = routeValues[1];
                     }
                     break;
                 case "closeAll":

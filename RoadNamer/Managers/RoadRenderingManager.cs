@@ -66,7 +66,7 @@ namespace RoadNamer.Managers
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = false;
                 }
-                foreach( RouteContainer route in RoadNameManager.Instance().m_routeMap.Values )
+                foreach( RouteContainer route in RoadNameManager.Instance().m_routeDict.Values )
                 {
                     route.m_shieldMesh.GetComponent<Renderer>().enabled = false;
                     route.m_numMesh.GetComponent<Renderer>().enabled = false;
@@ -84,7 +84,7 @@ namespace RoadNamer.Managers
                 }
                 if (m_routeEnabled)
                 {
-                    foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                    foreach (RouteContainer route in RoadNameManager.Instance().m_routeDict.Values)
                     {
                         route.m_shieldMesh.GetComponent<Renderer>().enabled = true;
                         route.m_numMesh.GetComponent<Renderer>().enabled = true;
@@ -135,7 +135,8 @@ namespace RoadNamer.Managers
                                 Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
                                 road.m_textMesh.transform.Rotate(90f, 0f, 90f);
                                 road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
-                                road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                //TODO: Figure out a better ratio for route markers
+                                road.m_textMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                                 road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.richText = true;
                                 road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
@@ -143,23 +144,26 @@ namespace RoadNamer.Managers
                         }
                     }
                 }
-                foreach (RouteContainer route in RoadNameManager.Instance().m_routeMap.Values)
+                foreach (RouteContainer route in RoadNameManager.Instance().m_routeDict.Values)
                 {
                     if (route.m_segmentId != 0)
                     {
-                        int routeNum = route.m_routeNum;
+                        string routeStr = route.m_route;
 
-                        if (routeNum != 0)
+                        if (routeStr != null)
                         {
                             NetSegment netSegment = netManager.m_segments.m_buffer[route.m_segmentId];
                             NetSegment.Flags segmentFlags = netSegment.m_flags;
 
                             if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
                             {
-                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
+                                //Load a route shield type ( generic motorway shield should be default value )
+                                RouteShieldInfo shieldInfo = RouteShieldUtility.Instance().GetRouteShieldInfo(route.m_routePrefix);
+                                
+                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode];
                                 NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
                                 //TODO: Make texture addition/selection based on prefix type
-                                Material mat = SpriteUtilities.m_textureStore["ON"];
+                                Material mat = SpriteUtilities.m_textureStore[shieldInfo.textureName];
                                 route.m_shieldObject.GetComponent<Renderer>().material = mat;
                                 //TODO: Make mesh size dependent on text size
                                 route.m_shieldMesh.mesh = MeshUtilities.CreateRectMesh(mat.mainTexture.width, mat.mainTexture.height);
@@ -169,7 +173,7 @@ namespace RoadNamer.Managers
                                 route.m_shieldMesh.transform.Rotate(90f, 0f, 90f);
                                 //TODO: Bind the elevation of the mesh to the text z offset
                                 route.m_shieldMesh.transform.position += (Vector3.up * (0.5f));
-                                route.m_shieldMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                route.m_shieldMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                                 route.m_shieldObject.GetComponent<Renderer>().sortingOrder = 1000;
 
                                 route.m_numMesh.anchor = TextAnchor.MiddleCenter;
@@ -185,11 +189,12 @@ namespace RoadNamer.Managers
                                 //Just a hack, to make sure the text actually shows up above the shield
                                 route.m_numMesh.offsetZ = 0.001f;
                                 //TODO: Definitely get a map of the texture to the required text offsets 
-                                route.m_numMesh.transform.localPosition += (Vector3.up * -0.61f);
-                                route.m_numMesh.transform.localPosition += (Vector3.left * 0f);
-                                route.m_numMesh.transform.localScale = new Vector3(m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f), m_textScale / (scaleMultiplier * 2f));
-                                route.m_numMesh.color = Color.black;
-                                route.m_numMesh.text = route.m_routeNum.ToString();
+                                route.m_numMesh.transform.localPosition += (Vector3.up * shieldInfo.upOffset);
+                                route.m_numMesh.transform.localPosition += (Vector3.left * shieldInfo.leftOffset);
+                                //TODO: Figure out a better ratio for route markers
+                                route.m_numMesh.transform.localScale = new Vector3(shieldInfo.textScale,shieldInfo.textScale,shieldInfo.textScale);
+                                route.m_numMesh.color = shieldInfo.textColor;
+                                route.m_numMesh.text = route.m_route.ToString();
                                 route.m_numTextObject.GetComponent<Renderer>().sortingOrder = 1001;
 
                             }

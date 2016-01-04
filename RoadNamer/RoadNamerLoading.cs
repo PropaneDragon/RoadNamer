@@ -7,6 +7,7 @@ using RoadNamer.Panels;
 using RoadNamer.Tools;
 using RoadNamer.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -142,11 +143,11 @@ namespace RoadNamer
                 spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
 
                 //TODO: Replace with a loader function( JSON mapping available )
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/ON.png","ON") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/BC.png", "BC") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/AUS.png", "AUS") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/I.png", "I") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddTexture("Icons/US.png", "US") && spriteSuccess;
+                RouteShieldUtility.LoadRouteShieldInfo();
+                foreach( KeyValuePair<string,RouteShieldInfo> shieldInfo in RouteShieldUtility.Instance().routeShieldDictionary)
+                {
+                    spriteSuccess = SpriteUtilities.AddTexture(shieldInfo.Value.texturePath, shieldInfo.Key) && spriteSuccess;
+                }
 
                 if (!spriteSuccess)
                 {

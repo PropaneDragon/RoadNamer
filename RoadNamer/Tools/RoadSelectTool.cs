@@ -67,8 +67,8 @@ namespace RoadNamer.Tools
                                     LoggerUtilities.LogToConsole(rotation.ToString());
 #endif
                                     RandomNameManager.LoadRandomNames();
-                                    m_roadNamePanel.m_initialRouteNum = RoadNameManager.Instance().getRouteNum(netSegmentId);
-                                    m_roadNamePanel.m_initialRoutePrefix = RoadNameManager.Instance().getRouteType(netSegmentId);
+                                    m_roadNamePanel.m_initialRouteStr = RoadNameManager.Instance().GetRouteStr(netSegmentId);
+                                    m_roadNamePanel.m_initialRoutePrefix = RoadNameManager.Instance().GetRouteType(netSegmentId);
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
 
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;

@@ -12,7 +12,7 @@ namespace RoadNamer
     public class RoadNamerSerialiser : SerializableDataExtensionBase
     {
         const string roadDataKey = "RoadNamerTool";
-        const string routeDataKey = "RoadNamerToolRoutes";
+        const string routeDataKey = "RoadNamerToolRoute";
 
         public override void OnSaveData()
         {
@@ -66,22 +66,18 @@ namespace RoadNamer
             if (loadedRoadData != null)
             {
                 MemoryStream roadMemoryStream = new MemoryStream();
-                MemoryStream routeMemoryStream = new MemoryStream();
                 roadMemoryStream.Write(loadedRoadData, 0, loadedRoadData.Length);
                 roadMemoryStream.Position = 0;
-                routeMemoryStream.Write(loadedRouteData, 0, loadedRouteData.Length);
-                routeMemoryStream.Position = 0;
 
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
 
                 try
                 {
                     RoadContainer[] roadNames = binaryFormatter.Deserialize(roadMemoryStream) as RoadContainer[];
-                    RouteContainer[] routeNames = binaryFormatter.Deserialize(routeMemoryStream) as RouteContainer[];
 
                     if (roadNames != null)
                     {
-                        RoadNameManager.Instance().Load(roadNames,routeNames);
+                        RoadNameManager.Instance().Load(roadNames,null);
                     }
                     else
                     {
@@ -96,6 +92,42 @@ namespace RoadNamer
                 finally
                 {
                     roadMemoryStream.Close();
+                }
+            }
+            else
+            {
+                LoggerUtilities.LogWarning("Found no data to load");
+            }
+
+            if (loadedRouteData != null)
+            {
+                MemoryStream routeMemoryStream = new MemoryStream();
+
+                routeMemoryStream.Write(loadedRouteData, 0, loadedRouteData.Length);
+                routeMemoryStream.Position = 0;
+
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+                try
+                {
+                    RouteContainer[] routeNames = binaryFormatter.Deserialize(routeMemoryStream) as RouteContainer[];
+
+                    if (routeNames != null)
+                    {
+                        RoadNameManager.Instance().Load(null, routeNames);
+                    }
+                    else
+                    {
+                        LoggerUtilities.LogWarning("Couldn't load route names, as the array is null!");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggerUtilities.LogException(ex);
+
+                }
+                finally
+                {
                     routeMemoryStream.Close();
                 }
             }

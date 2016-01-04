@@ -13,7 +13,7 @@ namespace RoadNamer.CustomUI
     {
         private UIPanel background;
         private UILabel label;
-        private int routeNum;
+        private string routeStr;
         private string routePrefix;
 
         public override void Start()
@@ -44,7 +44,7 @@ namespace RoadNamer.CustomUI
         {
 
             base.OnMouseDown(p);
-            EventBusManager.Instance().Publish("updateroutepaneltext", routePrefix+'/'+routeNum);
+            EventBusManager.Instance().Publish("updateroutepaneltext", routePrefix+'/'+routeStr);
         }
 
         public void Display(object data, bool isRowOdd)
@@ -54,12 +54,12 @@ namespace RoadNamer.CustomUI
                 string route = data as string;
 
                 string[] routeValues = route.Split('/');
+                routePrefix = routeValues[0];
+                routeStr = routeValues[1];
 
                 if (route != null && background != null)
                 {
-                    Int32.TryParse(routeValues[1],out routeNum);
-                    routePrefix = routeValues[0];
-                    label.text = routePrefix + routeNum.ToString();
+                    label.text = routeValues[0] + routeValues[1];
 
                     if (isRowOdd)
                     {
