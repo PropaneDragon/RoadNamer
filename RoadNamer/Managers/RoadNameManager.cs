@@ -23,7 +23,7 @@ namespace RoadNamer.Managers
         public Dictionary<string, int> m_usedRoutes = new Dictionary<string, int>();
 
         /// <summary>
-        /// Dictionary 
+        /// Dictionary of the segmentId to the route name container
         /// </summary>
         public Dictionary<ushort, RouteContainer> m_routeDict = new Dictionary<ushort, RouteContainer>();
 
@@ -237,7 +237,7 @@ namespace RoadNamer.Managers
 
         public void Load(RoadContainer[] roadNames, RouteContainer[] routeNames)
         {
-            if (m_roadDict != null)
+            if (roadNames != null)
             {
                 foreach (RoadContainer road in roadNames)
                 {
