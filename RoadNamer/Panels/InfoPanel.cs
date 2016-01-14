@@ -59,9 +59,7 @@ namespace RoadNamer.Panels
             float lastHeight = m_infoLabel.height;
 
             m_infoLabel.text =
-                "- <color#c8f582>Dutch random localisations added!</color> Thanks to 854850 from Reddit, Φίλιππος Α and Julia Juneap.\n\n" +
-                "- <color#c8f582>Now supports Cimtographer!</color> You can now export your roads with their names added!\n\n" +
-                "- There'll be more updates coming soon. Sorry for the lack of updates recently.";
+                "- Bugfixes and more debugging. <color#c8f582>Should have less crashing now!</color>";
 
             float heightDifference = m_infoLabel.height - lastHeight;
 

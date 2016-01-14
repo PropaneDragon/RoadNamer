@@ -62,7 +62,16 @@ namespace RoadNamer.Managers
             {
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
                 {
-                    road.m_textMesh.GetComponent<Renderer>().enabled = false;
+                    Renderer textRenderer = road.m_textMesh.GetComponent<Renderer>();
+
+                    if (textRenderer != null)
+                    {
+                        textRenderer.enabled = false;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Text renderer was null, so isn't drawing!");
+                    }
                 }
 
                 textHidden = true;
@@ -71,7 +80,16 @@ namespace RoadNamer.Managers
             {
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadList)
                 {
-                    road.m_textMesh.GetComponent<Renderer>().enabled = true;
+                    Renderer textRenderer = road.m_textMesh.GetComponent<Renderer>();
+
+                    if (textRenderer != null)
+                    {
+                        textRenderer.enabled = true;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Text renderer was null, so isn't drawing!");
+                    }
                 }
 
                 textHidden = false;
@@ -113,19 +131,22 @@ namespace RoadNamer.Managers
 
                                 float scaleMultiplier = m_textQuality / 20f;
 
-                                road.m_textMesh.anchor = TextAnchor.MiddleCenter;
-                                road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
-                                road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
-                                road.m_textMesh.GetComponent<Renderer>().receiveShadows = true;
-                                road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
-                                road.m_textMesh.transform.position = startNode.m_position;
-                                road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
-                                road.m_textMesh.transform.Rotate(90f, 0f, 90f);
-                                road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
-                                road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
-                                road.m_textMesh.offsetZ = m_textHeightOffset;
-                                road.m_textMesh.richText = true;
-                                road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
+                                if (road.m_textMesh != null)
+                                {
+                                    road.m_textMesh.anchor = TextAnchor.MiddleCenter;
+                                    road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                    road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                    road.m_textMesh.GetComponent<Renderer>().receiveShadows = true;
+                                    road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
+                                    road.m_textMesh.transform.position = startNode.m_position;
+                                    road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                    road.m_textMesh.transform.Rotate(90f, 0f, 90f);
+                                    road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
+                                    road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                    road.m_textMesh.offsetZ = m_textHeightOffset;
+                                    road.m_textMesh.richText = true;
+                                    road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
+                                }
                             }
                         }
                     }

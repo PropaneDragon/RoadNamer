@@ -75,7 +75,14 @@ namespace RoadNamer.Utilities
                         atlas.name = atlasName;
                         atlas.material = atlasMaterial;
 
-                        m_atlasStore.Add(atlasName, atlas);
+                        if (!m_atlasStore.ContainsKey(atlasName))
+                        {
+                            m_atlasStore.Add(atlasName, atlas);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Attempted to add initialise the same atlas! (" + atlasName + ")");
+                        }
 
                         returnValue = true;
                     }

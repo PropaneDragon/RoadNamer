@@ -59,36 +59,47 @@ namespace RoadNamer
 
             if (loadedData != null)
             {
-                MemoryStream memoryStream = new MemoryStream();
-                memoryStream.Write(loadedData, 0, loadedData.Length);
-                memoryStream.Position = 0;
-
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                Debug.Log("Road Namer: Found road names");
 
                 try
                 {
-                    RoadContainer[] roadNames = binaryFormatter.Deserialize(memoryStream) as RoadContainer[];
+                    MemoryStream memoryStream = new MemoryStream();
+                    memoryStream.Write(loadedData, 0, loadedData.Length);
+                    memoryStream.Position = 0;
 
-                    if (roadNames != null)
+                    BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+                    try
                     {
-                        RoadNameManager.Instance().Load(roadNames);
+                        RoadContainer[] roadNames = binaryFormatter.Deserialize(memoryStream) as RoadContainer[];
+
+                        if (roadNames != null)
+                        {
+                            RoadNameManager.Instance().Load(roadNames);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Road Namer: Couldn't load road names, as the array is null!");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Debug.LogWarning("Road Namer: Couldn't load road names, as the array is null!");
+                        Debug.LogError("Couldn't deserialise the road names!");
+                        Debug.LogException(ex);
+                    }
+                    finally
+                    {
+                        memoryStream.Close();
                     }
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     Debug.LogException(ex);
-                }
-                finally
-                {
-                    memoryStream.Close();
                 }
             }
             else
             {
+                Debug.LogError("Couldn't insert the road names into memory!");
                 Debug.LogWarning("Road Namer: Found no data to load");
             }
         }
