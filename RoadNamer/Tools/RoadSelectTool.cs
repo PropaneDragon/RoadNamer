@@ -11,6 +11,8 @@ namespace RoadNamer.Tools
     public class RoadSelectTool : DefaultTool
     {
         public RoadNamePanel m_roadNamePanel = null;
+        public UsedNamesPanel m_usedNamesPanel = null;
+        public UsedRoutesPanel m_usedRoutesPanel = null;
 
         protected override void Awake()
         {
@@ -32,6 +34,8 @@ namespace RoadNamer.Tools
         protected override void OnDisable()
         {
             base.OnDisable();
+            EventBusManager.Instance().Publish("closeAll", null);
+
         }
 
         protected override void OnToolUpdate()
@@ -53,14 +57,30 @@ namespace RoadNamer.Tools
                         {
                             if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
                             {
-                                ShowToolInfo(true, null, new Vector3());
+                                ShowToolInfo(false, null, new Vector3());
 
                                 if (m_roadNamePanel != null)
                                 {
+#if DEBUG
+                                    NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
+                                    Vector3 rotation = netSegment.GetDirection(netSegment.m_startNode);
+                                    LoggerUtilities.LogToConsole(rotation.ToString());
+#endif
+                                    RandomNameManager.LoadRandomNames();
+                                    m_roadNamePanel.m_initialRouteStr = RoadNameManager.Instance().GetRouteStr(netSegmentId);
+                                    m_roadNamePanel.m_initialRoutePrefix = RoadNameManager.Instance().GetRouteType(netSegmentId);
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
+
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
                                     m_roadNamePanel.Show();
+                                    m_usedNamesPanel.RefreshList();
+                                    m_usedNamesPanel.Show();
+                                    m_usedRoutesPanel.RefreshList();
+                                    m_usedRoutesPanel.Show();
+
+                                    OptionsManager.m_hasOpenedPanel = true;
+                                    OptionsManager.SaveOptions();
                                 }
                             }
                             else
@@ -70,6 +90,10 @@ namespace RoadNamer.Tools
                         }
                     }
                 }
+            }
+            else
+            {
+                ShowToolInfo(false, null, new Vector3());
             }
         }
 

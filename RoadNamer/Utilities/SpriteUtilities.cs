@@ -18,9 +18,9 @@ namespace RoadNamer.Utilities
           multiple sprites, and locations to those areas of the atlas.
           It's much better than storing individual sprites.
         */
-
-        public const ulong m_workshopId = 558960454ul;
         public static Dictionary<string, UITextureAtlas> m_atlasStore = new Dictionary<string, UITextureAtlas>();
+
+        public static Dictionary<string, Material> m_textureStore = new Dictionary<string, Material>();
 
         /// <summary>
         /// Returns a stored atlas.
@@ -31,7 +31,7 @@ namespace RoadNamer.Utilities
         {
             UITextureAtlas returnAtlas = null;
 
-            if(m_atlasStore.ContainsKey(atlasName))
+            if (m_atlasStore.ContainsKey(atlasName))
             {
                 returnAtlas = m_atlasStore[atlasName];
             }
@@ -48,26 +48,17 @@ namespace RoadNamer.Utilities
         public static bool InitialiseAtlas(string texturePath, string atlasName)
         {
             bool returnValue = false;
-            string modPath = null;
-            PluginManager pluginManager = Singleton<PluginManager>.instance;
+            string modPath = FileUtilities.GetModPath();
 
-            foreach (PluginManager.PluginInfo pluginInfo in pluginManager.GetPluginsInfo())
-            {
-                if (pluginInfo.name == "RoadNamer" || pluginInfo.publishedFileID.AsUInt64 == m_workshopId)
-                {
-                    modPath = pluginInfo.modPath;
-                }
-            }
-
-            if(modPath != null)
+            if (modPath != null)
             {
                 Shader shader = Shader.Find("UI/Default UI Shader");
 
-                if(shader != null)
+                if (shader != null)
                 {
                     string fullPath = modPath + "/" + texturePath;
 
-                    if(File.Exists(fullPath))
+                    if (File.Exists(fullPath))
                     {
                         Texture2D spriteTexture = new Texture2D(2, 2);
                         FileStream fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
@@ -75,6 +66,7 @@ namespace RoadNamer.Utilities
 
                         fileStream.Read(imageData, 0, (int)fileStream.Length);
                         spriteTexture.LoadImage(imageData);
+                        FixTransparency(spriteTexture);
 
                         Material atlasMaterial = new Material(shader)
                         {
@@ -91,17 +83,17 @@ namespace RoadNamer.Utilities
                     }
                     else
                     {
-                        LoggerUtilities.LogError("Could not find atlas at " + fullPath);
+                        LoggerUtilities.Log("Could not find atlas at " + fullPath);
                     }
                 }
                 else
                 {
-                    LoggerUtilities.LogError("Couldn't find the default UI Shader!");
+                    LoggerUtilities.Log("Couldn't find the default UI Shader!");
                 }
             }
             else
             {
-                LoggerUtilities.LogError("Could not find the mod path, which is odd.");
+                LoggerUtilities.Log("Could not find the mod path, which is odd.");
             }
 
             return returnValue;
@@ -132,8 +124,7 @@ namespace RoadNamer.Utilities
                 {
                     name = spriteName,
                     region = relativeLocation,
-                    texture = spriteTexture,
-                    border = new RectOffset()
+                    texture = spriteTexture
                 };
 
                 foundAtlas.AddSprite(createdSprite);
@@ -142,5 +133,75 @@ namespace RoadNamer.Utilities
 
             return returnValue;
         }
+
+        public static bool AddTexture( string texturePath, string textureName )
+        {
+            Shader shader = Shader.Find("UI/Default UI Shader");
+            string modPath = FileUtilities.GetModPath();
+            string fullPath = modPath + "/" + texturePath;
+
+            if (!shader || !File.Exists(fullPath))
+            {
+                return false;
+            }
+
+            Texture2D texture = new Texture2D(2, 2);
+            FileStream fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+            byte[] imageData = new byte[fileStream.Length];
+
+            fileStream.Read(imageData, 0, (int)fileStream.Length);
+            texture.LoadImage(imageData);
+            FixTransparency(texture);
+
+            Material material = new Material(shader);
+            material.mainTexture = texture;
+            m_textureStore[textureName] = material;
+            return true;
+        }
+
+        //I also copied this from Traffic++, which was copied from below
+        //=========================================================================
+        // Methods created by petrucio -> http://answers.unity3d.com/questions/238922/png-transparency-has-white-borderhalo.html
+        //
+        // Copy the values of adjacent pixels to transparent pixels color info, to
+        // remove the white border artifact when importing transparent .PNGs.
+        public static void FixTransparency(Texture2D texture)
+        {
+            Color32[] pixels = texture.GetPixels32();
+            int w = texture.width;
+            int h = texture.height;
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int idx = y * w + x;
+                    Color32 pixel = pixels[idx];
+                    if (pixel.a == 0)
+                    {
+                        bool done = false;
+                        if (!done && x > 0) done = TryAdjacent(ref pixel, pixels[idx - 1]);        // Left   pixel
+                        if (!done && x < w - 1) done = TryAdjacent(ref pixel, pixels[idx + 1]);        // Right  pixel
+                        if (!done && y > 0) done = TryAdjacent(ref pixel, pixels[idx - w]);        // Top    pixel
+                        if (!done && y < h - 1) done = TryAdjacent(ref pixel, pixels[idx + w]);        // Bottom pixel
+                        pixels[idx] = pixel;
+                    }
+                }
+            }
+
+            texture.SetPixels32(pixels);
+            texture.Apply();
+        }
+
+        private static bool TryAdjacent(ref Color32 pixel, Color32 adjacent)
+        {
+            if (adjacent.a == 0) return false;
+
+            pixel.r = adjacent.r;
+            pixel.g = adjacent.g;
+            pixel.b = adjacent.b;
+            return true;
+        }
+        //=========================================================================
     }
 }

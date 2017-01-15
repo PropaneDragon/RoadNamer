@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using ColossalFramework.UI;
+using System;
+using RoadNamer.Managers;
+using System.Collections.Generic;
 
 namespace RoadNamer.CustomUI
 {
@@ -9,6 +12,8 @@ namespace RoadNamer.CustomUI
         private UILabel m_title;
         private UIButton m_close;
         private UIDragHandle m_drag;
+
+        public List<String> m_closeActions = new List<string>();
 
         public string iconSprite
         {
@@ -86,13 +91,25 @@ namespace RoadNamer.CustomUI
 
             m_title.relativePosition = new Vector3(50, 13);
             m_title.text = title;
+            m_title.textAlignment = UIHorizontalAlignment.Center;
 
             m_close.atlas = UIUtils.defaultAtlas;
             m_close.relativePosition = new Vector3(width - 35, 2);
             m_close.normalBgSprite = "buttonclose";
             m_close.hoveredBgSprite = "buttonclosehover";
             m_close.pressedBgSprite = "buttonclosepressed";
-            m_close.eventClick += (component, param) => parent.Hide();
+            m_close.eventClick += CloseButton_clickedEventHandler;
+
+            m_title.width = parent.width - relativePosition.x - m_close.width - 10;
+        }
+
+        private void CloseButton_clickedEventHandler(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            parent.Hide();
+            foreach (string closeAction in m_closeActions)
+            {
+                EventBusManager.Instance().Publish(closeAction, null);
+            }
         }
     }
 }

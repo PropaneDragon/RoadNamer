@@ -53,10 +53,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Libs\SimpleJSON.cs" />
-    <Compile Include="RoadTypes.cs" />
+    <Compile Include="CustomUI\UIUsedRouteRowItem.cs" />
+    <Compile Include="Managers\OptionsManager.cs" />
+    <Compile Include="Managers\RandomNameManager.cs" />
+    <Compile Include="Managers\RouteShieldManager.cs" />
+    <Compile Include="Managers\SavedOptionManager.cs" />
+    <Compile Include="Panels\InfoPanel.cs" />
+    <Compile Include="Utilities\FileUtilities.cs" />
+    <Compile Include="Utilities\MeshUtilities.cs" />
+    <Compile Include="Utilities\RandomNameUtility.cs" />
+    <Compile Include="CustomUI\UIFastList.cs" />
+    <Compile Include="CustomUI\UIUsedNameRowItem.cs" />
+    <Compile Include="Managers\EventBusManager.cs" />
+    <Compile Include="Panels\UsedNamesPanel.cs" />
     <Compile Include="Utilities\LoggerUtilities.cs" />
-    <Compile Include="Utilities\RandomNameUtilities.cs" />
+    <Compile Include="Utilities\RouteShieldUtility.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
     <Compile Include="CustomUI\UITitleBar.cs" />
     <Compile Include="CustomUI\UIUtils.cs" />

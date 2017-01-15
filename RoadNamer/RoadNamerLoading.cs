@@ -7,6 +7,7 @@ using RoadNamer.Panels;
 using RoadNamer.Tools;
 using RoadNamer.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -18,7 +19,12 @@ namespace RoadNamer
     public class RoadNamerLoading : LoadingExtensionBase
     {
         private GameObject m_roadNamePanelObject;
+        private GameObject m_usedNamesPanelObject;
+        private GameObject m_usedRoutesPanelObject;
         private RoadNamePanel m_roadNamePanel;
+        private UsedNamesPanel m_usedNamesPanel;
+        private UsedRoutesPanel m_usedRoutesPanel;
+
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
         private UIButton m_tabButton = null;
         private RoadRenderingManager m_roadRenderingManager = null;
@@ -48,7 +54,25 @@ namespace RoadNamer
                 m_roadNamePanel.transform.parent = view.transform;
                 m_roadNamePanel.Hide();
 
-                RandomNameConfiguration.Load();
+                m_usedNamesPanelObject = new GameObject("UsedNamesPanel");
+                m_usedNamesPanel = m_usedNamesPanelObject.AddComponent<UsedNamesPanel>();
+                m_usedNamesPanel.transform.parent = view.transform;
+                m_usedNamesPanel.Hide();
+
+                m_usedRoutesPanelObject = new GameObject("UsedRoutesPanel");
+                m_usedRoutesPanel = m_usedRoutesPanelObject.AddComponent<UsedRoutesPanel>();
+                m_usedRoutesPanel.transform.parent = view.transform;
+                m_usedRoutesPanel.Hide();
+
+                EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedRoutesPanel);
+                EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedRoutesPanel);
+                EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("updateroutepaneltext", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_usedNamesPanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_usedRoutesPanel);
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
@@ -97,21 +121,35 @@ namespace RoadNamer
                     RenderManager.RegisterRenderableManager(m_roadRenderingManager);
                     m_roadRenderingManager.m_registered = true;
                 }
+
+                OptionsManager.m_isIngame = true;
+                OptionsManager.UpdateEverything();
             }
         }
 
+        /// <summary>
+        /// Loads all custom sprites
+        /// </summary>
         private void LoadSprites()
         {
-            bool atlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
+            bool iconAtlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
 
-            if (atlasSuccess)
+            if (iconAtlasSuccess )
             {
                 bool spriteSuccess = true;
 
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons");
-                spriteSuccess = spriteSuccess && SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons");
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
+
+                //TODO: Replace with a loader function( JSON mapping available )
+                RouteShieldUtility.LoadRouteShieldInfo();
+                foreach( KeyValuePair<string,RouteShieldInfo> shieldInfo in RouteShieldUtility.Instance().routeShieldDictionary)
+                {
+                    spriteSuccess = SpriteUtilities.AddTexture(shieldInfo.Value.texturePath, shieldInfo.Key) && spriteSuccess;
+                }
 
                 if (!spriteSuccess)
                 {
@@ -152,12 +190,24 @@ namespace RoadNamer
                 else
                 {
                     roadSelectTool.m_roadNamePanel = m_roadNamePanel;
-                }
+                    roadSelectTool.m_usedNamesPanel = m_usedNamesPanel;
+                    roadSelectTool.m_usedRoutesPanel = m_usedRoutesPanel;
+}
             }
         }
 
         public override void OnLevelUnloading()
         {
+            EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedRoutesPanel);
+            EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedRoutesPanel);
+            EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("updateroutepaneltext", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_usedNamesPanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_usedRoutesPanel);
+            OptionsManager.m_isIngame = false;
         }
 
         public override void OnReleased()

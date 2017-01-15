@@ -7,18 +7,25 @@ using UnityEngine;
 
 namespace RoadNamer.Managers
 {
+    /// <summary>
+    /// Handles all ingame rendering.
+    /// </summary>
     public class RoadRenderingManager : SimulationManagerBase<RoadRenderingManager, DistrictProperties>, IRenderableManager, ISimulationManager
     {
-        private Mesh m_nameMesh = null;
-        private Mesh m_iconMesh = null;
-
         private Material m_nameMaterial = null;
         private Material m_iconMaterial = null;
 
         private int m_lastCount = 0;
-        private double m_renderHeight = 1000.0;
+        private bool textHidden = false;
 
+        public float m_renderHeight = 1000f;
+        public float m_textScale = 0.5f;
+        public float m_textQuality = 20f;
+        public float m_textHeightOffset = -2f;
+        public bool m_alwaysShowText = false;
         public bool m_registered = false;
+        public bool m_textEnabled = true;
+        public bool m_routeEnabled = true;
 
         protected override void Awake()
         {
@@ -37,6 +44,8 @@ namespace RoadNamer.Managers
 
         protected override void BeginOverlayImpl(RenderManager.CameraInfo cameraInfo)
         {
+            DistrictManager districtManager = Singleton<DistrictManager>.instance;
+
             if (m_lastCount != RoadNameManager.Instance().m_roadDict.Count)
             {
                 m_lastCount = RoadNameManager.Instance().m_roadDict.Count;
@@ -51,63 +60,54 @@ namespace RoadNamer.Managers
                 }
             }
 
-            if (cameraInfo.m_height < m_renderHeight)
+            if (!textHidden && cameraInfo.m_height > m_renderHeight)
             {
-                DrawMesh();
-            }
-        }
-
-        private void DrawMesh()
-        {
-            DistrictManager districtManager = Singleton<DistrictManager>.instance;
-
-            if (districtManager.NamesVisible) //Camera mode - It only gets set in Cities classes, so I can't really get it any other way
-            {
-                if (this.m_nameMesh != null && this.m_nameMaterial != null)
+                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
-                    this.m_nameMaterial.color = districtManager.m_properties.m_areaNameColor;
-                    if (this.m_nameMaterial.SetPass(0))
+                    road.m_textMesh.GetComponent<Renderer>().enabled = false;
+                }
+                foreach( RouteContainer route in RoadNameManager.Instance().m_routeDict.Values )
+                {
+                    route.m_shieldMesh.GetComponent<Renderer>().enabled = false;
+                    route.m_numMesh.GetComponent<Renderer>().enabled = false;
+                }
+                textHidden = true;
+            }
+            else if (textHidden  && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
+            {
+                if (m_textEnabled)
+                {
+                    foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                     {
-                        Graphics.DrawMeshNow(this.m_nameMesh, Matrix4x4.identity);
+                        road.m_textMesh.GetComponent<Renderer>().enabled = true;
                     }
                 }
-
-                if (this.m_iconMesh != null && this.m_iconMaterial != null && this.m_iconMaterial.SetPass(0))
+                if (m_routeEnabled)
                 {
-                    Graphics.DrawMeshNow(this.m_iconMesh, Matrix4x4.identity);
+                    foreach (RouteContainer route in RoadNameManager.Instance().m_routeDict.Values)
+                    {
+                        route.m_shieldMesh.GetComponent<Renderer>().enabled = true;
+                        route.m_numMesh.GetComponent<Renderer>().enabled = true;
+                    }
                 }
+                textHidden = false;
             }
         }
 
+        /// <summary>
+        /// Redraw the text to be drawn later with a mesh. Use sparingly, as 
+        /// this is an expensive task.
+        /// </summary>
         private void RenderText()
         {
             DistrictManager districtManager = Singleton<DistrictManager>.instance;
 
             if (districtManager.m_properties.m_areaNameFont != null)
             {
-                int lastFontSize = districtManager.m_properties.m_areaNameFont.size;
-
                 UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
-                UIRenderData uiRenderData = UIRenderData.Obtain();
-                UIRenderData dynamicFontRenderData = UIRenderData.Obtain();
 
                 NetManager netManager = Singleton<NetManager>.instance;
-                NetSegment[] netSegments = netManager.m_segments.m_buffer;
-
-                uiRenderData.Clear();
-                dynamicFontRenderData.Clear();
-
-                PoolList<Vector3> vertices = uiRenderData.vertices;
-                PoolList<Vector3> normals = uiRenderData.normals;
-                PoolList<Color32> colors = uiRenderData.colors;
-                PoolList<Vector2> uvs = uiRenderData.uvs;
-                PoolList<int> triangles = uiRenderData.triangles;
-
-                PoolList<Vector3> dynamicFontVertices = dynamicFontRenderData.vertices;
-                PoolList<Vector3> dynamicFontNormals = dynamicFontRenderData.normals;
-                PoolList<Color32> dynamicFontColors = dynamicFontRenderData.colors;
-                PoolList<Vector2> dynamicFontUvs = dynamicFontRenderData.uvs;
-                PoolList<int> dynamicFontTriangles = dynamicFontRenderData.triangles;
+                float scaleMultiplier = m_textQuality / 20f;
 
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
@@ -117,118 +117,97 @@ namespace RoadNamer.Managers
 
                         if (roadName != null)
                         {
-                            int originalNormalCount = normals.Count;
-                            int originalDynamicFontNormalCount = dynamicFontNormals.Count;
-
                             NetSegment netSegment = netManager.m_segments.m_buffer[road.m_segmentId];
                             NetSegment.Flags segmentFlags = netSegment.m_flags;
 
                             if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
                             {
-                                UIFontRenderer fontRenderer = districtManager.m_properties.m_areaNameFont.ObtainRenderer();
-                                UIDynamicFont.DynamicFontRenderer dynamicFontRenderer = fontRenderer as UIDynamicFont.DynamicFontRenderer;
-
-                                if (dynamicFontRenderer != null)
-                                {
-                                    dynamicFontRenderer.spriteAtlas = districtManager.m_properties.m_areaIconAtlas;
-                                    dynamicFontRenderer.spriteBuffer = dynamicFontRenderData;
-                                }
-
-                                fontRenderer.defaultColor = new Color32(255, 255, 255, 64);
-                                fontRenderer.textScale = 0.5f;
-                                fontRenderer.pixelRatio = 1f;
-                                fontRenderer.processMarkup = true;
-                                fontRenderer.wordWrap = true;
-                                fontRenderer.multiLine = true;
-                                fontRenderer.textAlign = UIHorizontalAlignment.Center;
-                                fontRenderer.maxSize = new Vector2(450f, 900f);
-                                fontRenderer.shadow = false;
-                                fontRenderer.shadowColor = (Color32)Color.black;
-                                fontRenderer.shadowOffset = Vector2.one;
-
-                                Vector2 stringSize = fontRenderer.MeasureString(roadName);
-
-                                vertices.Add(new Vector3(-stringSize.x, -stringSize.y, 1f));
-                                vertices.Add(new Vector3(-stringSize.x, stringSize.y, 1f));
-                                vertices.Add(new Vector3(stringSize.x, stringSize.y, 1f));
-                                vertices.Add(new Vector3(stringSize.x, -stringSize.y, 1f));
-
-                                colors.Add(new Color32(0, 0, 0, 255));
-                                colors.Add(new Color32(0, 0, 0, 255));
-                                colors.Add(new Color32(0, 0, 0, 255));
-                                colors.Add(new Color32(0, 0, 0, 255));
-
-                                uvs.Add(new Vector2(-1f, -1f));
-                                uvs.Add(new Vector2(-1f, 1f));
-                                uvs.Add(new Vector2(1f, 1f));
-                                uvs.Add(new Vector2(1f, -1f));
-
-                                triangles.Add(vertices.Count - 4);
-                                triangles.Add(vertices.Count - 3);
-                                triangles.Add(vertices.Count - 1);
-                                triangles.Add(vertices.Count - 1);
-                                triangles.Add(vertices.Count - 3);
-                                triangles.Add(vertices.Count - 2);
-
-                                fontRenderer.vectorOffset = new Vector3(-225f, stringSize.y * 0.5f, 0f);
-                                fontRenderer.Render(roadName, uiRenderData);
+                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
+                                NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
 
                                 Vector3 segmentLocation = netSegment.m_bounds.center;
-
-                                for (int normalCount = originalNormalCount; normalCount < normals.Count; ++normalCount)
-                                {
-                                    normals[normalCount] = segmentLocation;
-                                }
-
-                                for (int normalCount = normals.Count; normalCount < vertices.Count; ++normalCount)
-                                {
-                                    normals.Add(segmentLocation);
-                                }
-
-                                for (int normalCount = originalDynamicFontNormalCount; normalCount < dynamicFontNormals.Count; ++normalCount)
-                                {
-                                    dynamicFontNormals[normalCount] = segmentLocation;
-                                }
-
-                                for (int normalCount = normals.Count; normalCount < dynamicFontVertices.Count; ++normalCount)
-                                {
-                                    dynamicFontNormals.Add(segmentLocation);
-                                }
+                                road.m_textMesh.anchor = TextAnchor.MiddleCenter;
+                                road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
+                                road.m_textMesh.transform.position = startNode.m_position;
+                                road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
+                                road.m_textMesh.transform.Rotate(90f, 0f, 90f);
+                                road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
+                                //TODO: Figure out a better ratio for route markers
+                                road.m_textMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                                road.m_textMesh.offsetZ = m_textHeightOffset;
+                                road.m_textMesh.richText = true;
+                                road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
                             }
                         }
                     }
                 }
-
-                if (this.m_nameMesh == null)
+                foreach (RouteContainer route in RoadNameManager.Instance().m_routeDict.Values)
                 {
-                    this.m_nameMesh = new Mesh();
+                    if (route.m_segmentId != 0)
+                    {
+                        string routeStr = route.m_route;
+
+                        if (routeStr != null)
+                        {
+                            NetSegment netSegment = netManager.m_segments.m_buffer[route.m_segmentId];
+                            NetSegment.Flags segmentFlags = netSegment.m_flags;
+
+                            if (segmentFlags.IsFlagSet(NetSegment.Flags.Created))
+                            {
+                                //Load a route shield type ( generic motorway shield should be default value )
+                                RouteShieldInfo shieldInfo = RouteShieldUtility.Instance().GetRouteShieldInfo(route.m_routePrefix);
+                                
+                                NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode];
+                                NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
+                                //TODO: Make texture addition/selection based on prefix type
+                                Material mat = SpriteUtilities.m_textureStore[shieldInfo.textureName];
+                                route.m_shieldObject.GetComponent<Renderer>().material = mat;
+                                //TODO: Make mesh size dependent on text size
+                                route.m_shieldMesh.mesh = MeshUtilities.CreateRectMesh(mat.mainTexture.width, mat.mainTexture.height);
+                                Vector3 startNodePosition = startNode.m_position;
+                                route.m_shieldMesh.transform.position = startNodePosition;
+                                route.m_shieldMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                route.m_shieldMesh.transform.Rotate(90f, 0f, 90f);
+                                //TODO: Bind the elevation of the mesh to the text z offset
+                                route.m_shieldMesh.transform.position += (Vector3.up * (0.5f));
+                                route.m_shieldMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                                route.m_shieldObject.GetComponent<Renderer>().sortingOrder = 1000;
+
+                                route.m_numMesh.anchor = TextAnchor.MiddleCenter;
+                                route.m_numMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
+                                route.m_numMesh.GetComponent<Renderer>().material = route.m_numMesh.font.material;
+                                //TODO: Tie the font size to the font size option
+                                route.m_numMesh.fontSize = 50;
+                                route.m_numMesh.transform.position = startNode.m_position;
+                                route.m_numMesh.transform.parent = route.m_shieldObject.transform;
+                                route.m_numMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                route.m_numMesh.transform.Rotate(90f, 0f, 90f);
+                                route.m_numMesh.transform.position = route.m_shieldObject.GetComponent<Renderer>().bounds.center;
+                                //Just a hack, to make sure the text actually shows up above the shield
+                                route.m_numMesh.offsetZ = 0.001f;
+                                //TODO: Definitely get a map of the texture to the required text offsets 
+                                route.m_numMesh.transform.localPosition += (Vector3.up * shieldInfo.upOffset);
+                                route.m_numMesh.transform.localPosition += (Vector3.left * shieldInfo.leftOffset);
+                                //TODO: Figure out a better ratio for route markers
+                                route.m_numMesh.transform.localScale = new Vector3(shieldInfo.textScale,shieldInfo.textScale,shieldInfo.textScale);
+                                route.m_numMesh.color = shieldInfo.textColor;
+                                route.m_numMesh.text = route.m_route.ToString();
+                                route.m_numTextObject.GetComponent<Renderer>().sortingOrder = 1001;
+
+                            }
+                        }
+                    }
                 }
-
-                this.m_nameMesh.Clear();
-                this.m_nameMesh.vertices = vertices.ToArray();
-                this.m_nameMesh.normals = normals.ToArray();
-                this.m_nameMesh.colors32 = colors.ToArray();
-                this.m_nameMesh.uv = uvs.ToArray();
-                this.m_nameMesh.triangles = triangles.ToArray();
-                this.m_nameMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
-
-                if (this.m_iconMesh == null)
-                {
-                    this.m_iconMesh = new Mesh();
-                }
-
-                this.m_iconMesh.Clear();
-                this.m_iconMesh.vertices = dynamicFontVertices.ToArray();
-                this.m_iconMesh.normals = dynamicFontNormals.ToArray();
-                this.m_iconMesh.colors32 = dynamicFontColors.ToArray();
-                this.m_iconMesh.uv = dynamicFontUvs.ToArray();
-                this.m_iconMesh.triangles = dynamicFontTriangles.ToArray();
-                this.m_iconMesh.bounds = new Bounds(Vector3.zero, new Vector3(9830.4f, 1024f, 9830.4f));
-
-                uiRenderData.Release();
             }
         }
 
+        /// <summary>
+        /// Forces rendering to update immediately. Use sparingly, as it
+        /// can be quite expensive.
+        /// </summary>
         public void ForceUpdate()
         {
             m_lastCount = -1;
