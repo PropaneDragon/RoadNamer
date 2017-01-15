@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using ColossalFramework;
-using RoadNamer.Utilities;
 using System.Reflection;
 
 namespace RoadNamer.Managers
@@ -17,12 +16,14 @@ namespace RoadNamer.Managers
     {
         public static bool m_isIngame = false;
         public static bool m_hasOpenedPanel = false;
-        public static string m_randomNamesLocation = FileUtilities.GetModPath() + "/Names/";
         public static readonly int m_major = Assembly.GetExecutingAssembly().GetName().Version.Major;
         public static readonly int m_minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
         public static readonly int m_build = Assembly.GetExecutingAssembly().GetName().Version.Build;
         public static readonly int m_revision = Assembly.GetExecutingAssembly().GetName().Version.Revision;
         public static readonly string m_versionStringFull = m_major.ToString() + "." + m_minor.ToString() + "." + m_build.ToString() + "." + m_revision.ToString();
+        public static readonly uint m_workshopId = 558960454u;
+        public static string m_randomNamesLocation = CimTools.File.Path.GetModPath(m_workshopId, "RoadNamer") + "/Names/";
+        public static string m_spritesLocation = CimTools.File.Path.GetModPath(m_workshopId, "RoadNamer") + "/Icons/";
 
         /// <summary>
         /// Contains all options that can be set using a checkbox. These
@@ -42,7 +43,7 @@ namespace RoadNamer.Managers
         private static RoadSliderOption[] sliderOptions = new RoadSliderOption[]
         {
             new RoadSliderOption() { uniqueName = "textDisappearDistance", readableName = "Rendering distance", min = 100f, max = 2000f, value = 1000f, step = 10f, enabled = true },
-            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.5f, step = 0.1f, enabled = true },
+            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 4f, value = 0.5f, step = 0.1f, enabled = true },
             new RoadSliderOption() { uniqueName = "textQuality", readableName = "Text quality", min = 5f, max = 40f, value = 20f, step = 1f, enabled = true },
             new RoadSliderOption() { uniqueName = "textHeight", readableName = "Text height offset", min = -2f, max = 2f, value = -2f, step = .2f, enabled = true }
         };
@@ -53,7 +54,7 @@ namespace RoadNamer.Managers
         /// </summary>
         private static RoadDropdownOption[] dropdownOptions = new RoadDropdownOption[]
         {
-            new RoadDropdownOption() { uniqueName = "randomNameLocalisation", readableName = "Random name localisation", value = 0, enabled = true }
+            new RoadDropdownOption() { uniqueName = "randomNameLocalisationText", readableName = "Random name localisation", value = "UK", enabled = true }
         };
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace RoadNamer.Managers
 
             foreach (RoadDropdownOption dropdownOption in dropdownOptions)
             {
-                UIDropDown dropdown = optionGroup.AddDropdown(dropdownOption.readableName, dropdownOption.options, dropdownOption.value, OptionChanged) as UIDropDown;
+                UIDropDown dropdown = optionGroup.AddDropdown(dropdownOption.readableName, dropdownOption.options, 0, OptionChanged) as UIDropDown;
                 dropdown.enabled = dropdownOption.enabled;
                 dropdown.name = dropdownOption.uniqueName;
                 dropdown.eventSelectedIndexChanged += Dropdown_eventSelectedIndexChanged;
@@ -101,21 +102,14 @@ namespace RoadNamer.Managers
 
             if (dropdown != null)
             {
-                RoadDropdownOption foundOption = null;
-
                 foreach (RoadDropdownOption option in dropdownOptions)
                 {
                     if (dropdown.name == option.uniqueName)
                     {
-                        foundOption = option;
+                        option.value = dropdown.selectedValue;
+                        dropdown.tooltip = option.readableName;
+                        dropdown.RefreshTooltip();
                     }
-                }
-
-                if (foundOption != null)
-                {
-                    foundOption.value = value;
-                    dropdown.tooltip = value.ToString();
-                    dropdown.RefreshTooltip();
                 }
             }
         }
@@ -245,9 +239,20 @@ namespace RoadNamer.Managers
             {
                 if (option.uniqueName == uniqueName)
                 {
-                    Debug.Log(option.value);
-                    returnValue = option.value;
-                    successful = true;
+                    if (option.options != null)
+                    {
+                        int foundIndex;
+
+                        for(foundIndex = 0; foundIndex < option.options.Length; ++foundIndex)
+                        {
+                            if(option.options[foundIndex] == option.value)
+                            {
+                                returnValue = foundIndex;
+                                successful = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -268,11 +273,8 @@ namespace RoadNamer.Managers
             {
                 if (option.uniqueName == uniqueName)
                 {
-                    if (option.options != null && option.options.Length >= option.value + 1)
-                    {
-                        returnValue = option.options[option.value];
-                        successful = returnValue != null && returnValue != "";
-                    }
+                    returnValue = option.value;
+                    successful = returnValue != null && returnValue != "";
                 }
             }
 
@@ -356,7 +358,7 @@ namespace RoadNamer.Managers
         {
             foreach (RoadDropdownOption option in dropdownOptions)
             {
-                if (option.uniqueName == "randomNameLocalisation")
+                if(option.uniqueName == "randomNameLocalisationText")
                 {
                     if (Directory.Exists(m_randomNamesLocation))
                     {
@@ -406,7 +408,7 @@ namespace RoadNamer.Managers
                     renderingManager.ForceUpdate();
                 }
 
-                GetDropdownValue("randomNameLocalisation", ref RandomNameManager.m_fileName);
+                GetDropdownValue("randomNameLocalisationText", ref RandomNameManager.m_fileName);
             }
         }
     }
@@ -434,7 +436,7 @@ namespace RoadNamer.Managers
     {
         public string uniqueName = "";
         public string readableName = "";
-        public int value = 0;
+        public string value = "";
         public string[] options = null;
         public bool enabled = false;
     }

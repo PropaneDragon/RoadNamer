@@ -1,5 +1,7 @@
-﻿using ColossalFramework;
-using ColossalFramework.Plugins;
+﻿using CimTools.File;
+using CimTools.Utilities;
+using CimTools.Workshop;
+using ColossalFramework;
 using ColossalFramework.UI;
 using ICities;
 using RoadNamer.Managers;
@@ -10,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml.Serialization;
 using UnityEngine;
 
 
@@ -34,7 +35,7 @@ namespace RoadNamer
             try //So we don't fuck up loading the city
             {
                 LoadSprites();
-                
+                Changelog.Instance().DownloadChangelogAsync(OptionsManager.m_workshopId);
             }
             catch (Exception ex)
             {
@@ -132,7 +133,7 @@ namespace RoadNamer
         /// </summary>
         private void LoadSprites()
         {
-            bool iconAtlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
+            bool atlasSuccess = SpriteUtilities.InitialiseAtlas(OptionsManager.m_spritesLocation + "UIIcons.png", "RoadNamerIcons");
 
             if (iconAtlasSuccess )
             {

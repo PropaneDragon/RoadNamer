@@ -1,11 +1,12 @@
-﻿using System;
-using ColossalFramework;
+﻿using ColossalFramework;
 using ColossalFramework.UI;
-using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
 using UnityEngine;
-using System.Text.RegularExpressions;
+using CimTools.Elements;
+using CimTools.Utilities;
+using CimTools.Panels;
+using CimTools.Workshop;
 
 namespace RoadNamer.Panels
 {
@@ -13,7 +14,7 @@ namespace RoadNamer.Panels
     {
         protected RectOffset m_UIPadding = new RectOffset(5, 5, 5, 5);
 
-        private InfoPanel m_infoPanel;
+        private UpdatePanel m_infoPanel;
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
         private UIDropDown m_routeTypeDropdown;
@@ -22,6 +23,7 @@ namespace RoadNamer.Panels
         private UILabel m_routeLabel;
 
         private UIColorField m_colourSelector;
+        private UIButton m_randomNameButton;
         private string m_initialRoadName;
        
 
@@ -62,8 +64,15 @@ namespace RoadNamer.Panels
         {
             base.Start();
 
-            m_infoPanel = this.AddUIComponent<InfoPanel>();
+            m_infoPanel = this.AddUIComponent<UpdatePanel>();
             m_infoPanel.Hide();
+
+            Changelog changelogDownloader = m_infoPanel.m_changelogDownloader;
+
+            if(!changelogDownloader.DownloadComplete && !changelogDownloader.DownloadInProgress)
+            {
+                changelogDownloader.DownloadChangelogAsync(OptionsManager.m_workshopId);
+            }
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
             m_panelTitle.title = "Set a name";
@@ -76,7 +85,7 @@ namespace RoadNamer.Panels
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
-            this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
+            this.atlas = UIUtilities.GetAtlas("Ingame");
             this.eventKeyPress += RoadNamePanel_eventKeyPress;
         }
 
@@ -90,7 +99,7 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
-            m_infoPanel.relativePosition = new Vector3(this.width - 20, -(m_infoPanel.height - 20));
+            m_infoPanel.setPositionSpeakyPoint(new Vector2(this.width - 20, -20));
 
             m_roadNameLabel = this.AddUIComponent<UILabel>();
             m_roadNameLabel.textScale = 1f;
@@ -107,75 +116,37 @@ namespace RoadNamer.Panels
             m_textField.eventKeyDown += m_textField_eventKeyDown;
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
             m_textField.textColor = Color.white;
-
-            m_routeLabel = this.AddUIComponent<UILabel>();
-            m_routeLabel.textScale = 1f;
-            m_routeLabel.size = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
-            m_routeLabel.textColor = new Color32(180, 180, 180, 255);
-            m_routeLabel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            m_routeLabel.textAlignment = UIHorizontalAlignment.Left;
-            m_routeLabel.text = "Route Name";
-
-            m_routeTypeDropdown = CustomUI.UIUtils.CreateDropDown(this, new Vector2(((this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f), 25));
-            //TODO: Replace with Random namer values
-            foreach( string key in RouteShieldUtility.Instance().routeShieldDictionary.Keys)
-            {
-                m_routeTypeDropdown.AddItem(key);
-            }
-            m_routeTypeDropdown.selectedIndex = 0;
-            m_routeTypeDropdown.relativePosition = new Vector3(m_UIPadding.left, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
-
-            m_routeStrField = CustomUI.UIUtils.CreateTextField(this);
-            m_routeStrField.relativePosition = new Vector3(m_UIPadding.left + m_routeTypeDropdown.width + m_UIPadding.right, m_routeLabel.relativePosition.y + m_routeLabel.height + m_UIPadding.bottom);
-            m_routeStrField.height = 25;
-            m_routeStrField.width = (this.width - m_UIPadding.left - 2 * m_UIPadding.right) / 2f;
-            m_routeStrField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
-            m_routeStrField.textColor = Color.white;
-            m_routeStrField.maxLength = 3;
-
-            UIButton randomNameButton = CustomUI.UIUtils.CreateButton(this);
-            randomNameButton.text = "";
-            randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
-            randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
-            randomNameButton.atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
-            randomNameButton.disabledBgSprite = "DiceIcon";
-            randomNameButton.normalFgSprite = "DiceIcon";
-            randomNameButton.focusedFgSprite = "DiceIcon";
-            randomNameButton.hoveredFgSprite = "DiceIcon";
-            randomNameButton.pressedFgSprite = "DiceIcon";
-            randomNameButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
-            randomNameButton.eventClicked += RandomNameButton_eventClicked;
-
+            
+            m_randomNameButton = UIUtilities.CreateButton(this);
+            m_randomNameButton.text = "";
+            m_randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
+            m_randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
+            m_randomNameButton.atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+            m_randomNameButton.disabledBgSprite = "DiceIcon";
+            m_randomNameButton.normalFgSprite = "DiceIcon";
+            m_randomNameButton.focusedFgSprite = "DiceIcon";
+            m_randomNameButton.hoveredFgSprite = "DiceIcon";
+            m_randomNameButton.pressedFgSprite = "DiceIcon";
+            m_randomNameButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
+            //m_randomNameButton.tooltip = RandomNameManager.m_fileName;
+            m_randomNameButton.eventClicked += RandomNameButton_eventClicked;
+            
             UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
-            colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_routeStrField.relativePosition.y + m_routeStrField.height + m_UIPadding.bottom);
-
-            m_colourSelector = CustomUI.UIUtils.CreateColorField(colourSelectorPinPanel);
+            colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
+            
+            m_colourSelector = UIUtilities.CreateColorField(colourSelectorPinPanel);
             m_colourSelector.pickerPosition = UIColorField.ColorPickerPosition.LeftBelow;
             m_colourSelector.eventColorChanged += ColourSelector_eventColorChanged;
             m_colourSelector.eventColorPickerClose += ColourSelector_eventColorPickerClose;
             m_colourSelector.tooltip = "Set the text colour";
             m_colourSelector.relativePosition = new Vector3(0, 0);
 
-            UIButton nameRoadButton = CustomUI.UIUtils.CreateButton(this);
+            UIButton nameRoadButton = UIUtilities.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
             nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_routeStrField.relativePosition.y + m_routeStrField.height + m_UIPadding.bottom);
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
-
-            UIButton randomRoadNameButton = CustomUI.UIUtils.CreateButton(this);
-            randomRoadNameButton.text = "Random Road";
-            randomRoadNameButton.size = new Vector2(120, 30);
-            randomRoadNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 2 * m_UIPadding.right - randomRoadNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            randomRoadNameButton.eventClicked += RandomRoadNameButton_eventClicked;
-            randomRoadNameButton.tooltip = "Generate a random name for the road";
-
-            UIButton randomRouteNameButton = CustomUI.UIUtils.CreateButton(this);
-            randomRouteNameButton.text = "Random Route";
-            randomRouteNameButton.size = new Vector2(120, 30);
-            randomRouteNameButton.relativePosition = new Vector3(this.width - nameRoadButton.width - 3 * m_UIPadding.right - randomRoadNameButton.width - randomRouteNameButton.width, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            randomRouteNameButton.eventClicked += RandomRouteNameButton_eventClicked;
-            randomRouteNameButton.tooltip = "Generate a random route name for the road";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
         }
@@ -195,7 +166,15 @@ namespace RoadNamer.Panels
 
             if (randomName != null)
             {
+                m_randomNameButton.tooltip = "";
                 m_textField.text = randomName;
+            }
+            else
+            {
+                m_randomNameButton.tooltip = "Could not find any road names :(";
+                m_randomNameButton.RefreshTooltip();
+                m_randomNameButton.bringTooltipToFront = true;
+                m_randomNameButton.tooltipBox.Show();
             }
         }
 

@@ -24,23 +24,31 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>C:\Program Files %28x86%29\Steam\steamapps\workshop\content\255710\558960454\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CimTools, Version=0.1.5821.35742, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\CimTools.dll</HintPath>
     </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ICities">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,6 +58,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -60,7 +69,6 @@
     <Compile Include="Managers\SavedOptionManager.cs" />
     <Compile Include="Panels\InfoPanel.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
-    <Compile Include="Utilities\MeshUtilities.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
     <Compile Include="CustomUI\UIFastList.cs" />
     <Compile Include="CustomUI\UIUsedNameRowItem.cs" />
@@ -69,8 +77,6 @@
     <Compile Include="Utilities\LoggerUtilities.cs" />
     <Compile Include="Utilities\RouteShieldUtility.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
-    <Compile Include="CustomUI\UITitleBar.cs" />
-    <Compile Include="CustomUI\UIUtils.cs" />
     <Compile Include="Managers\RoadNameManager.cs" />
     <Compile Include="Managers\RoadRenderingManager.cs" />
     <Compile Include="Panels\RoadNamePanel.cs" />
@@ -79,11 +85,32 @@
     <Compile Include="RoadNamerLoading.cs" />
     <Compile Include="RoadNamerMod.cs" />
     <Compile Include="RoadNamerSerialiser.cs" />
-    <Compile Include="Utilities\SpriteUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icons\UIIcons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libraries\CimTools.dll" />
+    <Content Include="Names\DE.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\FLE.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\FR.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\GRE.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\NL.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\UK.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Names\US.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

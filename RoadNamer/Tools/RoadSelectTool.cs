@@ -51,7 +51,7 @@ namespace RoadNamer.Tools
                     if (netSegmentId != 0)
                     {
                         NetManager netManager = Singleton<NetManager>.instance;
-                        NetSegment netSegment = netManager.m_segments.m_buffer[(int)netSegmentId];
+                        NetSegment netSegment = netManager.m_segments.m_buffer[netSegmentId];
 
                         if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
                         {
@@ -101,9 +101,10 @@ namespace RoadNamer.Tools
         {
             RaycastInput raycastInput = new RaycastInput(Camera.main.ScreenPointToRay(Input.mousePosition), Camera.main.farClipPlane);
             raycastInput.m_netService.m_service = ItemClass.Service.Road;
-            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels;
+            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels | ItemClass.Layer.PublicTransport;
             raycastInput.m_ignoreSegmentFlags = NetSegment.Flags.None;
             raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
+            raycastInput.m_ignoreBuildingFlags = Building.Flags.None;
             raycastInput.m_ignoreTerrain = true;
 
             return RayCast(raycastInput, out raycastOutput);

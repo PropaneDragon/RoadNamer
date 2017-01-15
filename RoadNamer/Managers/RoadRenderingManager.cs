@@ -129,6 +129,7 @@ namespace RoadNamer.Managers
                                 road.m_textMesh.anchor = TextAnchor.MiddleCenter;
                                 road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
                                 road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                road.m_textMesh.GetComponent<Renderer>().receiveShadows = true;
                                 road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
                                 road.m_textMesh.transform.position = startNode.m_position;
                                 road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
