@@ -7,6 +7,8 @@ using CimTools.v2.Utilities;
 using CimTools.v2.Panels;
 using CimTools.v2.Elements;
 using CimTools.v2.Workshop;
+using System.Collections.Generic;
+using System;
 
 namespace RoadNamer.Panels
 {
@@ -22,9 +24,9 @@ namespace RoadNamer.Panels
         private UIColorField m_colourSelector;
         private UIButton m_randomNameButton;
         private string m_initialRoadName;
-       
 
         public ushort m_netSegmentId = 0;
+        public List<ushort> m_netSegmentIds = new List<ushort>();
         public string m_netSegmentName;
 
         public string initialRoadName
@@ -168,7 +170,8 @@ namespace RoadNamer.Panels
 
         private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
-            string randomName = RandomNameManager.GenerateRandomRoadName(m_netSegmentId);
+            
+            string randomName = RandomNameManager.GenerateRandomRoadName(m_netSegmentIds.GetEnumerator().Current);
 
             if (randomName != null)
             {
@@ -219,12 +222,28 @@ namespace RoadNamer.Panels
                 {
                     roadName = StringUtilities.WrapNameWithColorTags(roadName, m_textField.textColor);
                     RoadRenderingManager roadRenderingManager = RoadRenderingManager.instance;
-                    RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName);
+                    doSetSegmentData(roadName);
                     Hide();
                     EventBusManager.Instance().Publish("closeUsedNamePanel", null);
                     EventBusManager.Instance().Publish("forceupdateroadnames", null);
                     roadRenderingManager.ForceUpdate();
                 }
+            }
+        }
+
+        private void doSetSegmentData(string roadName)
+        {
+            if( m_netSegmentIds.Count > 1)
+            {
+                foreach(ushort segmentId in m_netSegmentIds)
+                {
+                    string oldName = RoadNameManager.Instance().RoadExists(segmentId) ? RoadNameManager.Instance().m_roadDict[segmentId].m_roadName : null;
+                    RoadNameManager.Instance().SetRoadName(segmentId, roadName, oldName);
+
+                }
+            }else
+            {
+                RoadNameManager.Instance().SetRoadName(m_netSegmentId, roadName, m_initialRoadName);
             }
         }
 

@@ -8,9 +8,9 @@ namespace RoadNamer.Utilities
 {
     class CimToolHolder
     {
-        private static readonly ulong WORKSHOP_ID = 
+        private static readonly ulong WORKSHOP_ID = 558960454;
 
-        private static CimToolSettings settings = new CimToolSettings("RoadNamer");
+        private static CimToolSettings settings = new CimToolSettings("RoadNamer",workshopId:WORKSHOP_ID);
         public static CimToolBase toolBase = new CimToolBase(settings);
     }
 }

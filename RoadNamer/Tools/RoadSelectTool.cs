@@ -6,6 +6,7 @@ using System;
 using RoadNamer.Panels;
 using RoadNamer.Utilities;
 using ColossalFramework.Math;
+using System.Collections.Generic;
 
 namespace RoadNamer.Tools
 {
@@ -16,7 +17,7 @@ namespace RoadNamer.Tools
         public RoadNamePanel m_roadNamePanel = null;
         public UsedNamesPanel m_usedNamesPanel = null;
 
-        ushort netSegmentId = 0;
+        List<ushort> netSegmentIds = new List<ushort>();
         private Randomizer r1;
 
         protected override void Awake()
@@ -46,15 +47,29 @@ namespace RoadNamer.Tools
         {
             if (m_toolController != null && !m_toolController.IsInsideUI && Cursor.visible)
             {
-                RaycastOutput raycastOutput;
+                netSegmentIds.Clear();
 
+                RaycastOutput raycastOutput;
                 if (RaycastRoad(out raycastOutput))
                 {
-                    netSegmentId = raycastOutput.m_netSegment;
+                    ushort netSegmentId = raycastOutput.m_netSegment;
 
                     if (netSegmentId != 0)
                     {
+
                         NetSegment netSegment = netManager.m_segments.m_buffer[netSegmentId];
+
+                        netSegmentIds.Add(netSegmentId);
+                        if (Input.GetKey(KeyCode.LeftShift))
+                        {
+                            List<ushort> connectedSegments = getConnectingSegments(netSegmentId);
+                            connectedSegments.Remove(netSegmentId);
+                            netSegmentIds.AddRange(connectedSegments);
+                            if (m_roadNamePanel != null)
+                            {
+                                m_roadNamePanel.m_netSegmentIds = new List<ushort>(netSegmentIds);
+                            }
+                        }
 
                         if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
                         {
@@ -69,6 +84,8 @@ namespace RoadNamer.Tools
 
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
                                     m_roadNamePanel.m_netSegmentName = netSegment.Info.name.Replace(" ","");
+                                    m_roadNamePanel.m_netSegmentIds = Input.GetKey(KeyCode.LeftShift) ? m_roadNamePanel.m_netSegmentIds : new List<ushort>();
+
                                     m_roadNamePanel.Show();
                                     m_usedNamesPanel.RefreshList();
                                     m_usedNamesPanel.Show();
@@ -79,7 +96,11 @@ namespace RoadNamer.Tools
                             }
                             else if(Event.current.type == EventType.MouseDown && Event.current.button == (int)UIMouseButton.Left)
                             {
-                                RoadNameManager.Instance().DelRoadName(netSegmentId);
+                                foreach(ushort segmentId in netSegmentIds)
+                                {
+                                    RoadNameManager.Instance().DelRoadName(segmentId);
+                                }
+
                             }
                             else
                             {
@@ -99,10 +120,12 @@ namespace RoadNamer.Tools
         {
             Randomizer r2 = new Randomizer((int)Singleton<PropManager>.instance.m_props.NextFreeItem(ref r1));
 
-            if (netSegmentId != 0 && (!this.m_toolController.IsInsideUI && Cursor.visible))
+            if (netSegmentIds.Count > 0 && (!this.m_toolController.IsInsideUI && Cursor.visible))
             {
-                Color toolColor = this.GetToolColor(false, true);
-                RenderOverlay(cameraInfo, netSegmentId, toolColor);
+                foreach(ushort netSegmentId in netSegmentIds)
+                {
+                    RenderOverlay(cameraInfo, netSegmentId, this.m_toolController.m_errorColor);
+                }
             }
             base.RenderOverlay(cameraInfo);
         }
@@ -136,6 +159,37 @@ namespace RoadNamer.Tools
             raycastInput.m_ignoreTerrain = true;
 
             return RayCast(raycastInput, out raycastOutput);
+        }
+
+
+        private List<ushort> getConnectingSegments(ushort netSegmentId)
+        {
+            List<ushort> connectedSegments = new List<ushort>();
+            HashSet<ushort> seenSegments = new HashSet<ushort>();
+            getConnectingSegment(netSegmentId, ref connectedSegments, ref seenSegments);
+            return connectedSegments;
+            
+        }
+
+        private bool getConnectingSegment(ushort netSegmentId, ref List<ushort> connectedSegments, ref HashSet<ushort> seenSegments)
+        {
+            NetSegment netSegment = netManager.m_segments.m_buffer[netSegmentId];
+            if(netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created) &&
+               !seenSegments.Contains(netSegmentId) &&
+               netSegment.m_endLeftSegment == netSegment.m_endRightSegment &&
+               netSegment.m_startLeftSegment == netSegment.m_startRightSegment &&
+               connectedSegments.Count < 20)
+            {
+                connectedSegments.Add(netSegmentId);
+                seenSegments.Add(netSegmentId);
+                bool leftSegment = getConnectingSegment(netSegment.m_startRightSegment, ref connectedSegments, ref seenSegments);
+                bool rightSegment = getConnectingSegment(netSegment.m_endRightSegment, ref connectedSegments, ref seenSegments);
+                return leftSegment || rightSegment;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
