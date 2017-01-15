@@ -12,7 +12,6 @@ namespace RoadNamer.Tools
     {
         public RoadNamePanel m_roadNamePanel = null;
         public UsedNamesPanel m_usedNamesPanel = null;
-        public UsedRoutesPanel m_usedRoutesPanel = null;
 
         protected override void Awake()
         {
@@ -21,9 +20,9 @@ namespace RoadNamer.Tools
             base.Awake();
         }
 
-        protected override void OnToolGUI()
+        protected override void OnToolGUI(UnityEngine.Event e)
         {
-            base.OnToolGUI();
+            base.OnToolGUI(e);
         }
 
         protected override void OnEnable()
@@ -67,8 +66,6 @@ namespace RoadNamer.Tools
                                     LoggerUtilities.LogToConsole(rotation.ToString());
 #endif
                                     RandomNameManager.LoadRandomNames();
-                                    m_roadNamePanel.m_initialRouteStr = RoadNameManager.Instance().GetRouteStr(netSegmentId);
-                                    m_roadNamePanel.m_initialRoutePrefix = RoadNameManager.Instance().GetRouteType(netSegmentId);
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
 
                                     m_roadNamePanel.m_netSegmentId = netSegmentId;
@@ -76,8 +73,6 @@ namespace RoadNamer.Tools
                                     m_roadNamePanel.Show();
                                     m_usedNamesPanel.RefreshList();
                                     m_usedNamesPanel.Show();
-                                    m_usedRoutesPanel.RefreshList();
-                                    m_usedRoutesPanel.Show();
 
                                     OptionsManager.m_hasOpenedPanel = true;
                                     OptionsManager.SaveOptions();
@@ -101,7 +96,7 @@ namespace RoadNamer.Tools
         {
             RaycastInput raycastInput = new RaycastInput(Camera.main.ScreenPointToRay(Input.mousePosition), Camera.main.farClipPlane);
             raycastInput.m_netService.m_service = ItemClass.Service.Road;
-            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels | ItemClass.Layer.PublicTransport;
+            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels | ItemClass.Layer.PublicTransport | ItemClass.Layer.WaterPipes;
             raycastInput.m_ignoreSegmentFlags = NetSegment.Flags.None;
             raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
             raycastInput.m_ignoreBuildingFlags = Building.Flags.None;

@@ -38,9 +38,12 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CimTools, Version=0.1.5821.35742, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="CimTools, Version=2.1.6224.2660, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\CimTools.dll</HintPath>
+      <HintPath>Libraries\Cimtools\CimTools\bin\Release\CimTools.dll</HintPath>
     </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
@@ -65,10 +68,8 @@
     <Compile Include="CustomUI\UIUsedRouteRowItem.cs" />
     <Compile Include="Managers\OptionsManager.cs" />
     <Compile Include="Managers\RandomNameManager.cs" />
-    <Compile Include="Managers\RouteShieldManager.cs" />
     <Compile Include="Managers\SavedOptionManager.cs" />
-    <Compile Include="Panels\InfoPanel.cs" />
-    <Compile Include="Utilities\FileUtilities.cs" />
+    <Compile Include="Utilities\CimToolHolder.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
     <Compile Include="CustomUI\UIFastList.cs" />
     <Compile Include="CustomUI\UIUsedNameRowItem.cs" />
@@ -90,7 +91,7 @@
     <Content Include="Icons\UIIcons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Libraries\CimTools.dll" />
+    <Content Include="Libraries\CimTools.sln" />
     <Content Include="Names\DE.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -114,14 +115,21 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Libraries\.git" />
+    <None Include="Libraries\README.md" />
     <None Include="road-namer.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Libraries\CimToolsMod\" />
+    <Folder Include="Libraries\CimToolsTests\" />
+    <Folder Include="Libraries\CimTools\" />
+    <Folder Include="Libraries\TestResults\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)"
-xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"
-xcopy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\SteamApps\workshop\content\255710\558960454\"</PostBuildEvent>
+xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
