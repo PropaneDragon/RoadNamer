@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DebugSymbols>false</DebugSymbols>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -41,17 +42,16 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="CimTools, Version=2.1.6224.2660, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="CimTools, Version=2.1.6224.20825, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Cimtools\CimTools\bin\Release\CimTools.dll</HintPath>
+      <HintPath>..\..\CimTools\CimTools\bin\Release\CimTools.dll</HintPath>
     </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ICities">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,10 +65,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomUI\UIUsedRouteRowItem.cs" />
     <Compile Include="Managers\OptionsManager.cs" />
     <Compile Include="Managers\RandomNameManager.cs" />
     <Compile Include="Managers\SavedOptionManager.cs" />
+    <Compile Include="Utilities\ThreadingMonitor.cs" />
     <Compile Include="Utilities\CimToolHolder.cs" />
     <Compile Include="Utilities\RandomNameUtility.cs" />
     <Compile Include="CustomUI\UIFastList.cs" />
@@ -76,7 +76,6 @@
     <Compile Include="Managers\EventBusManager.cs" />
     <Compile Include="Panels\UsedNamesPanel.cs" />
     <Compile Include="Utilities\LoggerUtilities.cs" />
-    <Compile Include="Utilities\RouteShieldUtility.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
     <Compile Include="Managers\RoadNameManager.cs" />
     <Compile Include="Managers\RoadRenderingManager.cs" />
@@ -91,7 +90,6 @@
     <Content Include="Icons\UIIcons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Libraries\CimTools.sln" />
     <Content Include="Names\DE.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -116,14 +114,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\.git" />
-    <None Include="Libraries\README.md" />
     <None Include="road-namer.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Libraries\CimToolsMod\" />
-    <Folder Include="Libraries\CimToolsTests\" />
     <Folder Include="Libraries\CimTools\" />
-    <Folder Include="Libraries\TestResults\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

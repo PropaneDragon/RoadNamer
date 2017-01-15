@@ -60,6 +60,7 @@ namespace RoadNamer.Panels
             base.Start();
 
             m_infoPanel = this.AddUIComponent<UpdatePanel>();
+            m_infoPanel.Initialise(CimToolHolder.toolBase);
             m_infoPanel.Hide();
 
             Changelog changelogDownloader = m_infoPanel.m_changelogDownloader;
@@ -70,6 +71,7 @@ namespace RoadNamer.Panels
             }
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
+            m_panelTitle.Initialise(CimToolHolder.toolBase);
             m_panelTitle.title = "Set a name";
             m_panelTitle.iconAtlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
@@ -80,8 +82,8 @@ namespace RoadNamer.Panels
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
             this.atlas = CimToolHolder.toolBase.UIUtilities.defaultAtlas;
-            this.eventKeyPress += RoadNamePanel_eventKeyPress;
 
+            this.eventKeyPress += RoadNamePanel_eventKeyPress;
             this.eventVisibilityChanged += RoadNamePanel_eventVisibilityChanged;
         }
 
@@ -148,7 +150,7 @@ namespace RoadNamer.Panels
             UIButton nameRoadButton = CimToolHolder.toolBase.UIUtilities.CreateButton(this);
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
-            nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_colourSelector.relativePosition.y + m_colourSelector.height + m_UIPadding.bottom);
+            nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
             nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
 

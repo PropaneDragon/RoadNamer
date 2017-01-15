@@ -37,6 +37,7 @@ namespace RoadNamer.Panels
             base.Start();
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
+            m_panelTitle.Initialise(CimToolHolder.toolBase);
             m_panelTitle.title = "Existing names";
             m_panelTitle.iconAtlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";

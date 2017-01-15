@@ -5,13 +5,19 @@ using ColossalFramework.UI;
 using System;
 using RoadNamer.Panels;
 using RoadNamer.Utilities;
+using ColossalFramework.Math;
 
 namespace RoadNamer.Tools
 {
     public class RoadSelectTool : DefaultTool
     {
+        NetManager netManager = NetManager.instance;
+
         public RoadNamePanel m_roadNamePanel = null;
         public UsedNamesPanel m_usedNamesPanel = null;
+
+        ushort netSegmentId = 0;
+        private Randomizer r1;
 
         protected override void Awake()
         {
@@ -34,7 +40,6 @@ namespace RoadNamer.Tools
         {
             base.OnDisable();
             EventBusManager.Instance().Publish("closeAll", null);
-
         }
 
         protected override void OnToolUpdate()
@@ -45,26 +50,20 @@ namespace RoadNamer.Tools
 
                 if (RaycastRoad(out raycastOutput))
                 {
-                    ushort netSegmentId = raycastOutput.m_netSegment;
+                    netSegmentId = raycastOutput.m_netSegment;
 
                     if (netSegmentId != 0)
                     {
-                        NetManager netManager = Singleton<NetManager>.instance;
                         NetSegment netSegment = netManager.m_segments.m_buffer[netSegmentId];
 
                         if (netSegment.m_flags.IsFlagSet(NetSegment.Flags.Created))
                         {
-                            if (Event.current.type == EventType.MouseDown /*&& Event.current.button == (int)UIMouseButton.Left*/)
+                            if (Event.current.type == EventType.MouseDown && Event.current.button == (int)UIMouseButton.None)
                             {
                                 ShowToolInfo(false, null, new Vector3());
 
                                 if (m_roadNamePanel != null)
                                 {
-#if DEBUG
-                                    NetNode startNode = netManager.m_nodes.m_buffer[netSegment.m_startNode]; //Not used yet, but there just incase. This isn't final
-                                    Vector3 rotation = netSegment.GetDirection(netSegment.m_startNode);
-                                    LoggerUtilities.LogToConsole(rotation.ToString());
-#endif
                                     RandomNameManager.LoadRandomNames();
                                     m_roadNamePanel.initialRoadName = RoadNameManager.Instance().GetRoadName(netSegmentId);
 
@@ -78,6 +77,10 @@ namespace RoadNamer.Tools
                                     OptionsManager.SaveOptions();
                                 }
                             }
+                            else if(Event.current.type == EventType.MouseDown && Event.current.button == (int)UIMouseButton.Left)
+                            {
+                                RoadNameManager.Instance().DelRoadName(netSegmentId);
+                            }
                             else
                             {
                                 ShowToolInfo(true, "Click to name this road segment", netSegment.m_bounds.center);
@@ -90,6 +93,36 @@ namespace RoadNamer.Tools
             {
                 ShowToolInfo(false, null, new Vector3());
             }
+        }
+
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+            Randomizer r2 = new Randomizer((int)Singleton<PropManager>.instance.m_props.NextFreeItem(ref r1));
+
+            if (netSegmentId != 0 && (!this.m_toolController.IsInsideUI && Cursor.visible))
+            {
+                Color toolColor = this.GetToolColor(false, true);
+                RenderOverlay(cameraInfo, netSegmentId, toolColor);
+            }
+            base.RenderOverlay(cameraInfo);
+        }
+
+        private void RenderOverlay(RenderManager.CameraInfo cameraInfo, ushort netSegmentId, Color toolColor)
+        {
+            NetSegment segment = netManager.m_segments.m_buffer[netSegmentId];
+
+            NetInfo info = segment.Info;
+            if (info == null || (segment.m_flags & NetSegment.Flags.Untouchable) != NetSegment.Flags.None && !info.m_overlayVisible)
+                return;
+            Bezier3 bezier;
+            bezier.a = Singleton<NetManager>.instance.m_nodes.m_buffer[(int)segment.m_startNode].m_position;
+            bezier.d = Singleton<NetManager>.instance.m_nodes.m_buffer[(int)segment.m_endNode].m_position;
+            NetSegment.CalculateMiddlePoints(bezier.a, segment.m_startDirection, bezier.d, segment.m_endDirection, false, false, out bezier.b, out bezier.c);
+            bool flag1 = false;
+            bool flag2 = false;
+            Color color = this.GetToolColor(false, true);
+            ++ToolManager.instance.m_drawCallData.m_overlayCalls;
+            RenderManager.instance.OverlayEffect.DrawBezier(cameraInfo, color, bezier, info.m_halfWidth * 2f, !flag1 ? -100000f : info.m_halfWidth, !flag2 ? -100000f : info.m_halfWidth, -1f, 1280f, false, false);
         }
 
         bool RaycastRoad(out RaycastOutput raycastOutput)

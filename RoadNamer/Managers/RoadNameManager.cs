@@ -64,10 +64,14 @@ namespace RoadNamer.Managers
         {
             if(m_roadDict.ContainsKey(segmentId))
             {
+                //Destroy the mesh object first
+                GameObject.Destroy(m_roadDict[segmentId].m_textObject);
+
                 string roadName = m_roadDict[segmentId].m_roadName;
                 m_roadDict.Remove(segmentId);
                 DecrementRoadNameCounter(roadName);
             }
+            EventBusManager.Instance().Publish("forceupdateroadnames", null);
         }
 
         public void SetRoadName(ushort segmentId, string newName, string oldName = null)
