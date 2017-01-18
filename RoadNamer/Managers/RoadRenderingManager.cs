@@ -25,6 +25,7 @@ namespace RoadNamer.Managers
         public bool m_alwaysShowText = false;
         public bool m_registered = false;
         public bool m_textEnabled = true;
+        public bool m_routeEnabled = true;
 
         protected override void Awake()
         {
@@ -59,25 +60,26 @@ namespace RoadNamer.Managers
                 }
             }
 
-            if(!textHidden && cameraInfo.m_height > m_renderHeight)
+            if (!textHidden && cameraInfo.m_height > m_renderHeight)
             {
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
                     road.m_textMesh.GetComponent<Renderer>().enabled = false;
-            }
-
+                }
                 textHidden = true;
             }
-            else if(textHidden && m_textEnabled && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
-        {
-                foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+            else if (textHidden  && cameraInfo.m_height <= m_renderHeight && (districtManager.NamesVisible || m_alwaysShowText)) //This is a mess, and I'll sort it soon :)
             {
-                    road.m_textMesh.GetComponent<Renderer>().enabled = true;
+                if (m_textEnabled)
+                {
+                    foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
+                    {
+                        road.m_textMesh.GetComponent<Renderer>().enabled = true;
                     }
-
-                textHidden = false;
                 }
+                textHidden = false;
             }
+        }
 
         /// <summary>
         /// Redraw the text to be drawn later with a mesh. Use sparingly, as 
@@ -92,7 +94,7 @@ namespace RoadNamer.Managers
                 UIFontManager.Invalidate(districtManager.m_properties.m_areaNameFont);
 
                 NetManager netManager = Singleton<NetManager>.instance;
-                //NetSegment[] netSegments = netManager.m_segments.m_buffer;
+                float scaleMultiplier = m_textQuality / 20f;
 
                 foreach (RoadContainer road in RoadNameManager.Instance().m_roadDict.Values)
                 {
@@ -111,24 +113,24 @@ namespace RoadNamer.Managers
                                 NetNode endNode = netManager.m_nodes.m_buffer[netSegment.m_endNode];
 
                                 Vector3 segmentLocation = netSegment.m_bounds.center;
-
-                                float scaleMultiplier = m_textQuality / 20f;
-
                                 road.m_textMesh.anchor = TextAnchor.MiddleCenter;
                                 road.m_textMesh.font = districtManager.m_properties.m_areaNameFont.baseFont;
                                 road.m_textMesh.GetComponent<Renderer>().material = road.m_textMesh.font.material;
+                                road.m_textMesh.GetComponent<Renderer>().receiveShadows = true;
                                 road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
                                 road.m_textMesh.transform.position = startNode.m_position;
                                 road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
+                                Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
                                 road.m_textMesh.transform.Rotate(90f, 0f, 90f);
                                 road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
-                                road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier);
+                                //TODO: Figure out a better ratio for route markers
+                                road.m_textMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                                 road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.richText = true;
                                 road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
+                            }
+                        }
                     }
-                }
-                }
                 }
             }
         }

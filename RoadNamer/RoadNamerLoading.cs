@@ -1,5 +1,4 @@
 ﻿using ColossalFramework;
-using ColossalFramework.Plugins;
 using ColossalFramework.UI;
 using ICities;
 using RoadNamer.Managers;
@@ -7,10 +6,11 @@ using RoadNamer.Panels;
 using RoadNamer.Tools;
 using RoadNamer.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml.Serialization;
 using UnityEngine;
+
 
 namespace RoadNamer
 {
@@ -20,7 +20,7 @@ namespace RoadNamer
         private GameObject m_usedNamesPanelObject;
         private RoadNamePanel m_roadNamePanel;
         private UsedNamesPanel m_usedNamesPanel;
-    
+
         private RoadNamerSerialiser m_saveUtility = new RoadNamerSerialiser();
         private UIButton m_tabButton = null;
         private RoadRenderingManager m_roadRenderingManager = null;
@@ -30,8 +30,10 @@ namespace RoadNamer
             try //So we don't fuck up loading the city
             {
                 LoadSprites();
+                CimToolHolder.toolBase.Changelog.DownloadChangelogAsync();
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LoggerUtilities.LogException(ex);
             }
@@ -57,6 +59,8 @@ namespace RoadNamer
                 EventBusManager.Instance().Subscribe("forceupdateroadnames", m_usedNamesPanel);
                 EventBusManager.Instance().Subscribe("closeUsedNamePanel", m_usedNamesPanel);
                 EventBusManager.Instance().Subscribe("updateroadnamepaneltext", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_roadNamePanel);
+                EventBusManager.Instance().Subscribe("closeAll", m_usedNamesPanel);
 
                 if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
                 {
@@ -73,7 +77,7 @@ namespace RoadNamer
                     GameObject pageGameObject = UITemplateManager.GetAsGameObject("ScrollablePanelTemplate");
                     m_tabButton = tabStrip.AddTab("Road Namer", buttonGameObject, pageGameObject, new Type[] { }) as UIButton;
 
-                    UITextureAtlas atlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+                    UITextureAtlas atlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("RoadNamerIcons");
 
                     m_tabButton.eventClicked += TabButton_eventClicked;
                     m_tabButton.tooltip = "Road Namer";
@@ -116,17 +120,17 @@ namespace RoadNamer
         /// </summary>
         private void LoadSprites()
         {
-            bool atlasSuccess = SpriteUtilities.InitialiseAtlas("Icons/UIIcons.png", "RoadNamerIcons");
+            bool atlasSuccess = CimToolHolder.toolBase.SpriteUtilities.InitialiseAtlas(OptionsManager.m_spritesLocation + "UIIcons.png", "RoadNamerIcons");
 
             if (atlasSuccess)
             {
                 bool spriteSuccess = true;
 
-                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons") && spriteSuccess;
-                spriteSuccess = SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = CimToolHolder.toolBase.SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 2), new Vector2(36, 36)), "ToolbarFGIcon", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = CimToolHolder.toolBase.SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(40, 2), new Vector2(43, 49)), "ToolbarBGPressed", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = CimToolHolder.toolBase.SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(85, 2), new Vector2(43, 49)), "ToolbarBGHovered", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = CimToolHolder.toolBase.SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(130, 2), new Vector2(43, 49)), "ToolbarBGFocused", "RoadNamerIcons") && spriteSuccess;
+                spriteSuccess = CimToolHolder.toolBase.SpriteUtilities.AddSpriteToAtlas(new Rect(new Vector2(2, 53), new Vector2(42, 42)), "DiceIcon", "RoadNamerIcons") && spriteSuccess;
 
                 if (!spriteSuccess)
                 {
@@ -168,7 +172,7 @@ namespace RoadNamer
                 {
                     roadSelectTool.m_roadNamePanel = m_roadNamePanel;
                     roadSelectTool.m_usedNamesPanel = m_usedNamesPanel;
-                }
+}
             }
         }
 
@@ -177,6 +181,9 @@ namespace RoadNamer
             EventBusManager.Instance().UnSubscribe("forceupdateroadnames", m_usedNamesPanel);
             EventBusManager.Instance().UnSubscribe("closeUsedNamePanel", m_usedNamesPanel);
             EventBusManager.Instance().UnSubscribe("updateroadnamepaneltext", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("updateroutepaneltext", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_roadNamePanel);
+            EventBusManager.Instance().UnSubscribe("closeAll", m_usedNamesPanel);
             OptionsManager.m_isIngame = false;
         }
 

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RoadNameDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <AlwaysAssignPrefixes>false</AlwaysAssignPrefixes>
+  <AlwaysAssignPostfixes>false</AlwaysAssignPostfixes>
+   
+  <RoadPrefixes>
+    <Prefix>
+      <Name>Rue</Name>
+      <MaximumLanes>2</MaximumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>Quai</Name>
+      <MaximumLanes>2</MaximumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>Avenue</Name>
+      <MinimumLanes>3</MinimumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>Boulevard</Name>
+      <MinimumLanes>3</MinimumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>Autoroute</Name>
+      <MinimumLanes>3</MinimumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>A - %RANDOM100% </Name>
+      <MinimumLanes>3</MinimumLanes>
+    </Prefix>
+    <Prefix>
+      <Name>Place</Name>
+    </Prefix>
+  </RoadPrefixes>
+   
+  <RoadNames>
+    <RoadName>
+      <Name>de la France</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>false</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Paris</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>false</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Marseille</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>false</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Lyon</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>false</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Nice</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>Toulouse</Name>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>Nantes</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Strasbourg</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de Montpellier</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Bordeaux</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de Lille</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Rennes</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Reims</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <NoPostfix>true</NoPostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Le Havre</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <NoPostfix>true</NoPostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Saint-Étienne</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de Toulon</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Picardie</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>d'Alsace</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>du Midi</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de Bretagne</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>des Alpes</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>des Pyrénées</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>d'Aquitaine</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Seine</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>du Loire</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>du Rhône</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Gironde</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Garonne</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Libération</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Mer du Nord</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Mer Méditerranée</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Francophonie</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Suisse</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Belgique</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>du Luxembourg</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Normandie</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Lorraine</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Champagne</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>du Languedoc</Name>
+      <ForcePrefix>true</ForcePrefix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Côte d'Azur</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de Poitou</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+    <RoadName>
+      <Name>de la Bourgogne</Name>
+      <ForcePrefix>true</ForcePrefix>
+      <ForcePostfix>true</ForcePostfix>
+    </RoadName>
+  </RoadNames>
+</RoadNameDocument>

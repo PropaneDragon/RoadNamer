@@ -11,24 +11,24 @@ namespace RoadNamer
 {
     public class RoadNamerSerialiser : SerializableDataExtensionBase
     {
-        const string dataKey = "RoadNamerTool";
+        const string roadDataKey = "RoadNamerTool";
+        const string routeDataKey = "RoadNamerToolRoute";
 
         public override void OnSaveData()
         {
             LoggerUtilities.Log("Saving road names");
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            MemoryStream memoryStream = new MemoryStream();
+            MemoryStream roadMemoryStream = new MemoryStream();
 
             try
             {
-                RoadContainer[] roadNames = RoadNameManager.Instance().Save();
-
+                RoadContainer[] roadNames = RoadNameManager.Instance().SaveRoads();
                 if (roadNames != null)
                 {
-                    binaryFormatter.Serialize(memoryStream, roadNames);
-                    serializableDataManager.SaveData(dataKey, memoryStream.ToArray());
-                    LoggerUtilities.Log("Road names have been saved!");
+                    binaryFormatter.Serialize(roadMemoryStream, roadNames);
+                    serializableDataManager.SaveData(roadDataKey, roadMemoryStream.ToArray());
+                    Debug.Log("Road Namer: Road names have been saved!");
                 }
                 else
                 {
@@ -41,33 +41,33 @@ namespace RoadNamer
             }
             finally
             {
-                memoryStream.Close();
+                roadMemoryStream.Close();
             }
         }
 
         public override void OnLoadData()
         {
-            LoadRoadNames();
+            LoadNames();
             RandomNameManager.LoadRandomNames();           
         }
 
-        private void LoadRoadNames()
+        private void LoadNames()
         {
             LoggerUtilities.Log("Loading road names");
 
-            byte[] loadedData = serializableDataManager.LoadData(dataKey);
+            byte[] loadedRoadData = serializableDataManager.LoadData(roadDataKey);
 
-            if (loadedData != null)
+            if (loadedRoadData != null)
             {
-                MemoryStream memoryStream = new MemoryStream();
-                memoryStream.Write(loadedData, 0, loadedData.Length);
-                memoryStream.Position = 0;
+                MemoryStream roadMemoryStream = new MemoryStream();
+                roadMemoryStream.Write(loadedRoadData, 0, loadedRoadData.Length);
+                roadMemoryStream.Position = 0;
 
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
 
                 try
                 {
-                    RoadContainer[] roadNames = binaryFormatter.Deserialize(memoryStream) as RoadContainer[];
+                    RoadContainer[] roadNames = binaryFormatter.Deserialize(roadMemoryStream) as RoadContainer[];
 
                     if (roadNames != null)
                     {
@@ -81,16 +81,18 @@ namespace RoadNamer
                 catch (Exception ex)
                 {
                     LoggerUtilities.LogException(ex);
+
                 }
                 finally
                 {
-                    memoryStream.Close();
+                    roadMemoryStream.Close();
                 }
             }
             else
             {
                 LoggerUtilities.LogWarning("Found no data to load");
             }
+
         }
     }
 }

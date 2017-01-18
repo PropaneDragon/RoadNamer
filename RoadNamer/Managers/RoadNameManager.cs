@@ -17,9 +17,11 @@ namespace RoadNamer.Managers
         /// </summary>
         public Dictionary<ushort, RoadContainer> m_roadDict = new Dictionary<ushort, RoadContainer>();
         /// <summary>
-        /// Hashset of names already used( for random name generator)
+        /// Dictioanry of names/routes already used, to the number of segments that use that name/route
         /// </summary> 
-        public HashSet<string> m_usedNames = new HashSet<string>();
+        public Dictionary<string, int> m_usedNames = new Dictionary<string, int>();
+        public Dictionary<string, int> m_usedRoutes = new Dictionary<string, int>();
+
 
         public static RoadNameManager Instance()
         {
@@ -31,17 +33,98 @@ namespace RoadNamer.Managers
             return instance;
         }
 
-        public void SetRoadName(ushort segmentId, string newName, string oldName=null)
+        private void DecrementRoadNameCounter(string name)
         {
-			RoadContainer container = new RoadContainer( segmentId, newName );
-            m_roadDict[segmentId] = container;
-            if(oldName != null)
+            string strippedName = StringUtilities.RemoveTags(name);
+            if (m_usedNames.ContainsKey(strippedName))
             {
-                m_usedNames.Remove(StringUtilities.RemoveTags(oldName));
+                m_usedNames[strippedName] -= 1;
+                if (m_usedNames[strippedName] <= 0)
+                {
+                    m_usedNames.Remove(strippedName);
                 }
-            m_usedNames.Add(StringUtilities.RemoveTags(newName));
-            EventBusManager.Instance().Publish("forceupdateroadnames", null);
+
             }
+        }
+
+        private void DecrementRoadRouteCounter(string routeStr)
+        {
+            if (m_usedRoutes.ContainsKey(routeStr))
+            {
+                m_usedRoutes[routeStr] -= 1;
+                if (m_usedRoutes[routeStr] <= 0)
+                {
+                    m_usedRoutes.Remove(routeStr);
+                }
+
+            }
+        }
+
+        public void DelRoadName(ushort segmentId)
+        {
+            if(m_roadDict.ContainsKey(segmentId))
+            {
+                //Destroy the mesh object first
+                GameObject.Destroy(m_roadDict[segmentId].m_textObject);
+
+                string roadName = m_roadDict[segmentId].m_roadName;
+                m_roadDict.Remove(segmentId);
+                DecrementRoadNameCounter(roadName);
+            }
+            EventBusManager.Instance().Publish("forceupdateroadnames", null);
+        }
+
+        public void SetRoadName(ushort segmentId, string newName, string oldName = null)
+        {
+            RoadContainer roadContainer = null;
+            if( newName.Length > 0)
+            {
+                if (m_roadDict.ContainsKey(segmentId))
+                {
+                    roadContainer = m_roadDict[segmentId];
+                    roadContainer.m_roadName = newName;
+                }
+                else
+                {
+                    roadContainer = new RoadContainer(segmentId, newName);
+                    if (roadContainer.m_textObject == null)
+                    {
+                        roadContainer.m_textObject = new GameObject();
+                        roadContainer.m_textObject.AddComponent<MeshRenderer>();
+                        roadContainer.m_textMesh = roadContainer.m_textObject.AddComponent<TextMesh>();
+
+                    }
+                }
+                string strippedNewName = StringUtilities.RemoveTags(newName);
+                if (!m_usedNames.ContainsKey(strippedNewName))
+                {
+                    m_usedNames[strippedNewName] = 0;
+                }
+                m_usedNames[strippedNewName] += 1;
+            }
+            else
+            {
+                string strippedName = StringUtilities.RemoveTags(newName);
+                if (m_usedNames.ContainsKey(strippedName))
+                {
+                    m_usedNames[strippedName] -= 1;
+                    if (m_usedNames[strippedName] <= 0)
+                    {
+                        m_usedNames.Remove(strippedName);
+                    }
+
+                }
+            }
+         
+            m_roadDict[segmentId] = roadContainer;
+
+            if (oldName != null)
+            {
+                DecrementRoadNameCounter(oldName);
+            }
+
+            EventBusManager.Instance().Publish("forceupdateroadnames", null);
+        }
 
         public string GetRoadName(ushort segmentId)
         {
@@ -53,7 +136,7 @@ namespace RoadNamer.Managers
             return m_roadDict.ContainsKey(segmentId);
         }
 
-        public RoadContainer[] Save()
+        public RoadContainer[] SaveRoads()
         {
             List<RoadContainer> returnList = new List<RoadContainer>(m_roadDict.Values);
             return returnList.ToArray();
@@ -61,29 +144,31 @@ namespace RoadNamer.Managers
 
         public void Load(RoadContainer[] roadNames)
         {
-            if (m_roadDict != null)
+            if (roadNames != null)
             {
-                foreach (RoadContainer road in m_roadDict.Values)
+                foreach (RoadContainer road in roadNames)
                 {
-                    if(road.m_textObject == null)
+                    if (road.m_textObject == null)
                     {
                         road.m_textObject = new GameObject();
-                    }
+                        road.m_textObject.AddComponent<MeshRenderer>();
 
-                    if(road.m_textMesh == null)
-                    {
                         road.m_textMesh = road.m_textObject.AddComponent<TextMesh>();
-                    }
 
+                    }
                     m_roadDict[road.m_segmentId] = road;
-                    m_usedNames.Add(StringUtilities.RemoveTags(road.m_roadName));
+                    string strippedNewName = StringUtilities.RemoveTags(road.m_roadName);
+                    if (!m_usedNames.ContainsKey(strippedNewName))
+                    {
+                        m_usedNames[strippedNewName] = 0;
+                    }
+                    m_usedNames[strippedNewName] += 1;
+          
                 }
             }
-            else
-            {
-                LoggerUtilities.LogError("Something went wrong loading the road names!");
-            }
+
         }
+
     }
 
     [Serializable]

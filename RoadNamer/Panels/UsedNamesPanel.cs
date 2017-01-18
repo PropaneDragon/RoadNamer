@@ -1,4 +1,6 @@
-﻿using ColossalFramework.UI;
+﻿using CimTools.v2.Elements;
+using CimTools.v2.Utilities;
+using ColossalFramework.UI;
 using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
@@ -16,7 +18,8 @@ namespace RoadNamer.Panels
 
         private int titleOffset = 40;
         private UITitleBar m_panelTitle;
-        public UIFastList scrollOptionsList = null;
+        public UIFastList usedNamesList = null;
+
         private Vector2 offset = Vector2.zero;
 
         public override void Awake()
@@ -24,7 +27,7 @@ namespace RoadNamer.Panels
             this.isInteractive = true;
             this.enabled = true;
             this.width = 350;
-            this.height = 600;
+            this.height = 300;
 
             base.Awake();
         }
@@ -34,46 +37,55 @@ namespace RoadNamer.Panels
             base.Start();
 
             m_panelTitle = this.AddUIComponent<UITitleBar>();
+            m_panelTitle.Initialise(CimToolHolder.toolBase);
             m_panelTitle.title = "Existing names";
-            m_panelTitle.iconAtlas = SpriteUtilities.GetAtlas("RoadNamerIcons");
+            m_panelTitle.iconAtlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("RoadNamerIcons");
             m_panelTitle.iconSprite = "ToolbarFGIcon";
 
             CreatePanelComponents();
 
-            this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+            this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2 ) - height - m_UIPadding.top);
             this.backgroundSprite = "MenuPanel2";
-            this.atlas = CustomUI.UIUtils.GetAtlas("Ingame");
+            this.atlas = CimToolHolder.toolBase.UIUtilities.defaultAtlas;
+            this.eventVisibilityChanged += UsedNamesPanel_eventVisibilityChanged;
         }
 
         private void CreatePanelComponents()
         {
-            offset = new Vector2(m_UIPadding.left, titleOffset+m_UIPadding.top);
-            scrollOptionsList = UIFastList.Create<UIUsedNameRowItem>(this);
-            scrollOptionsList.backgroundSprite = "UnlockingPanel";
-            scrollOptionsList.size = new Vector2(350-m_UIPadding.left-m_UIPadding.right, 600-titleOffset-m_UIPadding.top-m_UIPadding.bottom);        
-            scrollOptionsList.canSelect = false;
-            scrollOptionsList.relativePosition = offset;
-            scrollOptionsList.rowHeight = 40f;
-            scrollOptionsList.rowsData.Clear();
-            scrollOptionsList.selectedIndex = -1;
+            usedNamesList = UIFastList.Create<UIUsedNameRowItem>(this);
+            usedNamesList.backgroundSprite = "UnlockingPanel";
+            usedNamesList.size = new Vector2(this.width-m_UIPadding.left-m_UIPadding.right, (this.height-titleOffset- m_UIPadding.top-m_UIPadding.bottom));
+            usedNamesList.canSelect = false;
+            usedNamesList.relativePosition = new Vector2(m_UIPadding.left, titleOffset + m_UIPadding.top);
+            usedNamesList.rowHeight = 40f;
+            usedNamesList.rowsData.Clear();
+            usedNamesList.selectedIndex = -1;
 
             RefreshList();
         }
 
         public void RefreshList()
         {
-            scrollOptionsList.rowsData.Clear();
-            foreach (string usedName in RoadNameManager.Instance().m_usedNames)
+            usedNamesList.rowsData.Clear();
+            foreach (string usedName in RoadNameManager.Instance().m_usedNames.Keys)
             {
-                scrollOptionsList.rowsData.Add(usedName);
+                usedNamesList.rowsData.Add(usedName);
             }
-            scrollOptionsList.DisplayAt(0);
-            scrollOptionsList.selectedIndex = 0;
+            usedNamesList.DisplayAt(0);
+            usedNamesList.selectedIndex = 0;
         }
+
+        private void UsedNamesPanel_eventVisibilityChanged(UIComponent component, bool visible)
+        {
+            if (!visible)
+            {
+                EventBusManager.Instance().Publish("closeAll", null);
+            }
+        }
+
 
         public void onReceiveEvent(string eventName, object eventData)
         {
-            LoggerUtilities.LogToConsole(eventName);
             string message = eventData as string;
             switch (eventName)
             {
@@ -83,9 +95,14 @@ namespace RoadNamer.Panels
                 case "closeUsedNamePanel":
                     Hide();
                     break;
+                case "closeAll":
+                    Hide();
+                    break;
                 default:
                     break;
             }
         }
+
     }
+
 }

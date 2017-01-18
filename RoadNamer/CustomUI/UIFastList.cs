@@ -334,7 +334,6 @@ namespace RoadNamer.CustomUI
         public void DisplayAt(float pos)
         {
             if (m_rowsData == null || m_rowHeight <= 0) return;
-            LoggerUtilities.LogToConsole(m_rowsData + " " + m_rowHeight);
 
             SetupControls();
 

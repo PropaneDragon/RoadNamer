@@ -9,6 +9,9 @@ namespace RoadNamer.Utilities
     [XmlRoot(ElementName = "RoadNameDocument")]
     public class RandomNameUtility
     {
+        [XmlElement("Author", IsNullable = false)]
+        public string m_author = "Unknown";
+
         [XmlElement("AlwaysAssignPrefixes", IsNullable = false)]
         public bool m_alwaysAssignPrefixes = false;
 
@@ -245,6 +248,12 @@ namespace RoadNamer.Utilities
 
         [XmlElement(IsNullable = false)]
         public int MaximumLanes = -1;
+
+        [XmlElement(IsNullable = false)]
+        public bool SpaceBetweenName = true;
+
+        [XmlElement(IsNullable = false)]
+        public bool LowercaseInitialOnName = false;
     }
 
     [Serializable()]
@@ -264,6 +273,9 @@ namespace RoadNamer.Utilities
 
         [XmlElement(IsNullable = false)]
         public int MaximumLanes = -1;
+
+        [XmlElement(IsNullable = false)]
+        public bool SpaceBetweenName = true;
     }
 
     [Serializable()]

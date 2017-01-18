@@ -1,26 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadNamer", "RoadNamer\RoadNamer.csproj", "{6A388B44-88A7-4E9E-8C2D-F51E173DB061}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadNamerTests", "RoadNamerTests\RoadNamerTests.csproj", "{58CD9723-08FC-4753-9A35-6DF199373F14}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CimTools", "RoadNamer\Libraries\Cimtools\CimTools\CimTools.csproj", "{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Rush Hour|Any CPU = Rush Hour|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Rush Hour|Any CPU.ActiveCfg = Release|Any CPU
+		{6A388B44-88A7-4E9E-8C2D-F51E173DB061}.Rush Hour|Any CPU.Build.0 = Release|Any CPU
 		{58CD9723-08FC-4753-9A35-6DF199373F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58CD9723-08FC-4753-9A35-6DF199373F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58CD9723-08FC-4753-9A35-6DF199373F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58CD9723-08FC-4753-9A35-6DF199373F14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Rush Hour|Any CPU.ActiveCfg = Release|Any CPU
+		{58CD9723-08FC-4753-9A35-6DF199373F14}.Rush Hour|Any CPU.Build.0 = Release|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Rush Hour|Any CPU.ActiveCfg = Rush Hour|Any CPU
+		{E8E37EFB-CCE7-4C4B-8B92-22E154101BB9}.Rush Hour|Any CPU.Build.0 = Rush Hour|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

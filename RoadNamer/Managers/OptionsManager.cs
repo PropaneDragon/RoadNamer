@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using ColossalFramework;
-using RoadNamer.Utilities;
 using System.Reflection;
+using RoadNamer.Utilities;
 
 namespace RoadNamer.Managers
 {
@@ -17,12 +17,14 @@ namespace RoadNamer.Managers
     {
         public static bool m_isIngame = false;
         public static bool m_hasOpenedPanel = false;
-        public static string m_randomNamesLocation = FileUtilities.GetModPath() + "/Names/";
         public static readonly int m_major = Assembly.GetExecutingAssembly().GetName().Version.Major;
         public static readonly int m_minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
         public static readonly int m_build = Assembly.GetExecutingAssembly().GetName().Version.Build;
         public static readonly int m_revision = Assembly.GetExecutingAssembly().GetName().Version.Revision;
         public static readonly string m_versionStringFull = m_major.ToString() + "." + m_minor.ToString() + "." + m_build.ToString() + "." + m_revision.ToString();
+        public static readonly uint m_workshopId = 558960454u;
+        public static string m_randomNamesLocation = CimToolHolder.toolBase.Path.GetModPath(m_workshopId, "RoadNamer") + "/Names/";
+        public static string m_spritesLocation = CimToolHolder.toolBase.Path.GetModPath(m_workshopId, "RoadNamer") + "/Icons/";
 
         /// <summary>
         /// Contains all options that can be set using a checkbox. These
@@ -31,6 +33,7 @@ namespace RoadNamer.Managers
         private static RoadCheckBoxOption[] checkboxOptions = new RoadCheckBoxOption[]
         {
             new RoadCheckBoxOption() { uniqueName = "showCamera", readableName = "Show road names in camera mode", value = false, enabled = true },
+            new RoadCheckBoxOption() { uniqueName = "showRoute", readableName = "Show route numbers", value = true, enabled = true },
             new RoadCheckBoxOption() { uniqueName = "show", readableName = "Show road names", value = true, enabled = true }
         };
 
@@ -41,7 +44,7 @@ namespace RoadNamer.Managers
         private static RoadSliderOption[] sliderOptions = new RoadSliderOption[]
         {
             new RoadSliderOption() { uniqueName = "textDisappearDistance", readableName = "Rendering distance", min = 100f, max = 2000f, value = 1000f, step = 10f, enabled = true },
-            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 2f, value = 0.5f, step = 0.1f, enabled = true },
+            new RoadSliderOption() { uniqueName = "textScale", readableName = "Text scale", min = 0.2f, max = 4f, value = 0.5f, step = 0.1f, enabled = true },
             new RoadSliderOption() { uniqueName = "textQuality", readableName = "Text quality", min = 5f, max = 40f, value = 20f, step = 1f, enabled = true },
             new RoadSliderOption() { uniqueName = "textHeight", readableName = "Text height offset", min = -2f, max = 2f, value = -2f, step = .2f, enabled = true }
         };
@@ -52,7 +55,7 @@ namespace RoadNamer.Managers
         /// </summary>
         private static RoadDropdownOption[] dropdownOptions = new RoadDropdownOption[]
         {
-            new RoadDropdownOption() { uniqueName = "randomNameLocalisation", readableName = "Random name localisation", value = 0, enabled = true }
+            new RoadDropdownOption() { uniqueName = "randomNameLocalisationText", readableName = "Random name localisation", value = "UK", enabled = true }
         };
 
         /// <summary>
@@ -65,7 +68,7 @@ namespace RoadNamer.Managers
 
             UIHelperBase optionGroup = helper.AddGroup("Road Namer Options");
 
-            foreach(RoadCheckBoxOption checkboxOption in checkboxOptions)
+            foreach (RoadCheckBoxOption checkboxOption in checkboxOptions)
             {
                 UICheckBox checkBox = optionGroup.AddCheckbox(checkboxOption.readableName, checkboxOption.value, OptionChanged) as UICheckBox;
                 checkBox.readOnly = !checkboxOption.enabled;
@@ -73,7 +76,7 @@ namespace RoadNamer.Managers
                 checkBox.eventCheckChanged += CheckBox_eventCheckChanged;
             }
 
-            foreach(RoadSliderOption sliderOption in sliderOptions)
+            foreach (RoadSliderOption sliderOption in sliderOptions)
             {
                 UISlider slider = optionGroup.AddSlider(sliderOption.readableName, sliderOption.min, sliderOption.max, sliderOption.step, sliderOption.value, OptionChanged) as UISlider;
                 slider.enabled = sliderOption.enabled;
@@ -84,7 +87,7 @@ namespace RoadNamer.Managers
 
             foreach (RoadDropdownOption dropdownOption in dropdownOptions)
             {
-                UIDropDown dropdown = optionGroup.AddDropdown(dropdownOption.readableName, dropdownOption.options, dropdownOption.value, OptionChanged) as UIDropDown;
+                UIDropDown dropdown = optionGroup.AddDropdown(dropdownOption.readableName, dropdownOption.options, 0, OptionChanged) as UIDropDown;
                 dropdown.enabled = dropdownOption.enabled;
                 dropdown.name = dropdownOption.uniqueName;
                 dropdown.eventSelectedIndexChanged += Dropdown_eventSelectedIndexChanged;
@@ -98,23 +101,16 @@ namespace RoadNamer.Managers
         {
             UIDropDown dropdown = component as UIDropDown;
 
-            if(dropdown != null)
+            if (dropdown != null)
             {
-                RoadDropdownOption foundOption = null;
-
                 foreach (RoadDropdownOption option in dropdownOptions)
                 {
                     if (dropdown.name == option.uniqueName)
                     {
-                        foundOption = option;
+                        option.value = dropdown.selectedValue;
+                        dropdown.tooltip = option.readableName;
+                        dropdown.RefreshTooltip();
                     }
-                }
-
-                if (foundOption != null)
-                {
-                    foundOption.value = value;
-                    dropdown.tooltip = value.ToString();
-                    dropdown.RefreshTooltip();
                 }
             }
         }
@@ -148,19 +144,19 @@ namespace RoadNamer.Managers
         {
             UICheckBox checkBox = component as UICheckBox;
 
-            if(checkBox != null) //Should bloody well not be null!
+            if (checkBox != null) //Should bloody well not be null!
             {
                 RoadCheckBoxOption foundOption = null;
 
-                foreach(RoadCheckBoxOption option in checkboxOptions)
+                foreach (RoadCheckBoxOption option in checkboxOptions)
                 {
-                    if(checkBox.name == option.uniqueName)
+                    if (checkBox.name == option.uniqueName)
                     {
                         foundOption = option;
                     }
                 }
 
-                if(foundOption != null)
+                if (foundOption != null)
                 {
                     foundOption.value = value;
                 }
@@ -195,9 +191,9 @@ namespace RoadNamer.Managers
         {
             bool successful = false;
 
-            foreach(RoadCheckBoxOption option in checkboxOptions)
+            foreach (RoadCheckBoxOption option in checkboxOptions)
             {
-                if(option.uniqueName == uniqueName)
+                if (option.uniqueName == uniqueName)
                 {
                     returnValue = option.value;
                     successful = true;
@@ -244,9 +240,20 @@ namespace RoadNamer.Managers
             {
                 if (option.uniqueName == uniqueName)
                 {
-                    Debug.Log(option.value);
-                    returnValue = option.value;
-                    successful = true;
+                    if (option.options != null)
+                    {
+                        int foundIndex;
+
+                        for(foundIndex = 0; foundIndex < option.options.Length; ++foundIndex)
+                        {
+                            if(option.options[foundIndex] == option.value)
+                            {
+                                returnValue = foundIndex;
+                                successful = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -267,11 +274,8 @@ namespace RoadNamer.Managers
             {
                 if (option.uniqueName == uniqueName)
                 {
-                    if (option.options != null && option.options.Length >= option.value + 1)
-                    {
-                        returnValue = option.options[option.value];
-                        successful = returnValue != null && returnValue != "";
-                    }
+                    returnValue = option.value;
+                    successful = returnValue != null && returnValue != "";
                 }
             }
 
@@ -353,20 +357,20 @@ namespace RoadNamer.Managers
         /// </summary>
         public static void Populate()
         {
-            foreach(RoadDropdownOption option in dropdownOptions)
+            foreach (RoadDropdownOption option in dropdownOptions)
             {
-                if(option.uniqueName == "randomNameLocalisation")
+                if(option.uniqueName == "randomNameLocalisationText")
                 {
-                    if(Directory.Exists(m_randomNamesLocation))
+                    if (Directory.Exists(m_randomNamesLocation))
                     {
                         List<string> fileNames = new List<string>();
 
-                        foreach(string fileLocation in Directory.GetFiles(m_randomNamesLocation))
+                        foreach (string fileLocation in Directory.GetFiles(m_randomNamesLocation))
                         {
                             string fileExtension = Path.GetExtension(fileLocation);
                             string fileName = Path.GetFileNameWithoutExtension(fileLocation);
 
-                            if(fileExtension != null && fileName != null && fileExtension.ToLower() == ".xml" && fileName != "")
+                            if (fileExtension != null && fileName != null && fileExtension.ToLower() == ".xml" && fileName != "")
                             {
                                 fileNames.Add(fileName);
                             }
@@ -395,6 +399,7 @@ namespace RoadNamer.Managers
                 if (renderingManager != null)
                 {
                     GetCheckBoxValue("showCamera", ref renderingManager.m_alwaysShowText);
+                    GetCheckBoxValue("showRoute", ref renderingManager.m_routeEnabled);
                     GetCheckBoxValue("show", ref renderingManager.m_textEnabled);
                     GetSliderValue("textDisappearDistance", ref renderingManager.m_renderHeight);
                     GetSliderValue("textScale", ref renderingManager.m_textScale);
@@ -404,7 +409,7 @@ namespace RoadNamer.Managers
                     renderingManager.ForceUpdate();
                 }
 
-                GetDropdownValue("randomNameLocalisation", ref RandomNameManager.m_fileName);
+                GetDropdownValue("randomNameLocalisationText", ref RandomNameManager.m_fileName);
             }
         }
     }
@@ -432,7 +437,7 @@ namespace RoadNamer.Managers
     {
         public string uniqueName = "";
         public string readableName = "";
-        public int value = 0;
+        public string value = "";
         public string[] options = null;
         public bool enabled = false;
     }

@@ -5,7 +5,7 @@ using RoadNamer.Managers;
 
 namespace RoadNamer.CustomUI
 {
-    class UIUsedNameRowItem : UIPanel, IUIFastListRow
+     public class UIUsedNameRowItem : UIPanel, IUIFastListRow
     {
         private UIPanel background;
         private UILabel label;
@@ -27,20 +27,19 @@ namespace RoadNamer.CustomUI
             background.zOrder = 0;
 
             label = this.AddUIComponent<UILabel>();
-            label.textScale = 0.6f;
+            label.textScale = 1f;
             label.size = new Vector2(width, height);
             label.textColor = new Color32(180, 180, 180, 255);
-            label.relativePosition = Vector2.zero;
+            label.relativePosition = new Vector2(0,height*0.25f);
             label.textAlignment = UIHorizontalAlignment.Left;
-            label.processMarkup = true;
         }
 
-        protected override void OnClick(UIMouseEventParameter p)
+        protected override void OnMouseDown(UIMouseEventParameter p)
         {
-            base.OnClick(p);
+            base.OnMouseDown(p);
             EventBusManager.Instance().Publish("updateroadnamepaneltext", label.text);
         }
-
+        
         public void Display(object data, bool isRowOdd)
         {
             if (data != null)

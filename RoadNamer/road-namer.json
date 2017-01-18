@@ -1,0 +1,159 @@
+{  
+  "roadnames":[  
+    "Main",
+    "Station",
+    "High",
+    "Park",
+    "Broadway",
+    "Church",
+    "Lake",
+    "Hill",
+    "Bridge",
+    "Ridge",
+    "View",
+    "Water",
+    "Front",
+    "Market",
+    "Fairway",
+    "Canterbury",
+    "Highbury",
+    "Veteran's Memorial",
+    "Oak",
+    "Elm",
+    "Cedar",
+    "Pine",
+    "Hickory",
+    "Maple",
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Alaska",
+    "Connecticut",
+    "Illinois",
+    "Michigan",
+    "New York",
+    "Pennsylvania",
+    "Washington",
+    "Yonge",
+    "Bloor",
+    "Charles",
+    "Windsor",
+    "TotallyMoo",
+    "BloodyPenguin",
+    "Boformer"
+  ],
+  "routetypes":{  
+    "None":[  
+      "M",
+      "A",
+      "I-"
+    ],
+    "Highway":[  
+      "Route",
+      "Highway",
+      "Interstate",
+      "Autobahn"
+    ],
+    "RuralHighway":[  
+      "Route",
+      "Highway",
+      "Interstate",
+      "Autobahn"
+    ],
+    "BasicRoad":[  
+      "Route"
+    ],
+    "MediumRoad":[
+      "Route",
+      "Highway"
+    ],
+    "LargeRoad":[
+      "Route",
+      "Highway"
+    ]
+  },
+  "roadTypes": {
+    "None": [
+      "huh?",
+      "what?"
+    ],
+    "TrainTrack": [
+      "Railway",
+      "Railine"
+    ],
+    "MetroTrack": [
+      "Metro",
+      "Line",
+      "Subway"
+    ],
+    "PedestrianPavement": [
+      "Walkway",
+      "Pathway"
+    ],
+    "PedestrianGravel": [
+      "Trail",
+      "Pathway"
+    ],
+    "PedestrianPavementBicycle": [
+      "Trail",
+      "Pathway",
+      "Bikeway"
+    ],
+    "GravelRoad": [
+      "Trail",
+      "Pathway",
+      "Backroad",
+      "Lane",
+      "Street",
+      "Road",
+      "Byway"
+    ],
+    "RuralHighway": [
+      "Expressway",
+      "Freeway",
+      "Highway",
+      "Motorway"
+    ],
+    "Highway": [
+      "Expressway",
+      "Freeway",
+      "Highway",
+      "Motorway"
+    ],
+    "BasicRoad": [
+      "Road",
+      "Street",
+      "Court",
+      "Lane",
+      "Drive",
+      "Court"
+    ],
+    "MediumRoad": [
+      "Road",
+      "Drive",
+      "Avenue",
+      "Way",
+      "Parkway",
+      "Highway",
+      "Boulevard"
+    ],
+    "LargeRoad": [
+      "Road",
+      "Way",
+      "Parkway",
+      "Highway",
+      "Boulevard"
+    ],
+    "SmallBusway": [
+      "Busway"
+    ],
+    "AirplaneRunway": [
+      "Runway"
+    ]
+  },
+  "roadTypeMappings": {
+	  "BasicRoad": "Highway" 
+  }
+}
