@@ -1,13 +1,11 @@
-﻿using ColossalFramework;
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
 using UnityEngine;
-using CimTools.v2.Utilities;
-using CimTools.v2.Panels;
-using CimTools.v2.Elements;
-using CimTools.v2.Workshop;
 using System.Collections.Generic;
+using CimToolsRoadNamer.v2.Panels;
+using CimToolsRoadNamer.v2.Workshop;
+using CimToolsRoadNamer.v2.Elements;
 using System;
 
 namespace RoadNamer.Panels
@@ -19,7 +17,6 @@ namespace RoadNamer.Panels
         private UpdatePanel m_infoPanel;
         private UITitleBar m_panelTitle;
         private UITextField m_textField;
-        private UILabel m_roadNameLabel;
 
         private UIColorField m_colourSelector;
         private UIButton m_randomNameButton;
@@ -83,7 +80,7 @@ namespace RoadNamer.Panels
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
             this.backgroundSprite = "MenuPanel2";
-            this.atlas = CimToolHolder.toolBase.UIUtilities.defaultAtlas;
+            this.atlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("Ingame");
 
             this.eventKeyPress += RoadNamePanel_eventKeyPress;
             this.eventVisibilityChanged += RoadNamePanel_eventVisibilityChanged;
@@ -107,25 +104,18 @@ namespace RoadNamer.Panels
 
         private void CreatePanelComponents()
         {
+            var helper = new UIHelper(this);
+
             m_infoPanel.SetPositionSpeakyPoint(new Vector2(this.width - 20, -20));
 
-            m_roadNameLabel = this.AddUIComponent<UILabel>();
-            m_roadNameLabel.textScale = 1f;
-            m_roadNameLabel.size = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
-            m_roadNameLabel.textColor = new Color32(180, 180, 180, 255);
-            m_roadNameLabel.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + m_UIPadding.bottom);
-            m_roadNameLabel.textAlignment = UIHorizontalAlignment.Left;
-            m_roadNameLabel.text = "Road Name";
-
-            m_textField = CimToolHolder.toolBase.UIUtilities.CreateTextField(this);
-            m_textField.relativePosition = new Vector3(m_UIPadding.left, m_roadNameLabel.relativePosition.y + m_roadNameLabel.height + m_UIPadding.bottom);
-            m_textField.height = 25;
+            m_textField = helper.AddTextfield("Road Name", "", text => { }, text => { }) as UITextField;
+            m_textField.relativePosition = new Vector3(m_UIPadding.left, m_panelTitle.height + 20 + m_UIPadding.bottom);
             m_textField.width = this.width - m_UIPadding.left - (m_UIPadding.right * 2) - m_textField.height;
             m_textField.eventKeyDown += m_textField_eventKeyDown;
             m_textField.processMarkup = false; //Might re-implement this eventually (needs work to stop it screwing up with markup)
             m_textField.textColor = Color.white;
             
-            m_randomNameButton = CimToolHolder.toolBase.UIUtilities.CreateButton(this);
+            m_randomNameButton = helper.AddButton("Button", RandomNameButton_eventClicked) as UIButton;
             m_randomNameButton.text = "";
             m_randomNameButton.size = new Vector2(m_textField.height, m_textField.height);
             m_randomNameButton.relativePosition = new Vector3(m_textField.relativePosition.x + m_textField.width + m_UIPadding.left, m_textField.relativePosition.y);
@@ -137,7 +127,6 @@ namespace RoadNamer.Panels
             m_randomNameButton.pressedFgSprite = "DiceIcon";
             m_randomNameButton.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
             //m_randomNameButton.tooltip = RandomNameManager.m_fileName;
-            m_randomNameButton.eventClicked += RandomNameButton_eventClicked;
             
             UIPanel colourSelectorPinPanel = this.AddUIComponent<UIPanel>();
             colourSelectorPinPanel.relativePosition = new Vector3(m_UIPadding.left, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
@@ -149,11 +138,10 @@ namespace RoadNamer.Panels
             m_colourSelector.tooltip = "Set the text colour";
             m_colourSelector.relativePosition = new Vector3(0, 0);
 
-            UIButton nameRoadButton = CimToolHolder.toolBase.UIUtilities.CreateButton(this);
+            UIButton nameRoadButton = helper.AddButton("Create the label", NameRoadButton_eventClicked) as UIButton;
             nameRoadButton.text = "Set";
             nameRoadButton.size = new Vector2(60, 30);
             nameRoadButton.relativePosition = new Vector3(this.width - nameRoadButton.width - m_UIPadding.right, m_textField.relativePosition.y + m_textField.height + m_UIPadding.bottom);
-            nameRoadButton.eventClicked += NameRoadButton_eventClicked;
             nameRoadButton.tooltip = "Create the label";
 
             this.height = nameRoadButton.relativePosition.y + nameRoadButton.height + m_UIPadding.bottom;
@@ -168,9 +156,8 @@ namespace RoadNamer.Panels
             }
         }
 
-        private void RandomNameButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
+        private void RandomNameButton_eventClicked()
         {
-            
             string randomName = RandomNameManager.GenerateRandomRoadName(m_netSegmentIds.GetEnumerator().Current);
 
             if (randomName != null)
@@ -185,6 +172,11 @@ namespace RoadNamer.Panels
                 m_randomNameButton.bringTooltipToFront = true;
                 m_randomNameButton.tooltipBox.Show();
             }
+        }
+
+        private void NameRoadButton_eventClicked()
+        {
+            SetRoadData();
         }
 
         private void ColourSelector_eventColorPickerClose(UIColorField dropdown, UIColorPicker popup, ref bool overridden)
@@ -203,11 +195,6 @@ namespace RoadNamer.Panels
             {
                 SetRoadData();
             }
-        }
-
-        private void NameRoadButton_eventClicked(UIComponent component, UIMouseEventParameter eventParam)
-        {
-            SetRoadData();
         }
 
         /// <summary>

@@ -1,13 +1,8 @@
-﻿using CimTools.v2.Elements;
-using CimTools.v2.Utilities;
+﻿using CimToolsRoadNamer.v2.Elements;
 using ColossalFramework.UI;
 using RoadNamer.CustomUI;
 using RoadNamer.Managers;
 using RoadNamer.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace RoadNamer.Panels
@@ -46,7 +41,7 @@ namespace RoadNamer.Panels
 
             this.relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2) + width, Mathf.Floor((GetUIView().fixedHeight - height) / 2 ) - height - m_UIPadding.top);
             this.backgroundSprite = "MenuPanel2";
-            this.atlas = CimToolHolder.toolBase.UIUtilities.defaultAtlas;
+            this.atlas = CimToolHolder.toolBase.SpriteUtilities.GetAtlas("Ingame");
             this.eventVisibilityChanged += UsedNamesPanel_eventVisibilityChanged;
         }
 
