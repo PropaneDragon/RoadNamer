@@ -158,7 +158,7 @@ namespace RoadNamer.Panels
 
         private void RandomNameButton_eventClicked()
         {
-            string randomName = RandomNameManager.GenerateRandomRoadName(m_netSegmentIds.GetEnumerator().Current);
+            string randomName = RandomNameManager.GenerateRandomRoadName(m_netSegmentIds[0]);
 
             if (randomName != null)
             {

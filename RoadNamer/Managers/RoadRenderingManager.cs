@@ -120,11 +120,9 @@ namespace RoadNamer.Managers
                                 road.m_textMesh.fontSize = (int)Math.Round(m_textQuality);
                                 road.m_textMesh.transform.position = startNode.m_position;
                                 road.m_textMesh.transform.LookAt(endNode.m_position, Vector3.up);
-                                Vector3 rotation = Vector3.Cross(startNode.m_position, endNode.m_position);
                                 road.m_textMesh.transform.Rotate(90f, 0f, 90f);
                                 road.m_textMesh.transform.position = (startNode.m_position + endNode.m_position) / 2f;
-                                //TODO: Figure out a better ratio for route markers
-                                road.m_textMesh.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                                road.m_textMesh.transform.localScale = new Vector3(m_textScale / scaleMultiplier, m_textScale / scaleMultiplier, m_textScale / scaleMultiplier); road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.offsetZ = m_textHeightOffset;
                                 road.m_textMesh.richText = true;
                                 road.m_textMesh.text = roadName.Replace("color#", "color=#"); //Convert from Colossal to Unity tags
