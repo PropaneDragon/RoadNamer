@@ -91,6 +91,7 @@ namespace RoadNamer.Managers
                     {
                         roadContainer.m_textObject = new GameObject();
                         roadContainer.m_textObject.AddComponent<MeshRenderer>();
+                        roadContainer.m_textObject.isStatic = true;
                         roadContainer.m_textMesh = roadContainer.m_textObject.AddComponent<TextMesh>();
 
                     }
